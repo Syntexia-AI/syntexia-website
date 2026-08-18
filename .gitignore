@@ -1,0 +1,6 @@
+.DS_Store
+.vercel/
+.design-canvas.state.json
+*.napkin
+_preview-*
+node_modules/

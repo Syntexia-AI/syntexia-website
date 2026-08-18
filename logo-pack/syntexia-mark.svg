@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="Syntexia mark">
+  <title>Syntexia Mark</title>
+  <desc>The Syntexia lattice mark — a 5×5 grid of dots with an emergent S pattern and copper accent at centre.</desc>
+  <g>
+    
+    <circle cx="432" cy="80" r="25" fill="#837C6F" opacity="0.32"></circle>
+    <circle cx="168" cy="168" r="25" fill="#837C6F" opacity="0.32"></circle>
+    <circle cx="256" cy="168" r="25" fill="#837C6F" opacity="0.32"></circle>
+    <circle cx="344" cy="168" r="25" fill="#837C6F" opacity="0.32"></circle>
+    <circle cx="432" cy="168" r="25" fill="#837C6F" opacity="0.32"></circle>
+    <circle cx="80" cy="344" r="25" fill="#837C6F" opacity="0.32"></circle>
+    <circle cx="168" cy="344" r="25" fill="#837C6F" opacity="0.32"></circle>
+    <circle cx="256" cy="344" r="25" fill="#837C6F" opacity="0.32"></circle>
+    <circle cx="344" cy="344" r="25" fill="#837C6F" opacity="0.32"></circle>
+    <circle cx="432" cy="432" r="25" fill="#837C6F" opacity="0.32"></circle>
+    
+    <circle cx="80" cy="80" r="25" fill="#F4F0E6"></circle>
+    <circle cx="168" cy="80" r="25" fill="#F4F0E6"></circle>
+    <circle cx="256" cy="80" r="25" fill="#F4F0E6"></circle>
+    <circle cx="344" cy="80" r="25" fill="#F4F0E6"></circle>
+    <circle cx="80" cy="168" r="25" fill="#F4F0E6"></circle>
+    <circle cx="80" cy="256" r="25" fill="#F4F0E6"></circle>
+    <circle cx="168" cy="256" r="25" fill="#F4F0E6"></circle>
+    <circle cx="344" cy="256" r="25" fill="#F4F0E6"></circle>
+    <circle cx="432" cy="256" r="25" fill="#F4F0E6"></circle>
+    <circle cx="432" cy="344" r="25" fill="#F4F0E6"></circle>
+    <circle cx="80" cy="432" r="25" fill="#F4F0E6"></circle>
+    <circle cx="168" cy="432" r="25" fill="#F4F0E6"></circle>
+    <circle cx="256" cy="432" r="25" fill="#F4F0E6"></circle>
+    <circle cx="344" cy="432" r="25" fill="#F4F0E6"></circle>
+    
+    <circle cx="256" cy="256" r="28" fill="#D9A56B"></circle>
+  </g>
+</svg>

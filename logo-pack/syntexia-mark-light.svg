@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="Syntexia mark on light">
+  <title>Syntexia Mark — light</title>
+  <rect width="512" height="512" rx="80" ry="80" fill="#F6F2EA"></rect>
+  <g>
+    <circle cx="432" cy="80" r="25" fill="#79705E" opacity="0.32"></circle>
+    <circle cx="168" cy="168" r="25" fill="#79705E" opacity="0.32"></circle>
+    <circle cx="256" cy="168" r="25" fill="#79705E" opacity="0.32"></circle>
+    <circle cx="344" cy="168" r="25" fill="#79705E" opacity="0.32"></circle>
+    <circle cx="432" cy="168" r="25" fill="#79705E" opacity="0.32"></circle>
+    <circle cx="80" cy="344" r="25" fill="#79705E" opacity="0.32"></circle>
+    <circle cx="168" cy="344" r="25" fill="#79705E" opacity="0.32"></circle>
+    <circle cx="256" cy="344" r="25" fill="#79705E" opacity="0.32"></circle>
+    <circle cx="344" cy="344" r="25" fill="#79705E" opacity="0.32"></circle>
+    <circle cx="432" cy="432" r="25" fill="#79705E" opacity="0.32"></circle>
+    <circle cx="80" cy="80" r="25" fill="#1A1814"></circle>
+    <circle cx="168" cy="80" r="25" fill="#1A1814"></circle>
+    <circle cx="256" cy="80" r="25" fill="#1A1814"></circle>
+    <circle cx="344" cy="80" r="25" fill="#1A1814"></circle>
+    <circle cx="80" cy="168" r="25" fill="#1A1814"></circle>
+    <circle cx="80" cy="256" r="25" fill="#1A1814"></circle>
+    <circle cx="168" cy="256" r="25" fill="#1A1814"></circle>
+    <circle cx="344" cy="256" r="25" fill="#1A1814"></circle>
+    <circle cx="432" cy="256" r="25" fill="#1A1814"></circle>
+    <circle cx="432" cy="344" r="25" fill="#1A1814"></circle>
+    <circle cx="80" cy="432" r="25" fill="#1A1814"></circle>
+    <circle cx="168" cy="432" r="25" fill="#1A1814"></circle>
+    <circle cx="256" cy="432" r="25" fill="#1A1814"></circle>
+    <circle cx="344" cy="432" r="25" fill="#1A1814"></circle>
+    <circle cx="256" cy="256" r="28" fill="#C18341"></circle>
+  </g>
+</svg>

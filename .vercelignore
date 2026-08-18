@@ -1,0 +1,9 @@
+_internal/
+_scripts/
+avatars/
+screenshots/
+DEPLOY.md
+.DS_Store
+.design-canvas.state.json
+*.napkin
+_preview-*
