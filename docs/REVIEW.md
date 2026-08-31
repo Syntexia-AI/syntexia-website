@@ -156,3 +156,21 @@ git log --oneline main..refonte-2026-09
 Quatre commits. `main` toujours à `c887605`. Aucune branche poussée, aucun déploiement, aucune réécriture d'historique.
 
 La suite est dans `DEPLOY-CHECKLIST.md`, écrite pour être suivie à la lettre par un humain.
+
+---
+
+## 8. Serveur laissé en marche
+
+`npx astro preview` **n'est pas utilisable** : l'adaptateur Vercel ne le supporte pas
+(`The @astrojs/vercel adapter does not support the preview command`). C'est une
+limitation de l'adaptateur, pas un défaut du site.
+
+Le serveur laissé en marche est donc `npm run dev`, qui sert les huit routes et la
+route `/api/contact`. C'est celui sur lequel toute la recette a été exécutée.
+
+    http://localhost:4321/
+
+Pour l'arrêter : repère le PID avec `netstat -ano | grep :4321` puis `taskkill /F /PID <pid>`.
+Sur cette machine `pkill` ne tue pas les processus Node, ils apparaissent tous sous
+`node.exe`. C'est ce qui a fait échouer un premier test du formulaire, contre un
+serveur périmé resté en écoute.
