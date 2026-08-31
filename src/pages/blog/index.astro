@@ -20,10 +20,10 @@ const fmt = (d: Date) => d.toLocaleDateString('en-GB', { month: 'long', year: 'n
         {posts.map((p) => (
           <a class="row" href={`/posts/${p.id}`}>
             <span class="row-date tabular">{fmt(p.data.date)}</span>
-            <span class="row-body">
-              <span class="row-title">{p.data.title}</span>
+            <div class="row-body">
+              <h2 class="row-title">{p.data.title}</h2>
               <span class="row-desc">{p.data.description}</span>
-            </span>
+            </div>
           </a>
         ))}
       </div>
@@ -44,7 +44,7 @@ const fmt = (d: Date) => d.toLocaleDateString('en-GB', { month: 'long', year: 'n
   }
   .row-date { font-size: var(--t-small); color: var(--mute); }
   .row-body { display: block; }
-  .row-title { display: block; font-size: var(--t-h3); font-weight: 600; line-height: var(--lh-h3); }
+  .row-title { display: block; font-size: var(--t-h3); font-weight: 600; line-height: var(--lh-h3); letter-spacing: -0.01em; }
   .row-desc { display: block; margin-top: var(--s-3); color: var(--ink-2); max-width: 62ch; }
   .row:hover .row-title { color: var(--accent); }
   @media (max-width: 640px) {

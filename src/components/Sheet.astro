@@ -6,7 +6,7 @@ interface Props { heading: string; rows: Row[]; total?: Row; }
 const { heading, rows, total } = Astro.props;
 ---
 <div class="sheet">
-  <h4 class="sheet-head">{heading}</h4>
+  <p class="sheet-head">{heading}</p>
   <table>
     <tbody>
       {rows.map((r) => (
@@ -35,6 +35,9 @@ const { heading, rows, total } = Astro.props;
     font-size: var(--t-small);
     color: var(--ink-2);
   }
+  /* En-tête d une pièce reproduite, pas une section de la page. Le rendre
+     titre cassait la hiérarchie (h1 puis h4) et le lecteur d écran annoncait
+     une structure qui n existe pas. */
   .sheet-head {
     font-family: var(--font-mono);
     font-size: var(--t-small);
