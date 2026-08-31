@@ -15,7 +15,7 @@ Le moteur Markdown d'Astro 7 charge un binaire natif que la **politique Applicat
 
 ## 2. Ce qui a changé
 
-1. Le site est passé d'un prototype React transpilé par Babel dans le navigateur à un site statique Astro. **La home servait 32 mots sans JavaScript, elle en sert 579.**
+1. Le site est passé d'un prototype React transpilé par Babel dans le navigateur à un site statique Astro. **La home servait 8 mots sans JavaScript, elle en sert 422.**
 2. Sept routes plus une page 404, toutes en HTML statique, aucune requête vers unpkg, Google Fonts ou un CDN.
 3. Archivo et Courier Prime auto-hébergées depuis `/fonts/`, preload des deux graisses d'Archivo.
 4. Palette d'origine conservée, trois valeurs corrigées par la mesure de contraste, échelle à cinq crans, focus visible partout, `prefers-reduced-motion` étendu à tout le site.
@@ -174,3 +174,79 @@ Pour l'arrêter : repère le PID avec `netstat -ano | grep :4321` puis `taskkill
 Sur cette machine `pkill` ne tue pas les processus Node, ils apparaissent tous sous
 `node.exe`. C'est ce qui a fait échouer un premier test du formulaire, contre un
 serveur périmé resté en écoute.
+
+---
+
+## 9. Le mark en volume. Écart à la DA, assumé et borné.
+
+Ajouté après la passe, sur décision explicite. **Un seul interdit est levé** :
+« le mark garde `brandSignalEmerge`, c'est le seul mouvement du site ». L'écart porte
+sur la **nature** du mouvement, pas sur son nombre. Il n'y a toujours qu'une seule
+pièce animée sur le site, et c'est le logo.
+
+Ce qui n'a pas bougé : aucun dégradé, aucun halo, aucune ombre, aucune apparition au
+scroll, aucun arrondi au dessus de 2px, aucune emphase dans un titre. Les huit lignes
+horaires, les pages intérieures et le pied de page sont inchangés.
+
+### Ce que c'est
+
+`src/components/MarkCanvas.astro`. WebGL écrit à la main : les matrices de perspective
+et de rotation, le vertex shader et le fragment shader sont dans le fichier. **Aucune
+bibliothèque, aucun CDN.** Three.js aurait pesé une cinquantaine de fois plus lourd que
+tout le JavaScript du site réuni.
+
+| mesure | valeur |
+|---|---|
+| poids du composant | 4,6 Ko non compressé |
+| **tout le JavaScript du site, gzip** | **2,8 Ko** |
+| géométrie | 25 cellules, 150 sommets, **un seul appel de dessin** |
+| rotation complète | 44 secondes |
+
+Les 25 points sont des billboards découpés en disques dans le fragment shader. Les
+points allumés avancent, les éteints reculent : c'est ce relief qui fait lire le S en
+volume. L'atténuation par la distance n'est pas un effet décoratif ajouté, c'est la
+conséquence de la perspective. Les trois teintes sont celles des tokens, aucune couleur
+n'a été introduite.
+
+### Ce qui se passe quand ça ne marche pas
+
+1. **Pas de JavaScript** : la grille CSS du mark reste dans le masthead, la page est
+   complète. Le canvas ne remplace jamais rien, il s'ajoute.
+2. **Pas de WebGL, ou pas d'extension de dérivées** : le composant renonce et ne pose
+   pas son drapeau d'affichage. Rien de cassé, rien de crénelé.
+3. **`prefers-reduced-motion`** : une seule image, sans boucle et sans écoute du
+   pointeur.
+4. **Hors écran ou onglet en arrière-plan** : la boucle s'arrête, plus rien ne consomme.
+
+### Trois bugs trouvés en le vérifiant, tous corrigés
+
+Ils méritent d'être listés parce qu'aucun n'aurait été visible sans mesurer les pixels
+réellement rendus.
+
+1. **En `prefers-reduced-motion`, le canvas dessinait mais restait invisible.** Le
+   drapeau d'affichage était posé après un `return` anticipé. Les gens qui demandent
+   moins d'animation ne voyaient donc rien du tout.
+2. **En mode animé, le canvas était un rectangle blanc.** Un contexte WebGL jamais
+   effacé a un contenu indéfini, que le navigateur affiche en blanc opaque. Le premier
+   effacement dépendait du démarrage de la boucle. Une image est désormais dessinée
+   immédiatement, sans attendre.
+3. **Au redimensionnement de la fenêtre, le canvas redevenait blanc.** Changer la taille
+   d'un canvas vide son buffer. En mode réduit, aucune boucle ne repasse derrière : le
+   blanc était définitif. Le redessin est maintenant branché sur les deux chemins.
+
+### Deux corrections de CSP faites au passage
+
+Le site produisait deux `<script>` inline, ce qui aurait violé `script-src 'self'` au
+moment de rendre la CSP bloquante. Le formulaire de contact n'utilise plus
+`is:inline` (l'adresse de repli passe par un attribut de données), et Astro a reçu
+l'instruction de ne plus inliner les petits scripts. **Le rendu ne contient plus aucun
+script inline**, hors le JSON-LD qui n'est pas exécutable.
+
+### Une correction de chiffre
+
+J'ai annoncé « la home servait 32 mots, elle en sert 579 ». **Les deux chiffres étaient
+faux.** Ma commande de mesure était gourmande et avalait du contenu entre le premier et
+le dernier script de la page. Mesure refaite avec un dépouillement non gourmand, sur
+l'ancien site et le nouveau, dans les mêmes conditions :
+
+**8 mots avant, 422 après.** L'écart réel est plus grand que celui que j'avais annoncé.

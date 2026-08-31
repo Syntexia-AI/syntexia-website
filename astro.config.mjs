@@ -12,6 +12,12 @@ export default defineConfig({
   build: {
     format: 'directory',
   },
+  // Aucun script inline dans le rendu : la CSP peut rester script-src 'self'
+  // sans 'unsafe-inline'. Sans cette option, Astro inline les petits scripts
+  // hoistés, ce qui violerait la politique une fois qu'elle sera bloquante.
+  vite: {
+    build: { assetsInlineLimit: 0 },
+  },
   devToolbar: {
     enabled: false,
   },

@@ -2,6 +2,7 @@
 import Base from '../layouts/Base.astro';
 import DayRow from '../components/DayRow.astro';
 import ContactForm from '../components/ContactForm.astro';
+import MarkCanvas from '../components/MarkCanvas.astro';
 import { getCollection } from 'astro:content';
 import { sectors, dayTotals, deploymentCount, partnerNetworkUrl } from '../facts';
 
@@ -48,8 +49,13 @@ const fmt = (d: Date) =>
 >
   <section class="day-section">
     <div class="shell">
-      <h1>{heading}</h1>
-      <p class="lead">{sub}</p>
+      <div class="hero-grid">
+        <div class="hero-text">
+          <h1>{heading}</h1>
+          <p class="lead">{sub}</p>
+        </div>
+        <MarkCanvas class="hero-mark" size={360} />
+      </div>
 
       <p class="disclaimer">
         A typical Tuesday. This is not a live feed and no customer data appears on this page.
@@ -128,6 +134,18 @@ const fmt = (d: Date) =>
 
 <style>
   .day-section { padding: var(--s-9) 0 var(--s-8); }
+
+  .hero-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: var(--s-8);
+    align-items: center;
+  }
+  .hero-mark { justify-self: end; }
+  @media (max-width: 900px) {
+    .hero-grid { grid-template-columns: 1fr; gap: var(--s-6); }
+    .hero-mark { justify-self: start; --mark3d-size: 220px; }
+  }
   .lead {
     font-size: var(--t-h3);
     line-height: 1.4;

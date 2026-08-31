@@ -33,7 +33,11 @@ const WIDTHS = [1440, 390];
 const out = `docs/shots/${phase}`;
 await mkdir(out, { recursive: true });
 
-const browser = await chromium.launch();
+// swiftshader : rendu GPU logiciel, pour que le canvas WebGL du mark soit
+// dessiné même sans carte graphique (headless, CI).
+const browser = await chromium.launch({
+  args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader'],
+});
 const results = [];
 
 for (const [name, path] of routes) {

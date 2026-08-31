@@ -1,0 +1,400 @@
+---
+// MarkCanvas.astro
+//
+// La matrice 5x5 du mark, rendue en volume. WebGL écrit à la main : pas de
+// three.js, pas de bibliothèque, pas de CDN. Le shader et les matrices sont
+// dans ce fichier. Coût réel mesuré dans docs/REVIEW.md.
+//
+// C'est le seul écart à la règle « le mark est le seul mouvement du site ».
+// L'écart porte sur la nature du mouvement, pas sur son nombre : il n'y a
+// toujours qu'une seule pièce animée sur tout le site, et c'est le logo.
+//
+// Trois dégradations, dans cet ordre :
+//   1. Pas de JavaScript      -> la grille CSS de BrandMark reste affichée.
+//   2. Pas de WebGL           -> idem, le canvas ne remplace jamais rien.
+//   3. prefers-reduced-motion -> une seule image, sans boucle ni pointeur.
+//
+// Aucune couleur nouvelle : les trois teintes viennent de tokens.css et sont
+// passées en data-attribute pour éviter de parser de l'oklch en JavaScript.
+
+interface Props {
+  size?: number;
+  class?: string;
+}
+const { size = 340, class: cls = '' } = Astro.props;
+---
+
+<div
+  class={`mark3d ${cls}`.trim()}
+  data-mark3d
+  data-ink="#F4F0E6"
+  data-mute="#7F796C"
+  data-accent="#EDA968"
+  style={`--mark3d-size:${size}px`}
+  aria-hidden="true"
+>
+  <canvas data-mark3d-canvas></canvas>
+</div>
+
+<script>
+  // ---------------------------------------------------------------------
+  // Algèbre. Quatre fonctions, colonne-major, comme WebGL les attend.
+  // ---------------------------------------------------------------------
+
+  function perspective(fovy: number, aspect: number, near: number, far: number) {
+    const f = 1 / Math.tan(fovy / 2);
+    const nf = 1 / (near - far);
+    // prettier-ignore
+    return new Float32Array([
+      f / aspect, 0, 0, 0,
+      0, f, 0, 0,
+      0, 0, (far + near) * nf, -1,
+      0, 0, 2 * far * near * nf, 0,
+    ]);
+  }
+
+  function multiply(a: Float32Array, b: Float32Array) {
+    const out = new Float32Array(16);
+    for (let c = 0; c < 4; c++) {
+      for (let r = 0; r < 4; r++) {
+        let s = 0;
+        for (let k = 0; k < 4; k++) s += a[k * 4 + r] * b[c * 4 + k];
+        out[c * 4 + r] = s;
+      }
+    }
+    return out;
+  }
+
+  function rotationY(t: number) {
+    const c = Math.cos(t);
+    const s = Math.sin(t);
+    // prettier-ignore
+    return new Float32Array([c, 0, -s, 0,  0, 1, 0, 0,  s, 0, c, 0,  0, 0, 0, 1]);
+  }
+
+  function rotationX(t: number) {
+    const c = Math.cos(t);
+    const s = Math.sin(t);
+    // prettier-ignore
+    return new Float32Array([1, 0, 0, 0,  0, c, s, 0,  0, -s, c, 0,  0, 0, 0, 1]);
+  }
+
+  function translation(x: number, y: number, z: number) {
+    // prettier-ignore
+    return new Float32Array([1, 0, 0, 0,  0, 1, 0, 0,  0, 0, 1, 0,  x, y, z, 1]);
+  }
+
+  const hexToRgb = (h: string): [number, number, number] => {
+    const n = parseInt(h.slice(1), 16);
+    return [((n >> 16) & 255) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255];
+  };
+
+  // ---------------------------------------------------------------------
+  // Shaders. Le point est un billboard : un quad qui fait toujours face à
+  // la caméra, découpé en disque dans le fragment shader. Vingt-cinq quads,
+  // un seul appel de dessin.
+  // ---------------------------------------------------------------------
+
+  const VERT = `
+    attribute vec2 aQuad;
+    attribute vec3 aCell;
+    attribute float aType;
+    uniform mat4 uProj;
+    uniform mat4 uView;
+    uniform float uRadius;
+    varying vec2 vQuad;
+    varying float vType;
+    varying float vDepth;
+    void main() {
+      vec4 eye = uView * vec4(aCell, 1.0);
+      eye.xy += aQuad * uRadius;
+      vDepth = -eye.z;
+      vQuad = aQuad;
+      vType = aType;
+      gl_Position = uProj * eye;
+    }
+  `;
+
+  // L'atténuation par la profondeur n'est pas un effet décoratif : c'est la
+  // conséquence de la perspective. Aucun halo, aucun dégradé de couleur,
+  // aucune spécularité. Un disque plein, une opacité, rien d'autre.
+  const FRAG = `
+    precision highp float;
+    varying vec2 vQuad;
+    varying float vType;
+    varying float vDepth;
+    uniform vec3 uInk;
+    uniform vec3 uMute;
+    uniform vec3 uAccent;
+    uniform float uFade;
+    void main() {
+      float d = length(vQuad);
+      float edge = fwidth(d) * 1.5;
+      float mask = 1.0 - smoothstep(1.0 - edge, 1.0, d);
+      if (mask < 0.004) discard;
+      vec3 tint = vType > 1.5 ? uAccent : (vType > 0.5 ? uInk : uMute);
+      float base = vType > 0.5 ? 1.0 : 0.34;
+      float fog = clamp((vDepth - 6.55) / 1.5, 0.0, 1.0);
+      gl_FragColor = vec4(tint, mask * base * (1.0 - fog * 0.55) * uFade);
+    }
+  `;
+
+  function compile(gl: WebGLRenderingContext, type: number, src: string) {
+    const sh = gl.createShader(type)!;
+    gl.shaderSource(sh, src);
+    gl.compileShader(sh);
+    if (!gl.getShaderParameter(sh, gl.COMPILE_STATUS)) {
+      gl.deleteShader(sh);
+      return null;
+    }
+    return sh;
+  }
+
+  // Le S de la marque. Même motif que BrandMark.astro et que l'ancien
+  // BRAND_PATTERN de src/sections.jsx. 2 = point d'accent, au centre.
+  // prettier-ignore
+  const PATTERN = [
+    1, 1, 1, 1, 0,
+    1, 0, 0, 0, 0,
+    1, 1, 2, 1, 1,
+    0, 0, 0, 0, 1,
+    1, 1, 1, 1, 0,
+  ];
+
+  function start(host: HTMLElement) {
+    const canvas = host.querySelector('[data-mark3d-canvas]') as HTMLCanvasElement | null;
+    if (!canvas) return;
+
+    const gl = (canvas.getContext('webgl', {
+      alpha: true,
+      antialias: true,
+      premultipliedAlpha: false,
+    }) || null) as WebGLRenderingContext | null;
+    if (!gl) return; // pas de WebGL : la grille CSS reste, on ne touche à rien
+
+    // fwidth vient d'une extension en WebGL 1. Sans elle, on renonce plutôt
+    // que de rendre des disques crénelés.
+    if (!gl.getExtension('OES_standard_derivatives')) return;
+
+    const vs = compile(gl, gl.VERTEX_SHADER, '#extension GL_OES_standard_derivatives : enable\n' + VERT);
+    const fs = compile(gl, gl.FRAGMENT_SHADER, '#extension GL_OES_standard_derivatives : enable\n' + FRAG);
+    if (!vs || !fs) return;
+
+    const prog = gl.createProgram()!;
+    gl.attachShader(prog, vs);
+    gl.attachShader(prog, fs);
+    gl.linkProgram(prog);
+    if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) return;
+    gl.useProgram(prog);
+
+    // Géométrie : 25 cellules, 2 triangles chacune, 6 sommets. 150 sommets
+    // au total, un seul buffer entrelacé, un seul drawArrays.
+    const QUAD = [-1, -1, 1, -1, 1, 1, -1, -1, 1, 1, -1, 1];
+    const data: number[] = [];
+    const SPACING = 0.62;
+    for (let i = 0; i < 25; i++) {
+      const col = i % 5;
+      const row = (i / 5) | 0;
+      const x = (col - 2) * SPACING;
+      const y = (2 - row) * SPACING;
+      // Léger relief : les points allumés avancent, les éteints reculent.
+      // C'est ce qui fait lire le S en volume plutôt qu'en aplat.
+      const type = PATTERN[i];
+      const z = type === 2 ? 0.34 : type === 1 ? 0.12 : -0.2;
+      for (let v = 0; v < 6; v++) {
+        data.push(QUAD[v * 2], QUAD[v * 2 + 1], x, y, z, type);
+      }
+    }
+
+    const buf = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), gl.STATIC_DRAW);
+
+    const STRIDE = 6 * 4;
+    const bind = (name: string, size: number, offset: number) => {
+      const loc = gl.getAttribLocation(prog, name);
+      gl.enableVertexAttribArray(loc);
+      gl.vertexAttribPointer(loc, size, gl.FLOAT, false, STRIDE, offset);
+    };
+    bind('aQuad', 2, 0);
+    bind('aCell', 3, 8);
+    bind('aType', 1, 20);
+
+    const u = (n: string) => gl.getUniformLocation(prog, n);
+    const uProj = u('uProj');
+    const uView = u('uView');
+    const uRadius = u('uRadius');
+    const uFade = u('uFade');
+
+    gl.uniform3fv(u('uInk'), hexToRgb(host.dataset.ink || '#F4F0E6'));
+    gl.uniform3fv(u('uMute'), hexToRgb(host.dataset.mute || '#7F796C'));
+    gl.uniform3fv(u('uAccent'), hexToRgb(host.dataset.accent || '#EDA968'));
+
+    gl.enable(gl.BLEND);
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+    // Pas de test de profondeur : le tri se fait par le mélange, et le motif
+    // est assez plat pour que l'ordre ne se voie pas.
+    gl.disable(gl.DEPTH_TEST);
+
+    let w = 0;
+    let h = 0;
+    // Renvoie true si la taille a changé. Un changement de taille vide le
+    // drawing buffer : il faut redessiner derrière, sinon le canvas reste
+    // blanc. C'est ce qui se produisait au redimensionnement de la fenêtre
+    // et dans les captures pleine page, en mode reduced-motion où aucune
+    // boucle ne repasse.
+    function resize() {
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const r = host.getBoundingClientRect();
+      const nw = Math.max(1, Math.round(r.width * dpr));
+      const nh = Math.max(1, Math.round(r.height * dpr));
+      if (nw === w && nh === h) return false;
+      w = nw;
+      h = nh;
+      canvas.width = w;
+      canvas.height = h;
+      gl.viewport(0, 0, w, h);
+      gl.uniformMatrix4fv(uProj, false, perspective(0.62, w / h, 0.1, 40));
+      return true;
+    }
+
+    // Cible et valeur courante du regard. L'écart entre les deux est ce qui
+    // donne l'inertie : le mark suit le pointeur, il ne le colle pas.
+    let targetX = 0;
+    let targetY = 0;
+    let curX = 0;
+    let curY = 0;
+    let fade = 0;
+
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+    function onPointer(e: PointerEvent) {
+      const r = host.getBoundingClientRect();
+      const cx = r.left + r.width / 2;
+      const cy = r.top + r.height / 2;
+      targetX = Math.max(-1, Math.min(1, (e.clientX - cx) / (window.innerWidth / 2)));
+      targetY = Math.max(-1, Math.min(1, (e.clientY - cy) / (window.innerHeight / 2)));
+    }
+
+    let lastSpin = 0;
+
+    function draw(spin: number) {
+      lastSpin = spin;
+      resize();
+      gl.clearColor(0, 0, 0, 0);
+      gl.clear(gl.COLOR_BUFFER_BIT);
+      const view = multiply(
+        translation(0, 0, -7.2),
+        multiply(rotationX(curY * 0.26), rotationY(spin + curX * 0.44))
+      );
+      gl.uniformMatrix4fv(uView, false, view);
+      gl.uniform1f(uRadius, 0.148);
+      gl.uniform1f(uFade, fade);
+      gl.drawArrays(gl.TRIANGLES, 0, 150);
+    }
+
+    // Rendu figé : une image, sans boucle, sans écoute du pointeur.
+    // Le drapeau ready doit être posé ici aussi, sinon le canvas dessine
+    // mais reste à opacity 0 et personne ne le voit. C'est exactement le
+    // chemin emprunté par les gens qui ont demandé moins d'animation.
+    if (reduced.matches) {
+      curX = 0.28;
+      curY = -0.12;
+      fade = 1;
+      resize();
+      draw(0.42);
+      host.dataset.ready = 'true';
+      // Aucune boucle dans ce mode : c'est ici, et seulement ici, que le
+      // redessin après redimensionnement doit être branché.
+      window.addEventListener('resize', () => draw(0.42), { passive: true });
+      return;
+    }
+
+    let raf = 0;
+    let t0 = 0;
+    let running = false;
+
+    // Une première image tout de suite, sans attendre l'observateur.
+    // Un contexte WebGL jamais effacé a un contenu indéfini, que certains
+    // navigateurs affichent en blanc opaque. C'est ce qui se produisait ici :
+    // le canvas restait un rectangle blanc tant que la boucle n'avait pas
+    // démarré. On ne laisse jamais le buffer dans cet état.
+    fade = 0;
+    draw(0);
+
+    function frame(t: number) {
+      if (!t0) t0 = t;
+      const elapsed = (t - t0) / 1000;
+      // Une rotation complète en 44 secondes. Assez lent pour qu'on ne
+      // regarde pas le mouvement, assez présent pour qu'on sente la matière.
+      const spin = (elapsed * Math.PI * 2) / 44;
+      curX += (targetX - curX) * 0.045;
+      curY += (targetY - curY) * 0.045;
+      fade += (1 - fade) * 0.05;
+      draw(spin);
+      raf = requestAnimationFrame(frame);
+    }
+
+    // Le canvas ne tourne que s'il est à l'écran. Onglet en arrière-plan ou
+    // hero scrollé hors champ : plus rien ne consomme.
+    const io = new IntersectionObserver((entries) => {
+      const visible = entries[0]?.isIntersecting ?? false;
+      if (visible && !running) {
+        running = true;
+        t0 = 0;
+        raf = requestAnimationFrame(frame);
+      } else if (!visible && running) {
+        running = false;
+        cancelAnimationFrame(raf);
+      }
+    });
+    io.observe(host);
+
+    window.addEventListener('pointermove', onPointer, { passive: true });
+    window.addEventListener(
+      'resize',
+      () => {
+        // La boucle redessine d'elle-même quand elle tourne. Quand elle est
+        // en pause parce que le mark est hors écran, il faut repeindre à la
+        // main, sinon le buffer vidé par le redimensionnement reste blanc.
+        if (!running) draw(lastSpin);
+      },
+      { passive: true }
+    );
+
+    // Le canvas prend la place de la grille CSS seulement maintenant, une
+    // fois qu'on est certain qu'il sait dessiner.
+    host.dataset.ready = 'true';
+  }
+
+  document.querySelectorAll<HTMLElement>('[data-mark3d]').forEach(start);
+</script>
+
+<style>
+  .mark3d {
+    width: var(--mark3d-size);
+    height: var(--mark3d-size);
+    max-width: 100%;
+    aspect-ratio: 1;
+    /* Tant que WebGL n'a pas confirmé, le bloc ne réserve rien de visible.
+       La grille CSS du mark reste seule à l'écran, dans le masthead. */
+    opacity: 0;
+    transition: opacity 0.6s ease;
+  }
+
+  .mark3d[data-ready='true'] {
+    opacity: 1;
+  }
+
+  .mark3d canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .mark3d {
+      transition: none;
+    }
+  }
+</style>

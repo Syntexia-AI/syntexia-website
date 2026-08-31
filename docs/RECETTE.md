@@ -66,18 +66,23 @@ Compté sur le HTML statique de `dist/client/`, scripts et styles retirés.
 
 | route | mots servis sans JS |
 |---|---|
-| `/404.html` | 51 |
-| `/about/index.html` | 195 |
-| `/blog/index.html` | 86 |
-| `/index.html` | 575 |
-| `/posts/precedent-meets-pace/index.html` | 1178 |
-| `/posts/the-quiet-revolution-coming-to-audit/index.html` | 621 |
-| `/security/index.html` | 245 |
-| `/team/index.html` | 47 |
+| `/404.html` | 50 |
+| `/about/index.html` | 184 |
+| `/blog/index.html` | 78 |
+| `/index.html` | 422 |
+| `/posts/precedent-meets-pace/index.html` | 1158 |
+| `/posts/the-quiet-revolution-coming-to-audit/index.html` | 601 |
+| `/security/index.html` | 233 |
+| `/team/index.html` | 43 |
 
-Pour mémoire, la home d'avant la refonte servait **32 mots**, dont le titre de l'onglet
-et le bloc de configuration. Tout le reste était produit par React après transpilation
-Babel dans le navigateur du visiteur.
+Mesure faite avec un dépouillement non gourmand (perl, non greedy multiligne). Une
+mesure au sed ligne à ligne, utilisée dans une première version de ce document,
+donnait des chiffres faux dans les deux sens : elle avalait du contenu entre le
+premier et le dernier script de la page.
+
+Même mesure appliquée à la production actuelle : **8 mots**. Tout le reste de
+l'ancienne home était produit par React après transpilation Babel dans le
+navigateur du visiteur.
 
 ## Validation HTML
 

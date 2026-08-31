@@ -1,7 +1,13 @@
 ---
 import { sectors, contactEmail } from '../facts';
 ---
-<form class="contact-form" id="contact-form" method="post" action="/api/contact">
+<form
+  class="contact-form"
+  id="contact-form"
+  method="post"
+  action="/api/contact"
+  data-fallback={contactEmail.value}
+>
   <div class="grid">
     <div class="field">
       <label for="cf-name">Name</label>
@@ -40,24 +46,25 @@ import { sectors, contactEmail } from '../facts';
   </div>
 </form>
 
-<script is:inline define:vars={{ fallbackEmail: contactEmail.value }}>
-  (() => {
-    const form = document.getElementById('contact-form');
-    const status = document.getElementById('cf-status');
-    if (!form || !status) return;
+<script>
+  // Pas de is:inline, pas de define:vars : le script est bundlé et servi
+  // depuis notre origine, ce qui permet à la CSP de rester script-src 'self'
+  // sans 'unsafe-inline'. L'adresse de repli passe par un data-attribute.
+  const form = document.getElementById('contact-form') as HTMLFormElement | null;
+  const status = document.getElementById('cf-status');
+
+  if (form && status) {
+    const fallbackEmail = form.dataset.fallback || 'office@syntexia.ai';
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const button = form.querySelector('button[type="submit"]');
+      const button = form.querySelector('button[type="submit"]') as HTMLButtonElement;
       button.disabled = true;
       status.textContent = 'Sending.';
 
       try {
-        const res = await fetch('/api/contact', {
-          method: 'POST',
-          body: new FormData(form),
-        });
-        const data = await res.json().catch(() => ({}));
+        const res = await fetch('/api/contact', { method: 'POST', body: new FormData(form) });
+        const data = await res.json().catch(() => ({}) as Record<string, string>);
 
         if (res.ok) {
           form.reset();
@@ -73,7 +80,7 @@ import { sectors, contactEmail } from '../facts';
         button.disabled = false;
       }
     });
-  })();
+  }
 </script>
 
 <style>
