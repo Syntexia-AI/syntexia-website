@@ -1,0 +1,142 @@
+---
+// Reconstitution de l'écran de suivi des dossiers, tel qu'il existe dans les
+// plateformes : entités, machine à états de phases, contrôle anti-blanchiment,
+// indépendance, ordre de travail. Interface en portugais européen, comme la
+// vraie. Voir docs/FACTS-PRODUIT.md.
+//
+// Ce n'est pas une capture d'écran d'un dossier client, et ce n'en sera jamais
+// une : les fichiers clients sont exclus de notre gestion de version dès le
+// premier commit. Les six lignes ci-dessous sont fictives, les raisons sociales
+// sont caviardées, et la légende le dit sous le cadre.
+//
+// La mono ne sert qu'aux identifiants (NIPC, référence de dossier), où elle est
+// du contenu et non de la décoration.
+
+const ROWS = [
+  { ref: 'DOS-2026-041', phase: 'Execução', bcft: 'Simplificadas', indep: 'OK', state: 'ok' },
+  { ref: 'DOS-2026-042', phase: 'Aceitação', bcft: 'Reforçadas', indep: 'Rever', state: 'flag' },
+  { ref: 'DOS-2026-043', phase: 'Planeamento', bcft: 'Simplificadas', indep: 'OK', state: 'ok' },
+  { ref: 'DOS-2026-044', phase: 'Aceitação', bcft: 'Em curso', indep: 'Pendente', state: 'wait' },
+  { ref: 'DOS-2026-045', phase: 'Conclusão', bcft: 'Simplificadas', indep: 'OK', state: 'ok' },
+  { ref: 'DOS-2026-046', phase: 'Execução', bcft: 'Reforçadas', indep: 'OK', state: 'ok' },
+];
+---
+
+<figure class="frame">
+  <div class="frame-bar">
+    <span class="frame-title">Dossiês de auditoria</span>
+    <span class="frame-meta tabular">6 entidades</span>
+  </div>
+
+  <div class="frame-body">
+    <table>
+      <thead>
+        <tr>
+          <th scope="col">Referência</th>
+          <th scope="col">Entidade</th>
+          <th scope="col">Fase</th>
+          <th scope="col">BCFT</th>
+          <th scope="col">Independência</th>
+        </tr>
+      </thead>
+      <tbody>
+        {ROWS.map((r) => (
+          <tr>
+            <td class="mono">{r.ref}</td>
+            <td><span class="black" role="img" aria-label="Redacted"></span></td>
+            <td>{r.phase}</td>
+            <td>{r.bcft}</td>
+            <td class={`state state-${r.state}`}>{r.indep}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+
+  <figcaption>
+    Reconstruction of the case tracker. Fictional references, client names blacked out.
+  </figcaption>
+</figure>
+
+<style>
+  .frame {
+    border: 1px solid var(--line);
+    background: var(--bg-2);
+    margin: 0;
+  }
+
+  .frame-bar {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--s-4);
+    padding: var(--s-4) var(--s-5);
+    border-bottom: 1px solid var(--line);
+    background: var(--surface);
+  }
+
+  .frame-title {
+    font-size: 14.5px;
+    font-weight: 500;
+    color: var(--ink);
+  }
+
+  .frame-meta {
+    font-size: var(--t-small);
+    color: var(--mute);
+  }
+
+  .frame-body { overflow-x: auto; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    min-width: 520px;
+  }
+
+  th {
+    text-align: left;
+    font-size: var(--t-small);
+    font-weight: 500;
+    color: var(--mute);
+    padding: var(--s-3) var(--s-5);
+    border-bottom: 1px solid var(--line);
+  }
+
+  td {
+    padding: var(--s-4) var(--s-5);
+    color: var(--ink-2);
+    border-bottom: 1px solid var(--line-soft);
+    white-space: nowrap;
+  }
+
+  tbody tr:last-child td { border-bottom: 0; }
+
+  .mono {
+    font-family: var(--font-mono);
+    font-size: var(--t-small);
+    color: var(--mute);
+  }
+
+  .black {
+    display: inline-block;
+    width: 108px;
+    height: 11px;
+    background: var(--ink);
+    vertical-align: middle;
+  }
+
+  /* Un état se lit au mot, pas à la pastille. L'accent reste réservé aux
+     actions : ici seule la ligne qui demande une décision humaine le porte. */
+  .state-flag { color: var(--accent); }
+  .state-wait { color: var(--mute); }
+
+  figcaption {
+    font-size: var(--t-small);
+    line-height: var(--lh-small);
+    color: var(--mute-2);
+    padding: var(--s-4) var(--s-5);
+    border-top: 1px solid var(--line);
+  }
+</style>

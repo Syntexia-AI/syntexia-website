@@ -1,0 +1,114 @@
+---
+// Le flux réel d'un cabinet portugais, tel qu'il est implémenté dans les
+// plateformes : Aceitação/Continuação, Planeamento, Execução, Conclusão.
+// L'exécution est verrouillée tant que l'acceptation et le contrôle
+// anti-blanchiment ne sont pas conclus, par entité. Les conclusions sont
+// datées, ce qui constitue la chronologie de la preuve d'audit.
+//
+// Source : README de ctng-intelligence, lu le 2026-08-31. Voir
+// docs/FACTS-PRODUIT.md. Aucun nom de client, aucune donnée.
+//
+// Profondeur par blocs pleins et filets d'un pixel, jamais par l'ombre.
+// C'est la mécanique d'Anthropic, transposée en sombre. Voir le rapport
+// docs/benchmark/03-references-da.md, recommandation 4.
+
+const PHASES = [
+  {
+    pt: 'Aceitação',
+    en: 'Acceptance',
+    detail: 'Beneficial owners, sanctions, politically exposed persons.',
+  },
+  { pt: 'Planeamento', en: 'Planning', detail: 'Scope, materiality, the team and the calendar.' },
+  { pt: 'Execução', en: 'Fieldwork', detail: 'Working papers, balances, timesheets.' },
+  { pt: 'Conclusão', en: 'Conclusion', detail: 'Dated, signed, and kept as evidence.' },
+];
+---
+
+<div class="flow">
+  <ol class="flow-rail">
+    {PHASES.map((p, i) => (
+      <li class={`flow-step ${i < 2 ? 'is-gate' : ''}`}>
+        <span class="flow-index tabular">{`0${i + 1}`}</span>
+        <span class="flow-pt">{p.pt}</span>
+        <span class="flow-en">{p.en}</span>
+        <span class="flow-detail">{p.detail}</span>
+      </li>
+    ))}
+  </ol>
+
+  <p class="flow-note">
+    Fieldwork stays locked until acceptance and the anti-money-laundering check are
+    concluded, entity by entity. Every conclusion carries the date it was reached.
+  </p>
+</div>
+
+<style>
+  .flow {
+    border-top: 1px solid var(--line);
+    padding-top: var(--s-6);
+  }
+
+  .flow-rail {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1px;
+    background: var(--line);
+    list-style: none;
+  }
+
+  /* Chaque phase est un bloc plein. Le filet du dessus est le fond de la
+     grille qui transparaît, pas une bordure : une seule ligne partout. */
+  .flow-step {
+    background: var(--bg);
+    padding: var(--s-5) var(--s-5) var(--s-6);
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-2);
+  }
+
+  /* Les deux phases verrouillantes se distinguent par un bloc plus dense,
+     pas par une couleur d'accent. L'accent reste réservé aux actions. */
+  .flow-step.is-gate {
+    background: var(--surface);
+  }
+
+  .flow-index {
+    font-size: var(--t-small);
+    color: var(--mute);
+  }
+
+  .flow-pt {
+    font-size: 21px;
+    font-weight: 600;
+    letter-spacing: -0.014em;
+    color: var(--ink);
+  }
+
+  .flow-en {
+    font-size: var(--t-small);
+    color: var(--mute);
+  }
+
+  .flow-detail {
+    font-size: 14.5px;
+    line-height: 1.5;
+    color: var(--ink-2);
+    margin-top: var(--s-3);
+  }
+
+  .flow-note {
+    font-size: var(--t-small);
+    line-height: var(--lh-small);
+    color: var(--mute-2);
+    margin-top: var(--s-5);
+    max-width: 72ch;
+  }
+
+  @media (max-width: 860px) {
+    .flow-rail { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+
+  @media (max-width: 520px) {
+    .flow-rail { grid-template-columns: 1fr; }
+  }
+</style>

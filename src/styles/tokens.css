@@ -36,6 +36,13 @@
   src: url('/fonts/archivo-600.woff2') format('woff2');
 }
 @font-face {
+  font-family: 'Archivo';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/archivo-700.woff2') format('woff2');
+}
+@font-face {
   font-family: 'Courier Prime';
   font-style: normal;
   font-weight: 400;

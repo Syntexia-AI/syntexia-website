@@ -3,6 +3,8 @@ import Base from '../layouts/Base.astro';
 import ContactForm from '../components/ContactForm.astro';
 import MarkCanvas from '../components/MarkCanvas.astro';
 import Sheet from '../components/Sheet.astro';
+import AppFrame from '../components/AppFrame.astro';
+import AuditFlow from '../components/AuditFlow.astro';
 import { getCollection } from 'astro:content';
 import { sectors, partnerNetworkUrl } from '../facts';
 
@@ -100,11 +102,24 @@ const fmt = (d: Date) => d.toLocaleDateString('en-GB', { month: 'long', year: 'n
           <a class="btn btn-secondary" href="#what">See what it does</a>
         </div>
       </div>
-      <MarkCanvas class="hero-mark" size={340} />
+      <MarkCanvas class="hero-mark" size={400} />
     </div>
   </section>
 
-  <section class="section" id="what">
+  <section class="band" id="product">
+    <div class="shell">
+      <AppFrame />
+    </div>
+  </section>
+
+  <section class="section" id="flow">
+    <div class="shell">
+      <h2 class="section-title">The order a firm actually works in.</h2>
+      <AuditFlow />
+    </div>
+  </section>
+
+  <section class="band" id="what">
     <div class="shell">
       <div class="pillars">
         {PILLARS.map((p) => (
@@ -142,7 +157,7 @@ const fmt = (d: Date) => d.toLocaleDateString('en-GB', { month: 'long', year: 'n
     </div>
   </section>
 
-  <section class="section" id="sectors">
+  <section class="band" id="sectors">
     <div class="shell">
       <h2 class="section-title">What we run today</h2>
       <div class="sectors">
@@ -183,7 +198,7 @@ const fmt = (d: Date) => d.toLocaleDateString('en-GB', { month: 'long', year: 'n
     </div>
   </section>
 
-  <section class="section" id="contact">
+  <section class="band" id="contact">
     <div class="shell">
       <h2 class="section-title">Tell us what you want it to do</h2>
       <p class="contact-lead">
@@ -196,6 +211,15 @@ const fmt = (d: Date) => d.toLocaleDateString('en-GB', { month: 'long', year: 'n
 </Base>
 
 <style>
+  /* Rythme de la page. La profondeur vient de blocs pleins alternés et de
+     filets d'un pixel, jamais d'une ombre. L'accent cuivré ne sert qu'aux
+     actions : il n'apparaît dans aucun fond. */
+  .band {
+    padding: var(--s-9) 0;
+    background: var(--bg-2);
+    border-top: 1px solid var(--line-soft);
+  }
+
   /* ---------- Accroche ---------- */
 
   .hero { padding: var(--s-10) 0 var(--s-9); }
