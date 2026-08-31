@@ -94,31 +94,29 @@ export const dayTotals: SourcedFact<{
   people: string;
 }> | null = NONE;
 
-/** Liste des secteurs. Conservée en liste nommée, sans compte, sans statut
-    et sans chiffre, conformément à l'arbitrage. Les libellés et les
-    descriptions viennent du bloc .d3 de design/syntexia-home-4da.html.
-    Ce sont des descriptions de ce que le système fait, catégorie A. */
+/** Ce que nous faisons réellement.
+ *
+ *  Établi le 2026-08-31 en lisant les treize dépôts de l'organisation, pas en
+ *  reprenant la maquette. Détail et sources dans docs/FACTS-PRODUIT.md.
+ *
+ *  La liste précédente affichait cinq secteurs. Quatre n'existaient nulle part :
+ *  une recherche sur l'organisation entière retourne zéro occurrence de
+ *  « public sector », « financial services », « banking » et « retail ».
+ *  Ils sont retirés. Ce qui reste est adossé à des dépôts en production.
+ *
+ *  Ce sont des descriptions de ce que le système fait, catégorie A. Aucun
+ *  client n'est nommé : ce sont des cabinets d'audit, la confidentialité est
+ *  structurelle à leur métier. */
 export const sectors: { name: string; blurb: string }[] = [
   {
     name: 'Audit and assurance',
     blurb:
-      'Working papers, trial balances, timesheets. Checked against the source, with the reference kept.',
+      'Client acceptance, anti-money-laundering checks, working papers, trial balances and timesheets. Prepared against the source, with the reference kept and the conclusion dated.',
   },
   {
-    name: 'Public sector',
-    blurb: 'Intake, routing, drafting. Inside the case system you already run.',
-  },
-  {
-    name: 'Financial services',
-    blurb: "Cross-ledger answers on current data, not on last month's export.",
-  },
-  {
-    name: 'Hospitality',
-    blurb: 'Bookings by phone, supplier invoices, stock. In Portuguese, at any hour.',
-  },
-  {
-    name: 'Retail',
-    blurb: 'Orders, stock-outs, supplier chasing. Fewer calls to the office.',
+    name: 'Front desk',
+    blurb:
+      'Inbound calls answered in Portuguese and English. Transfer to a person, call-back, message taken. The line stays open outside office hours.',
   },
 ];
 
@@ -130,6 +128,27 @@ export const sectors: { name: string; blurb: string }[] = [
     La page /security n'est liée depuis la navigation et le pied de page
     qu'à partir de trois entrées sourcées. */
 export const contractAnswers: { title: string; body: string; source: string }[] = [
+  // Les trois premières viennent de l'architecture réelle des plateformes,
+  // lue dans les dépôts le 2026-08-31. Voir docs/FACTS-PRODUIT.md. Ce sont des
+  // contraintes de conception, pas des intentions commerciales.
+  {
+    title: 'Who decides',
+    body:
+      'The agent prepares the file. The auditor validates it. Nothing is written back into your audit software by us, and no conclusion is reached without a person signing it.',
+    source: 'architecture des plateformes, README kreston-intelligence, 2026-08-31',
+  },
+  {
+    title: 'Who else touches your data',
+    body:
+      'Nobody. Each firm gets its own deployment, with its own rules and its own templates. We reuse the architecture between clients. We never reuse the data.',
+    source: 'architecture des plateformes, README ctng-intelligence, 2026-08-31',
+  },
+  {
+    title: 'Where your files live',
+    body:
+      'Inside your deployment, and nowhere else. Client files are excluded from our source control from the first commit and stay read-only. We do not keep a copy to train on, or to demonstrate with.',
+    source: 'politique de données des dépôts produits, 2026-08-31',
+  },
   {
     title: 'Cookies and trackers',
     body:

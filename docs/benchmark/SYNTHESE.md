@@ -45,28 +45,27 @@ en Courier Prime, avec les données client caviardées en noir : une facture fou
 portugaise, une balance analytique, une feuille d'heures. Elles sont légendées
 « Illustrative documents. No customer data. »
 
-**Et cette page n'est liée nulle part.** Elle attend un troisième fait sourcé pour
-apparaître dans la navigation. Notre seul actif visuel réellement différenciant est
-invisible.
+**Cette page était liée nulle part**, faute d'un troisième fait sourcé. La lecture des
+dépôts, le 2026-08-31, en a fourni trois de plus, tirés de l'architecture réelle : qui
+décide, qui touche aux données, où vivent les fichiers. **La page est désormais liée
+dans la navigation et le pied de page.** Reste à remonter les pièces sur la page
+d'accueil.
 
-## Dispositif 2. La démo essayable. Un seul concurrent le fait.
+## Dispositif 2. La démo essayable. RETIRÉ après vérification du code.
 
-Sur les sept acteurs de la voix analysés, **un seul propose de parler à l'agent sans
-créer de compte** : Bland.ai, avec un sélecteur de scénarios par industrie. Vapi a un
-bouton d'appel navigateur. Les autres appellent « démo » un formulaire HubSpot
-(Cognigy) ou une ancre morte (Synthflow, dont le bouton « Hear Demo » ne mène nulle
-part).
+**Cette recommandation était fausse et je ne l'avais pas vérifiée.**
 
-C'est le dispositif de preuve le plus fort du panel, pour une raison simple : **le
-visiteur vérifie la promesse lui-même en trente secondes**, au lieu de croire un
-chiffre déclaratif.
+Sur les sept acteurs de la voix, un seul propose de parler à l'agent sans compte
+(Bland.ai). J'en avais conclu qu'il fallait publier un numéro de démonstration.
 
-Et c'est le seul type de preuve qui échappe entièrement à notre problème de sourcing.
-Une démonstration qui fonctionne ne prétend rien : elle se produit.
+La lecture des dépôts, le 2026-08-31, montre que c'est irréalisable. Chaque
+réceptionniste est un locataire mono-client, branché sur la base d'une société
+réelle, avec ses numéros de transfert et ses règles métier. **Il n'existe aucun agent
+générique à faire appeler.** Publier un numéro reviendrait à exposer une ligne
+cliente.
 
-Notre home ne contient aujourd'hui aucune occurrence de `try`, `demo`, `listen` ou
-`call us`. Nous vendons de la voix, et c'est la seule chose au monde qui se prouve
-sans donnée client, sans logo et sans chiffre.
+Ce qui reste vrai du constat : le visiteur ne peut rien vérifier par lui-même. La
+réponse n'est pas une démonstration vocale, c'est le dispositif 1, la pièce montrée.
 
 ---
 
@@ -80,9 +79,12 @@ sans donnée client, sans logo et sans chiffre.
 
 Comparé au nôtre :
 
-> « One Tuesday. Nobody was on shift. »
-> « Not a chatbot. Not a co-pilot. The layer that does the work inside the systems
-> these companies already run. »
+> « One Tuesday. Nobody started from a blank page. »
+> « Not a chatbot. Not a co-pilot. The agent prepares the file, the auditor validates
+> it, inside the software the firm already uses. »
+
+(titre et sous-titre corrigés le 2026-08-31 : la version analysée disait « Nobody was
+on shift », ce qui contredisait le produit, où l'auditeur valide toujours.)
 
 Notre titre est narratif, le sien est descriptif. **Aucun des sept acteurs de la voix
 n'a un titre narratif** : ils annoncent tous ce qu'ils font et pour qui, souvent
@@ -156,13 +158,14 @@ Effet : la page d'accueil montre enfin la **matière** du travail, pas seulement
 récit. Coût : faible. Aucun fait nouveau requis, les documents sont déclarés
 illustratifs.
 
-### 2. Ajouter une démonstration vocale essayable
+### 2. Dire le métier réel
 
-Le dispositif de preuve le plus fort du benchmark, et le seul qui échappe entièrement
-au problème de sourcing. Un numéro à appeler affiché sur la page d'accueil suffit.
+Le benchmark a été mené sur un positionnement erroné. Le site annonçait cinq
+secteurs : quatre n'existent nulle part dans les treize dépôts. Corrigé le
+2026-08-31, voir `docs/FACTS-PRODUIT.md`.
 
-Ce que cela demande de toi : un numéro dédié qui aboutit sur un agent, et l'accord
-pour qu'il soit public. **C'est une décision, pas un développement.**
+Le vrai concurrent n'est donc pas Bland.ai sur la voix, mais les plateformes d'audit
+du lot 2, où le constat central tient toujours : aucune ne montre de pièce.
 
 ### 3. Remonter les boutons au premier écran
 

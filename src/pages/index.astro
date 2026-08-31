@@ -11,12 +11,12 @@ import { sectors, dayTotals, deploymentCount, partnerNetworkUrl } from '../facts
 // même bloc. Aucune ne prétend à un fait mesuré.
 const DAY = [
   { hour: '02:14', kind: 'Voice', text: "A member cancels tomorrow's seven o'clock session. The studio's own rule is applied, the slot is released, nobody is woken up." },
-  { hour: '06:40', kind: 'Documents', text: 'Eleven supplier invoices arrive overnight. Lines are read, matched to the order, posted to the ERP with the source attached.' },
+  { hour: '06:40', kind: 'Documents', text: 'A new engagement is screened before anyone accepts it. Beneficial owners, sanctions, politically exposed persons. The conclusion is dated the day it is reached.' },
   { hour: '07:55', kind: 'Voice', text: 'A caller asks for opening hours in English. The call switches language mid-sentence and stays there.' },
   { hour: '09:12', kind: 'Documents', text: "A trial balance is reconciled against last year's closing. Two accounts do not tie. Both are flagged with the working paper reference." },
   { hour: '11:30', kind: 'Voice', text: 'Someone wants a piece valued. The call goes to a person, who picks up with the summary already written.' },
   { hour: '14:05', kind: 'Documents', text: 'Timesheets for the week are checked against the engagement budget. Three entries land in the wrong year and are corrected.' },
-  { hour: '17:48', kind: 'Voice', text: 'A supplier calls about an unpaid invoice. The reference is found in four seconds and read back.' },
+  { hour: '17:48', kind: 'Voice', text: 'A caller asks for someone who has left for the day. No transfer is attempted. The call-back is registered, and the team has it in writing.' },
   { hour: '23:41', kind: 'Documents', text: 'The day is closed. Everything posted is written to an audit trail that survives the people who wrote it.' },
 ];
 
@@ -28,11 +28,11 @@ const DAY = [
 // Le segment est donc retiré, pas réécrit. Il revient tel quel dès que
 // deploymentCount est renseigné. Voir docs/REVIEW.md.
 const heading = deploymentCount
-  ? `One Tuesday, across ${deploymentCount.value} companies. Nobody was on shift.`
-  : 'One Tuesday. Nobody was on shift.';
+  ? `One Tuesday, across ${deploymentCount.value} firms. Nobody started from a blank page.`
+  : 'One Tuesday. Nobody started from a blank page.';
 
 const sub =
-  'Not a chatbot. Not a co-pilot. The layer that does the work inside the systems these companies already run.';
+  'Not a chatbot. Not a co-pilot. The agent prepares the file, the auditor validates it, inside the software the firm already uses.';
 
 const posts = (await getCollection('posts')).sort(
   (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
@@ -43,7 +43,7 @@ const fmt = (d: Date) =>
 ---
 
 <Base
-  title="Syntexia. Voice and document systems for regulated companies."
+  title="Syntexia. Audit paperwork prepared by an agent, validated by the auditor."
   description={sub}
   path="/"
 >
@@ -82,7 +82,7 @@ const fmt = (d: Date) =>
 
   <section class="section" id="sectors">
     <div class="shell">
-      <h2>We build for</h2>
+      <h2>What we run</h2>
       <div class="sectors">
         {sectors.map((s) => (
           <div class="sector">
