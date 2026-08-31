@@ -1,0 +1,59 @@
+---
+const { links } = Astro.props;
+---
+<button class="menu-toggle" id="menu-open" aria-expanded="false" aria-controls="mobile-menu">Menu</button>
+
+<div class="mobile-menu" id="mobile-menu" data-open="false" role="dialog" aria-modal="true" aria-label="Site menu">
+  <div class="mobile-menu-head">
+    <span class="brand-name">Syntexia<span>.AI</span></span>
+    <button class="menu-toggle" id="menu-close">Close</button>
+  </div>
+  <nav>
+    {links.map((l: { href: string; label: string }) => <a href={l.href}>{l.label}</a>)}
+  </nav>
+</div>
+
+<script>
+  // Menu plein écran sous 768px. Focus piégé, fermeture Escape.
+  const menu = document.getElementById('mobile-menu');
+  const open = document.getElementById('menu-open');
+  const close = document.getElementById('menu-close');
+
+  if (menu && open && close) {
+    const focusables = () =>
+      Array.from(
+        menu.querySelectorAll<HTMLElement>('a[href], button')
+      ).filter((el) => el.offsetParent !== null);
+
+    const setOpen = (state: boolean) => {
+      menu.dataset.open = String(state);
+      open.setAttribute('aria-expanded', String(state));
+      document.documentElement.style.overflow = state ? 'hidden' : '';
+      if (state) focusables()[0]?.focus();
+      else open.focus();
+    };
+
+    open.addEventListener('click', () => setOpen(true));
+    close.addEventListener('click', () => setOpen(false));
+
+    document.addEventListener('keydown', (e) => {
+      if (menu.dataset.open !== 'true') return;
+      if (e.key === 'Escape') {
+        setOpen(false);
+        return;
+      }
+      if (e.key !== 'Tab') return;
+      const items = focusables();
+      if (!items.length) return;
+      const first = items[0];
+      const last = items[items.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    });
+  }
+</script>

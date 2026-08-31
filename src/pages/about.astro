@@ -1,0 +1,80 @@
+---
+import Base from '../layouts/Base.astro';
+import { partnerNetworkUrl } from '../facts';
+
+// Copy repris de about.html, nettoyé.
+// Ce qui a été retiré et pourquoi est dans docs/REVIEW.md, section « Retiré »,
+// avec la ligne de restauration de chaque passage.
+---
+
+<Base
+  title="About Syntexia"
+  description="Syntexia builds voice and document systems that run inside the tools a company already uses."
+  path="/about"
+>
+  <section class="section first">
+    <div class="shell">
+      <h1>The era of generic AI is ending. What comes next runs inside the business.</h1>
+
+      <div class="prose">
+        <p>
+          Most organisations do not need another chatbot, another co-pilot, another
+          general-purpose model with a clever prompt. They need intelligence that lives
+          where the work happens: in the inbox, the phone line, the CRM, the accounting
+          system, the operations stack.
+        </p>
+        <p>
+          Syntexia is built on a single idea. Real intelligence is embedded, not bolted
+          on. It reads the same documents your team reads. It picks up the phone. It
+          writes the report. It catches the discrepancy before it becomes a problem.
+        </p>
+        <p>
+          We are not selling a model. We are not selling a platform staff have to learn.
+          We are building the intelligence layer for serious operations.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="shell">
+      <h2>The work is methodical.</h2>
+      <div class="prose">
+        <p>
+          We start by mapping the systems already in use, the questions teams are already
+          asking, the operations that consume their time. Then we embed intelligence into
+          that fabric, quietly, without asking anyone to learn a new tool.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  {partnerNetworkUrl && (
+    <section class="section">
+      <div class="shell">
+        <h2>Anthropic Claude Partner Network</h2>
+        <div class="prose">
+          <p>
+            We build with Claude, the model family we believe sets the standard for the
+            kind of careful, high-stakes work our customers operate in.
+            <a href={partnerNetworkUrl.value} rel="noopener">Read the announcement</a>.
+          </p>
+        </div>
+      </div>
+    </section>
+  )}
+
+  <section class="section">
+    <div class="shell">
+      <h2>The team</h2>
+      <div class="prose">
+        <p><a href="/team">See who builds it</a>.</p>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .first { border-top: 0; }
+  .prose { margin-top: var(--s-6); display: flex; flex-direction: column; gap: var(--s-5); }
+</style>

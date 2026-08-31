@@ -1,0 +1,60 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getCollection, render } from 'astro:content';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('posts');
+  return posts.map((post) => ({ params: { slug: post.id }, props: { post } }));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+
+const iso = post.data.date.toISOString().slice(0, 10);
+const human = post.data.date.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+
+const articleLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: post.data.title,
+  description: post.data.description,
+  datePublished: iso,
+  author: { '@type': 'Person', name: post.data.author },
+};
+---
+
+<Base title={post.data.title} description={post.data.description} path={`/posts/${post.id}`} ogType="article">
+  <article class="section first">
+    <div class="shell">
+      <p class="meta">
+        <time class="tabular" datetime={iso}>{human}</time>
+        <span>{post.data.author}</span>
+      </p>
+      <h1>{post.data.title}</h1>
+      <div class="prose">
+        <Content />
+      </div>
+      <p class="back"><a href="/blog">All insights</a></p>
+    </div>
+  </article>
+  <script type="application/ld+json" set:html={JSON.stringify(articleLd)} />
+</Base>
+
+<style>
+  .first { border-top: 0; }
+  .meta { display: flex; gap: var(--s-5); font-size: var(--t-small); color: var(--mute); margin-bottom: var(--s-5); }
+  .prose { margin-top: var(--s-7); max-width: var(--measure); }
+  .prose :global(p) { margin-bottom: var(--s-5); }
+  .prose :global(h2) { margin: var(--s-8) 0 var(--s-4); }
+  .prose :global(h3) { margin: var(--s-7) 0 var(--s-3); }
+  .prose :global(ul), .prose :global(ol) { margin: 0 0 var(--s-5) var(--s-5); color: var(--ink-2); }
+  .prose :global(li) { margin-bottom: var(--s-2); }
+  .prose :global(blockquote) {
+    border-left: 2px solid var(--line);
+    padding-left: var(--s-5);
+    margin: var(--s-6) 0;
+  }
+  .prose :global(em) { font-style: italic; }
+  .prose :global(a) { color: var(--ink); }
+  .back { margin-top: var(--s-8); }
+</style>

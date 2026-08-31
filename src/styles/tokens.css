@@ -1,2 +1,102 @@
-/* placeholder P1. Remplace en P3. */
-:root{ --bg:#0B0A08; --ink:#F4F0E6; }
+/* tokens.css
+   Source unique des variables. Aucun autre fichier ne redéfinit un token.
+   Palette reprise à l identique de [data-palette="copper"][data-mode="dark"] de
+   l ancien styles.css, avec trois corrections imposées par la mesure de
+   contraste, pas par le goût. Voir docs/CONTRAST.md :
+     --mute-2 : #5A554B puis #6F6A5F donnaient 2.6:1 et 3.68:1. Retenu #7F796C,
+                qui donne 4.57:1. La valeur #6F6A5F de la directive ne tenait
+                pas la promesse de 4.5:1 qui la justifiait.
+     --mute   : #837C6F donnait 4.37:1 sur --surface. Retenu #867E71, 4.51:1.
+     --line-strong : nouveau. Les bordures de champ sont un composant
+                d interface, seuil 3:1. --line seul donne 1.32:1. */
+
+/* Polices auto-hébergées. Servies depuis notre origine, jamais depuis Google.
+   Les woff2 sont copiés dans public/fonts/ pour que le chemin soit stable et
+   preloadable, et pour que font-src 'self' suffise. */
+
+@font-face {
+  font-family: 'Archivo';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/archivo-400.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Archivo';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/fonts/archivo-500.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Archivo';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/fonts/archivo-600.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Courier Prime';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/courier-prime-400.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Courier Prime';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/courier-prime-700.woff2') format('woff2');
+}
+
+:root {
+  /* Couleur */
+  --bg: #0B0A08;
+  --bg-2: #110F0C;
+  --surface: #181612;
+  --line: #2A2622;
+  --line-strong: #655C52;
+  --line-soft: #1E1B17;
+  --ink: #F4F0E6;
+  --ink-2: #C9C3B5;
+  --mute: #867E71;
+  --mute-2: #7F796C;
+  --accent: #EDA968;
+  --accent: oklch(0.79 0.12 65);
+  --accent-ink: #0B0A08;
+  --selection: oklch(0.42 0.08 65);
+
+  /* Familles. La mono ne sert que dans un document reproduit. */
+  --font-ui: 'Archivo', system-ui, -apple-system, sans-serif;
+  --font-mono: 'Courier Prime', ui-monospace, monospace;
+
+  /* Échelle. Cinq crans. Toute autre taille est un défaut. */
+  --t-display: clamp(40px, 5.2vw, 64px);
+  --lh-display: 1.05;
+  --ls-display: -0.022em;
+  --t-h2: clamp(28px, 3.4vw, 38px);
+  --lh-h2: 1.1;
+  --t-h3: 24px;
+  --lh-h3: 1.25;
+  --t-body: 16px;
+  --lh-body: 1.6;
+  --t-small: 13px;
+  --lh-small: 1.5;
+
+  /* Espacement */
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 24px;
+  --s-6: 32px;
+  --s-7: 48px;
+  --s-8: 64px;
+  --s-9: 96px;
+  --s-10: 128px;
+
+  /* Mesure */
+  --shell: 1180px;
+  --measure: 68ch;
+}

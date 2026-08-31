@@ -1,0 +1,53 @@
+---
+import Base from '../layouts/Base.astro';
+
+// Deux fiches. Nom et fonction viennent de team.html, seule source existante.
+// Les biographies et les photos ne sont pas sourcées, donc rien n'est rendu à
+// leur place : ni texte d'attente, ni silhouette générique.
+const PEOPLE = [
+  {
+    name: 'Karim Vissangy',
+    role: 'CEO and Chief AI Officer',
+    linkedin: 'https://www.linkedin.com/in/karim-vissangy-17aa893a/',
+  },
+  {
+    name: 'Baptiste Bouault',
+    role: 'CTO',
+    linkedin: null,
+  },
+];
+---
+
+<Base
+  title="The team behind Syntexia"
+  description="Who builds and runs the voice and document systems."
+  path="/team"
+>
+  <section class="section first">
+    <div class="shell">
+      <h1>The team</h1>
+      <div class="people">
+        {PEOPLE.map((p) => (
+          <div class="person">
+            <h2>{p.name}</h2>
+            <p class="role">{p.role}</p>
+            {p.linkedin && <p><a href={p.linkedin} rel="noopener">LinkedIn</a></p>}
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .first { border-top: 0; }
+  .people {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--s-7);
+    margin-top: var(--s-7);
+  }
+  .person { border-top: 1px solid var(--line); padding-top: var(--s-5); }
+  .role { margin-top: var(--s-2); color: var(--mute); }
+  .person p + p { margin-top: var(--s-4); }
+</style>

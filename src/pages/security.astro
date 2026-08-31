@@ -1,0 +1,124 @@
+---
+import Base from '../layouts/Base.astro';
+import Sheet from '../components/Sheet.astro';
+import { contractAnswers, SECURITY_LINK_THRESHOLD, securityIsLinked } from '../facts';
+
+// Bloc .d4 de design/syntexia-home-4da.html, reproduit.
+//
+// Cette page n'est PAS liée depuis la navigation ni depuis le pied de page
+// tant qu'elle ne porte pas au moins trois entrées sourcées. Elle en porte
+// deux, toutes deux démontrables par le build lui-même. Les quatre réponses
+// de la maquette (hébergement, rétention, sous-traitants, entraînement)
+// portaient des engagements contractuels qu'aucune source ne soutient : elles
+// sont retirées, et la ligne d'activation est dans docs/REVIEW.md.
+//
+// Les trois documents ci-dessous sont entièrement fictifs. Ils illustrent une
+// forme, pas un client.
+
+const INVOICE = {
+  heading: 'FATURA FT 2026/0148',
+  rows: [
+    { label: 'Fornecedor', value: '', redacted: true },
+    { label: 'NIF', value: '', redacted: true },
+    { label: 'Bacalhau demolhado 5 kg', value: '184,50' },
+    { label: 'Azeite virgem extra 5 L', value: '96,20' },
+    { label: 'Batata nova 25 kg', value: '41,75' },
+  ],
+  total: { label: 'Total', value: '322,45' },
+};
+
+const BALANCE = {
+  heading: 'BALANCETE ANALITICO',
+  rows: [
+    { label: '21 Clientes', value: '418 902,11' },
+    { label: '22 Fornecedores', value: '207 441,08' },
+    { label: '31 Compras', value: '', redacted: true },
+    { label: '63 Gastos com pessoal', value: '', redacted: true },
+  ],
+  total: { label: 'Diferenca', value: '0,00' },
+};
+
+const TIMESHEET = {
+  heading: 'FOLHA DE HORAS',
+  rows: [
+    { label: 'Trabalho de campo', value: '7,5 h' },
+    { label: 'Revisao', value: '3,0 h' },
+    { label: 'Arquivo', value: '1,5 h' },
+  ],
+};
+---
+
+<Base
+  title="What Syntexia can put in a contract"
+  description="What the systems read, and what this website does not do."
+  path="/security"
+>
+  <section class="section first">
+    <div class="shell split">
+      <div>
+        <h1>We read the paperwork nobody wants to read.</h1>
+        <p class="lead">
+          Supplier invoices, trial balances, timesheets, audit working papers. Read,
+          checked against the source, and posted into the systems your team already uses.
+        </p>
+        <p class="acts"><a class="btn btn-primary" href="/#contact">Send us a document</a></p>
+      </div>
+
+      <div class="pile">
+        <Sheet heading={INVOICE.heading} rows={INVOICE.rows} total={INVOICE.total} />
+        <Sheet heading={BALANCE.heading} rows={BALANCE.rows} total={BALANCE.total} />
+        <Sheet heading={TIMESHEET.heading} rows={TIMESHEET.rows} />
+        <p class="legend">Illustrative documents. No customer data.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="shell">
+      <h2>What we can put in a contract</h2>
+      <div class="answers">
+        {contractAnswers.map((a) => (
+          <div class="answer">
+            <h3>{a.title}</h3>
+            <p>{a.body}</p>
+          </div>
+        ))}
+      </div>
+
+      {!securityIsLinked && (
+        <p class="pending">
+          Everything on this page is verifiable from the site itself. The commitments a
+          buyer asks for next, where it runs, how long it is kept, who else touches it,
+          and whether it trains a model, are not published here yet, because they are
+          contractual answers and not marketing copy.
+        </p>
+      )}
+    </div>
+  </section>
+</Base>
+
+<style>
+  .first { border-top: 0; }
+  .split { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-9); align-items: start; }
+  .lead { margin-top: var(--s-5); font-size: 17px; }
+  .acts { margin-top: var(--s-6); }
+  .pile { display: flex; flex-direction: column; gap: var(--s-4); }
+  .legend { font-size: var(--t-small); color: var(--mute-2); margin-top: var(--s-2); }
+  .answers {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--s-6);
+    margin-top: var(--s-6);
+  }
+  .answer p { margin-top: var(--s-3); }
+  .pending {
+    margin-top: var(--s-7);
+    font-size: var(--t-small);
+    line-height: var(--lh-small);
+    color: var(--mute-2);
+    max-width: 68ch;
+  }
+  @media (max-width: 860px) {
+    .split { grid-template-columns: 1fr; gap: var(--s-7); }
+  }
+</style>

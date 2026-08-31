@@ -1,0 +1,15 @@
+---
+// Matrice 5x5 formant un S, point central en accent.
+// Motif repris à l'identique de l'ancien src/sections.jsx (BRAND_PATTERN).
+// Son animation brandSignalEmerge est le seul mouvement du site.
+const PATTERN = [
+  1, 1, 1, 1, 0,
+  1, 0, 0, 0, 0,
+  1, 1, 2, 1, 1,
+  0, 0, 0, 0, 1,
+  1, 1, 1, 1, 0,
+];
+---
+<span class="brand-mark" aria-hidden="true">
+  {PATTERN.map((v) => <i class={v === 1 ? 'on' : v === 2 ? 'acc' : ''}></i>)}
+</span>

@@ -1,6 +1,180 @@
 ---
 import Base from '../layouts/Base.astro';
+import DayRow from '../components/DayRow.astro';
+import ContactForm from '../components/ContactForm.astro';
+import { getCollection } from 'astro:content';
+import { sectors, dayTotals, deploymentCount, partnerNetworkUrl } from '../facts';
+
+// Bloc .d2 de design/syntexia-home-4da.html, reproduit.
+// Les huit lignes sont des opérations types, déclarées comme telles dans le
+// même bloc. Aucune ne prétend à un fait mesuré.
+const DAY = [
+  { hour: '02:14', kind: 'Voice', text: "A member cancels tomorrow's seven o'clock session. The studio's own rule is applied, the slot is released, nobody is woken up." },
+  { hour: '06:40', kind: 'Documents', text: 'Eleven supplier invoices arrive overnight. Lines are read, matched to the order, posted to the ERP with the source attached.' },
+  { hour: '07:55', kind: 'Voice', text: 'A caller asks for opening hours in English. The call switches language mid-sentence and stays there.' },
+  { hour: '09:12', kind: 'Documents', text: "A trial balance is reconciled against last year's closing. Two accounts do not tie. Both are flagged with the working paper reference." },
+  { hour: '11:30', kind: 'Voice', text: 'Someone wants a piece valued. The call goes to a person, who picks up with the summary already written.' },
+  { hour: '14:05', kind: 'Documents', text: 'Timesheets for the week are checked against the engagement budget. Three entries land in the wrong year and are corrected.' },
+  { hour: '17:48', kind: 'Voice', text: 'A supplier calls about an unpaid invoice. The reference is found in four seconds and read back.' },
+  { hour: '23:41', kind: 'Documents', text: 'The day is closed. Everything posted is written to an audit trail that survives the people who wrote it.' },
+];
+
+// « across five companies » dans la maquette. Le nombre n'est pas sourcé,
+// donc la formulation sans nombre est retenue. Voir docs/REVIEW.md.
+const heading = deploymentCount
+  ? `One Tuesday, across ${deploymentCount.value} companies. Nobody was on shift.`
+  : 'One Tuesday, across our live deployments. Nobody was on shift.';
+
+const sub =
+  'Not a chatbot. Not a co-pilot. The layer that does the work inside the systems these companies already run.';
+
+const posts = (await getCollection('posts')).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
+);
+
+const fmt = (d: Date) =>
+  d.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
 ---
-<Base title="Syntexia">
-  <h1>Socle P1</h1>
+
+<Base
+  title="Syntexia. Voice and document systems for regulated companies."
+  description={sub}
+  path="/"
+>
+  <section class="day-section">
+    <div class="shell">
+      <h1>{heading}</h1>
+      <p class="lead">{sub}</p>
+
+      <p class="disclaimer">
+        A typical Tuesday. This is not a live feed and no customer data appears on this page.
+      </p>
+
+      <div class="day">
+        {DAY.map((d) => <DayRow hour={d.hour} kind={d.kind} text={d.text} />)}
+      </div>
+
+      {dayTotals && (
+        <div class="totals">
+          <div><b class="tabular">{dayTotals.value.calls}</b><span>calls answered</span></div>
+          <div><b class="tabular">{dayTotals.value.documents}</b><span>documents read</span></div>
+          <div><b class="tabular">{dayTotals.value.people}</b><span>people on shift</span></div>
+        </div>
+      )}
+
+      <div class="acts">
+        <a class="btn btn-primary" href="#contact">Book a call</a>
+        <a class="btn btn-secondary" href="#sectors">See what we run</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="sectors">
+    <div class="shell">
+      <h2>We build for</h2>
+      <div class="sectors">
+        {sectors.map((s) => (
+          <div class="sector">
+            <h3>{s.name}</h3>
+            <p>{s.blurb}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  {partnerNetworkUrl && (
+    <section class="section">
+      <div class="shell">
+        <h2>Anthropic Claude Partner Network</h2>
+        <p>
+          Syntexia is a member of the network.
+          <a href={partnerNetworkUrl.value} rel="noopener">Read the announcement</a>.
+        </p>
+      </div>
+    </section>
+  )}
+
+  <section class="section" id="insights">
+    <div class="shell">
+      <h2>Insights</h2>
+      <div class="insights">
+        {posts.map((p) => (
+          <a class="insight" href={`/posts/${p.id}`}>
+            <span class="insight-date tabular">{fmt(p.data.date)}</span>
+            <h3>{p.data.title}</h3>
+            <p>{p.data.description}</p>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="contact">
+    <div class="shell">
+      <h2>Tell us what you want it to do</h2>
+      <p class="contact-lead">
+        We answer within a working day. If you would rather describe it out loud, say so and we will call you.
+      </p>
+      <ContactForm />
+    </div>
+  </section>
 </Base>
+
+<style>
+  .day-section { padding: var(--s-9) 0 var(--s-8); }
+  .lead {
+    font-size: var(--t-h3);
+    line-height: 1.4;
+    color: var(--ink-2);
+    margin-top: var(--s-5);
+    max-width: 46ch;
+  }
+  .disclaimer {
+    font-size: var(--t-small);
+    line-height: var(--lh-small);
+    color: var(--mute-2);
+    margin-top: var(--s-5);
+    max-width: 60ch;
+  }
+  .day { margin-top: var(--s-6); border-bottom: 1px solid var(--line-soft); }
+
+  .totals {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-8);
+    margin-top: var(--s-7);
+  }
+  .totals div { display: flex; flex-direction: column; gap: var(--s-2); }
+  .totals b { font-size: 44px; font-weight: 600; color: var(--accent); line-height: 1; }
+  .totals span { font-size: var(--t-small); color: var(--mute); }
+
+  .acts { display: flex; flex-wrap: wrap; gap: var(--s-4); margin-top: var(--s-7); }
+
+  .sectors {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: var(--s-6);
+    margin-top: var(--s-6);
+  }
+  .sector p { margin-top: var(--s-2); font-size: var(--t-body); }
+
+  .insights {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--s-6);
+    margin-top: var(--s-6);
+  }
+  .insight {
+    display: block;
+    text-decoration: none;
+    border-top: 1px solid var(--line);
+    padding-top: var(--s-4);
+  }
+  .insight-date { font-size: var(--t-small); color: var(--mute); }
+  .insight h3 { margin-top: var(--s-3); }
+  .insight p { margin-top: var(--s-3); font-size: var(--t-body); }
+  .insight:hover h3 { color: var(--accent); }
+
+  .contact-lead { margin: var(--s-4) 0 var(--s-6); }
+</style>

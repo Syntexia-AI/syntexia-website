@@ -1,0 +1,56 @@
+---
+// Document reproduit. C'est le seul endroit du site où la mono est du
+// contenu et non de la décoration. Données entièrement fictives.
+interface Row { label: string; value: string; redacted?: boolean; }
+interface Props { heading: string; rows: Row[]; total?: Row; }
+const { heading, rows, total } = Astro.props;
+---
+<div class="sheet">
+  <h4 class="sheet-head">{heading}</h4>
+  <table>
+    <tbody>
+      {rows.map((r) => (
+        <tr>
+          <td>{r.label}</td>
+          <td class="n">{r.redacted ? <span class="black" aria-label="redacted"></span> : r.value}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+  {total && (
+    <>
+      <div class="sheet-rule"></div>
+      <table><tbody><tr><td>{total.label}</td><td class="n">{total.value}</td></tr></tbody></table>
+    </>
+  )}
+</div>
+
+<style>
+  .sheet {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 0;
+    padding: var(--s-5);
+    font-family: var(--font-mono);
+    font-size: var(--t-small);
+    color: var(--ink-2);
+  }
+  .sheet-head {
+    font-family: var(--font-mono);
+    font-size: var(--t-small);
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: var(--s-4);
+  }
+  .sheet table { width: 100%; border-collapse: collapse; }
+  .sheet td { padding: 3px 0; vertical-align: baseline; }
+  .sheet td.n { text-align: right; font-variant-numeric: tabular-nums; }
+  .sheet-rule { border-top: 1px solid var(--line); margin: var(--s-3) 0; }
+  .black {
+    display: inline-block;
+    width: 84px;
+    height: 11px;
+    background: var(--ink);
+    vertical-align: middle;
+  }
+</style>

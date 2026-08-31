@@ -1,0 +1,53 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+
+const posts = (await getCollection('posts')).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
+);
+const fmt = (d: Date) => d.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+---
+
+<Base
+  title="Insights from Syntexia"
+  description="Field notes and sector analysis from the team that builds and runs the systems."
+  path="/blog"
+>
+  <section class="section first">
+    <div class="shell">
+      <h1>Insights</h1>
+      <div class="list">
+        {posts.map((p) => (
+          <a class="row" href={`/posts/${p.id}`}>
+            <span class="row-date tabular">{fmt(p.data.date)}</span>
+            <span class="row-body">
+              <span class="row-title">{p.data.title}</span>
+              <span class="row-desc">{p.data.description}</span>
+            </span>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .first { border-top: 0; }
+  .list { margin-top: var(--s-7); border-top: 1px solid var(--line); }
+  .row {
+    display: grid;
+    grid-template-columns: 160px 1fr;
+    gap: var(--s-5);
+    padding: var(--s-6) 0;
+    border-bottom: 1px solid var(--line-soft);
+    text-decoration: none;
+  }
+  .row-date { font-size: var(--t-small); color: var(--mute); }
+  .row-body { display: block; }
+  .row-title { display: block; font-size: var(--t-h3); font-weight: 600; line-height: var(--lh-h3); }
+  .row-desc { display: block; margin-top: var(--s-3); color: var(--ink-2); max-width: 62ch; }
+  .row:hover .row-title { color: var(--accent); }
+  @media (max-width: 640px) {
+    .row { grid-template-columns: 1fr; gap: var(--s-2); }
+  }
+</style>
