@@ -1,6 +1,10 @@
-.DS_Store
+node_modules/
+dist/
+.astro/
 .vercel/
-.design-canvas.state.json
+.env
+.env.*
+!.env.example
+.DS_Store
 *.napkin
 _preview-*
-node_modules/

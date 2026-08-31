@@ -1,20 +1,25 @@
 {
-  "cleanUrls": true,
-  "trailingSlash": false,
   "redirects": [
+    {
+      "source": "/(.*)",
+      "has": [{ "type": "host", "value": "syntexia.ai" }],
+      "destination": "https://www.syntexia.ai/$1",
+      "permanent": true
+    },
     { "source": "/install-signature", "destination": "/", "permanent": true }
   ],
   "headers": [
     {
-      "source": "/(.*)\\.(svg|css|jsx|js)",
+      "source": "/(.*)",
       "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=3600, must-revalidate" }
-      ]
-    },
-    {
-      "source": "/(.*)\\.html",
-      "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "X-Frame-Options", "value": "DENY" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
+        { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=()" },
+        {
+          "key": "Content-Security-Policy-Report-Only",
+          "value": "default-src 'self'; img-src 'self' data:; font-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'; frame-ancestors 'none'; form-action 'self'; base-uri 'self'; object-src 'none'"
+        }
       ]
     }
   ]
