@@ -1,88 +1,150 @@
 ---
 import Base from '../layouts/Base.astro';
-import DayRow from '../components/DayRow.astro';
 import ContactForm from '../components/ContactForm.astro';
 import MarkCanvas from '../components/MarkCanvas.astro';
+import Sheet from '../components/Sheet.astro';
 import { getCollection } from 'astro:content';
-import { sectors, dayTotals, deploymentCount, partnerNetworkUrl } from '../facts';
+import { sectors, partnerNetworkUrl } from '../facts';
 
-// Bloc .d2 de design/syntexia-home-4da.html, reproduit.
-// Les huit lignes sont des opérations types, déclarées comme telles dans le
-// même bloc. Aucune ne prétend à un fait mesuré.
-const DAY = [
-  { hour: '02:14', kind: 'Voice', text: "A member cancels tomorrow's seven o'clock session. The studio's own rule is applied, the slot is released, nobody is woken up." },
-  { hour: '06:40', kind: 'Documents', text: 'A new engagement is screened before anyone accepts it. Beneficial owners, sanctions, politically exposed persons. The conclusion is dated the day it is reached.' },
-  { hour: '07:55', kind: 'Voice', text: 'A caller asks for opening hours in English. The call switches language mid-sentence and stays there.' },
-  { hour: '09:12', kind: 'Documents', text: "A trial balance is reconciled against last year's closing. Two accounts do not tie. Both are flagged with the working paper reference." },
-  { hour: '11:30', kind: 'Voice', text: 'Someone wants a piece valued. The call goes to a person, who picks up with the summary already written.' },
-  { hour: '14:05', kind: 'Documents', text: 'Timesheets for the week are checked against the engagement budget. Three entries land in the wrong year and are corrected.' },
-  { hour: '17:48', kind: 'Voice', text: 'A caller asks for someone who has left for the day. No transfer is attempted. The call-back is registered, and the team has it in writing.' },
-  { hour: '23:41', kind: 'Documents', text: 'The day is closed. Everything posted is written to an audit trail that survives the people who wrote it.' },
+// Copy repris de l'ancien site, commit c887605, src/sections.jsx.
+// C'est le meilleur matériau dont nous disposons, et il n'est pas centré sur la
+// voix : il décrit une couche d'intelligence. Trois nettoyages, imposés par la
+// section 2 de la directive :
+//   - « quiet, embedded, always on » retiré, triplet parallèle.
+//   - « reading, routing, drafting, reconciling, anticipating » retiré, c'est
+//     le motif « reads, routes, drafts » explicitement interdit.
+//   - « Live in real organizations, every day » retiré, statut non sourcé.
+// Les emphases dans les titres sont retirées, elles sont interdites.
+
+const heading = 'The intelligence layer for serious operations.';
+const sub =
+  'Not a chatbot. Not a co-pilot. Intelligence that runs inside the systems your business already uses, where the work actually happens.';
+
+// Les quatre piliers. Structure et texte de l'ancien site, nettoyés.
+const PILLARS = [
+  {
+    label: 'It lives inside your systems',
+    title: 'Intelligence that runs where your business already runs.',
+    body:
+      'Your intelligence is not a separate platform staff log into. It runs inside the systems you already use: the phone line, the inbox, the documents, the accounting and audit software.',
+  },
+  {
+    label: 'It communicates with your teams',
+    title: 'It picks up the phone, drafts the report, pulls the number.',
+    body:
+      'It speaks the language of the people who run your business, answering internal questions, drafting reports and surfacing the numbers that matter, inside the tools the team already uses.',
+  },
+  {
+    label: 'It acts alongside them',
+    title: 'Not advice. It does the work, end to end.',
+    body:
+      "The repetitive operations that consume your team's time happen automatically, accurately and continuously, escalating only what needs a human.",
+  },
+  {
+    label: 'It shows you what is next',
+    title: 'Foresight that surfaces what matters before it becomes urgent.',
+    body:
+      'It does not only describe what already happened. It looks forward, at your data, patterns and risks, and tells your team what to act on now to change the outcome.',
+  },
 ];
 
-// La maquette dit « One Tuesday, across five companies. Nobody was on shift. »
-// Le nombre n'est pas sourcé. La directive proposait de le remplacer par
-// « across our live deployments », mais cette formulation affirme encore un
-// statut de déploiement en production, qui est une affirmation de catégorie B
-// tout autant que le nombre. Le vérificateur de claims l'a relevée.
-// Le segment est donc retiré, pas réécrit. Il revient tel quel dès que
-// deploymentCount est renseigné. Voir docs/REVIEW.md.
-const heading = deploymentCount
-  ? `One Tuesday, across ${deploymentCount.value} firms. Nobody started from a blank page.`
-  : 'One Tuesday. Nobody started from a blank page.';
-
-const sub =
-  'Not a chatbot. Not a co-pilot. The agent prepares the file, the auditor validates it, inside the software the firm already uses.';
+// Pièces reproduites, remontées de /security. Le benchmark est net : aucun des
+// huit acteurs du documentaire ne montre de document. Données entièrement
+// fictives, déclarées comme telles sous la pile.
+const INVOICE = {
+  heading: 'FATURA FT 2026/0148',
+  rows: [
+    { label: 'Fornecedor', value: '', redacted: true },
+    { label: 'NIF', value: '', redacted: true },
+    { label: 'Bacalhau demolhado 5 kg', value: '184,50' },
+    { label: 'Azeite virgem extra 5 L', value: '96,20' },
+  ],
+  total: { label: 'Total', value: '322,45' },
+};
+const BALANCE = {
+  heading: 'BALANCETE ANALITICO',
+  rows: [
+    { label: '21 Clientes', value: '418 902,11' },
+    { label: '22 Fornecedores', value: '207 441,08' },
+    { label: '31 Compras', value: '', redacted: true },
+  ],
+  total: { label: 'Diferenca', value: '0,00' },
+};
+const TIMESHEET = {
+  heading: 'FOLHA DE HORAS',
+  rows: [
+    { label: 'Trabalho de campo', value: '7,5 h' },
+    { label: 'Revisao', value: '3,0 h' },
+    { label: 'Arquivo', value: '1,5 h' },
+  ],
+};
 
 const posts = (await getCollection('posts')).sort(
   (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
 );
-
-const fmt = (d: Date) =>
-  d.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+const fmt = (d: Date) => d.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
 ---
 
 <Base
-  title="Syntexia. Audit paperwork prepared by an agent, validated by the auditor."
+  title="Syntexia. The intelligence layer for serious operations."
   description={sub}
   path="/"
 >
-  <section class="day-section">
+  <section class="hero">
+    <div class="shell hero-grid">
+      <div class="hero-text">
+        <h1>{heading}</h1>
+        <p class="lead">{sub}</p>
+        <div class="acts">
+          <a class="btn btn-primary" href="#contact">Book a call</a>
+          <a class="btn btn-secondary" href="#what">See what it does</a>
+        </div>
+      </div>
+      <MarkCanvas class="hero-mark" size={340} />
+    </div>
+  </section>
+
+  <section class="section" id="what">
     <div class="shell">
-      <div class="hero-grid">
-        <div class="hero-text">
-          <h1>{heading}</h1>
-          <p class="lead">{sub}</p>
-        </div>
-        <MarkCanvas class="hero-mark" size={360} />
+      <div class="pillars">
+        {PILLARS.map((p) => (
+          <article class="pillar">
+            <p class="pillar-label">{p.label}</p>
+            <h2>{p.title}</h2>
+            <p class="pillar-body">{p.body}</p>
+          </article>
+        ))}
       </div>
+    </div>
+  </section>
 
-      <p class="disclaimer">
-        A typical Tuesday. This is not a live feed and no customer data appears on this page.
-      </p>
-
-      <div class="day">
-        {DAY.map((d) => <DayRow hour={d.hour} kind={d.kind} text={d.text} />)}
+  <section class="section" id="paperwork">
+    <div class="shell paper-grid">
+      <div class="paper-text">
+        <h2>We read the paperwork nobody wants to read.</h2>
+        <p>
+          Supplier invoices, trial balances, timesheets, audit working papers. Read,
+          checked against the source, and prepared inside the software your team
+          already uses.
+        </p>
+        <p class="paper-note">
+          The agent prepares the file. The auditor validates it. Nothing is concluded
+          without a person signing it.
+        </p>
+        <p><a href="/security">What we can put in a contract</a></p>
       </div>
-
-      {dayTotals && (
-        <div class="totals">
-          <div><b class="tabular">{dayTotals.value.calls}</b><span>calls answered</span></div>
-          <div><b class="tabular">{dayTotals.value.documents}</b><span>documents read</span></div>
-          <div><b class="tabular">{dayTotals.value.people}</b><span>people on shift</span></div>
-        </div>
-      )}
-
-      <div class="acts">
-        <a class="btn btn-primary" href="#contact">Book a call</a>
-        <a class="btn btn-secondary" href="#sectors">See what we run</a>
+      <div class="pile">
+        <Sheet heading={INVOICE.heading} rows={INVOICE.rows} total={INVOICE.total} />
+        <Sheet heading={BALANCE.heading} rows={BALANCE.rows} total={BALANCE.total} />
+        <Sheet heading={TIMESHEET.heading} rows={TIMESHEET.rows} />
+        <p class="legend">Illustrative documents. No customer data.</p>
       </div>
     </div>
   </section>
 
   <section class="section" id="sectors">
     <div class="shell">
-      <h2>What we run</h2>
+      <h2 class="section-title">What we run today</h2>
       <div class="sectors">
         {sectors.map((s) => (
           <div class="sector">
@@ -97,7 +159,7 @@ const fmt = (d: Date) =>
   {partnerNetworkUrl && (
     <section class="section">
       <div class="shell">
-        <h2>Anthropic Claude Partner Network</h2>
+        <h2 class="section-title">Anthropic Claude Partner Network</h2>
         <p>
           Syntexia is a member of the network.
           <a href={partnerNetworkUrl.value} rel="noopener">Read the announcement</a>.
@@ -108,7 +170,7 @@ const fmt = (d: Date) =>
 
   <section class="section" id="insights">
     <div class="shell">
-      <h2>Insights</h2>
+      <h2 class="section-title">Insights</h2>
       <div class="insights">
         {posts.map((p) => (
           <a class="insight" href={`/posts/${p.id}`}>
@@ -123,9 +185,10 @@ const fmt = (d: Date) =>
 
   <section class="section" id="contact">
     <div class="shell">
-      <h2>Tell us what you want it to do</h2>
+      <h2 class="section-title">Tell us what you want it to do</h2>
       <p class="contact-lead">
-        We answer within a working day. If you would rather describe it out loud, say so and we will call you.
+        We answer within a working day. If you would rather describe it out loud, say
+        so and we will call you.
       </p>
       <ContactForm />
     </div>
@@ -133,71 +196,121 @@ const fmt = (d: Date) =>
 </Base>
 
 <style>
-  .day-section { padding: var(--s-9) 0 var(--s-8); }
+  /* ---------- Accroche ---------- */
+
+  .hero { padding: var(--s-10) 0 var(--s-9); }
 
   .hero-grid {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
-    gap: var(--s-8);
+    gap: var(--s-9);
     align-items: center;
   }
-  .hero-mark { justify-self: end; }
-  @media (max-width: 900px) {
-    .hero-grid { grid-template-columns: 1fr; gap: var(--s-6); }
-    .hero-mark { justify-self: start; --mark3d-size: 220px; }
-  }
+
+  .hero h1 { max-width: 15ch; }
+
   .lead {
-    font-size: var(--t-h3);
-    line-height: 1.4;
+    font-size: 19px;
+    line-height: 1.55;
     color: var(--ink-2);
-    margin-top: var(--s-5);
-    max-width: 46ch;
+    margin-top: var(--s-6);
+    max-width: 48ch;
   }
-  .disclaimer {
+
+  /* Les boutons vivent dans l'accroche, donc visibles sans défiler. Ils étaient
+     après les huit lignes horaires, mesurés à 1533 px sur desktop. */
+  .acts { display: flex; flex-wrap: wrap; gap: var(--s-4); margin-top: var(--s-7); }
+
+  .hero-mark { justify-self: end; }
+
+  /* ---------- Piliers ---------- */
+
+  .pillars {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--s-9) var(--s-8);
+  }
+
+  .pillar { border-top: 1px solid var(--line); padding-top: var(--s-5); }
+
+  .pillar-label {
+    font-size: var(--t-small);
+    line-height: var(--lh-small);
+    color: var(--mute);
+    margin-bottom: var(--s-4);
+  }
+
+  .pillar h2 {
+    font-size: var(--t-h3);
+    line-height: var(--lh-h3);
+    letter-spacing: -0.012em;
+    max-width: 24ch;
+  }
+
+  .pillar-body { margin-top: var(--s-4); max-width: 46ch; }
+
+  /* ---------- Paperasse ---------- */
+
+  .paper-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: var(--s-9);
+    align-items: start;
+  }
+
+  .paper-text h2 { max-width: 16ch; }
+  .paper-text p { margin-top: var(--s-5); }
+  .paper-note { color: var(--ink); }
+
+  .pile { display: flex; flex-direction: column; gap: var(--s-4); }
+
+  .legend {
     font-size: var(--t-small);
     line-height: var(--lh-small);
     color: var(--mute-2);
-    margin-top: var(--s-5);
-    max-width: 60ch;
+    margin-top: var(--s-2);
   }
-  .day { margin-top: var(--s-6); border-bottom: 1px solid var(--line-soft); }
 
-  .totals {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--s-8);
-    margin-top: var(--s-7);
-  }
-  .totals div { display: flex; flex-direction: column; gap: var(--s-2); }
-  .totals b { font-size: 44px; font-weight: 600; color: var(--accent); line-height: 1; }
-  .totals span { font-size: var(--t-small); color: var(--mute); }
+  /* ---------- Secteurs, insights, contact ---------- */
 
-  .acts { display: flex; flex-wrap: wrap; gap: var(--s-4); margin-top: var(--s-7); }
+  .section-title { margin-bottom: var(--s-7); }
 
   .sectors {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: var(--s-6);
-    margin-top: var(--s-6);
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--s-8);
   }
-  .sector p { margin-top: var(--s-2); font-size: var(--t-body); }
+  .sector { border-top: 1px solid var(--line); padding-top: var(--s-5); }
+  .sector p { margin-top: var(--s-3); }
 
   .insights {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: var(--s-6);
-    margin-top: var(--s-6);
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--s-8);
   }
   .insight {
     display: block;
     text-decoration: none;
     border-top: 1px solid var(--line);
-    padding-top: var(--s-4);
+    padding-top: var(--s-5);
   }
   .insight-date { font-size: var(--t-small); color: var(--mute); }
-  .insight h3 { margin-top: var(--s-3); }
-  .insight p { margin-top: var(--s-3); font-size: var(--t-body); }
+  .insight h3 { margin-top: var(--s-3); max-width: 24ch; }
+  .insight p { margin-top: var(--s-3); }
   .insight:hover h3 { color: var(--accent); }
 
-  .contact-lead { margin: var(--s-4) 0 var(--s-6); }
+  .contact-lead { margin-bottom: var(--s-7); }
+
+  /* ---------- Adaptation ---------- */
+
+  @media (max-width: 980px) {
+    .hero-grid { grid-template-columns: 1fr; gap: var(--s-7); }
+    .hero-mark { justify-self: start; --mark3d-size: 240px; }
+    .paper-grid { grid-template-columns: 1fr; gap: var(--s-7); }
+  }
+
+  @media (max-width: 720px) {
+    .hero { padding: var(--s-8) 0 var(--s-7); }
+    .pillars { grid-template-columns: 1fr; gap: var(--s-7); }
+  }
 </style>

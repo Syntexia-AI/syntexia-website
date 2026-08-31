@@ -165,6 +165,24 @@ const { size = 340, class: cls = '' } = Astro.props;
     const canvas = host.querySelector('[data-mark3d-canvas]') as HTMLCanvasElement | null;
     if (!canvas) return;
 
+    // Un contexte WebGL peut être perdu à tout moment : mise en veille,
+    // pression mémoire, changement de carte graphique, onglet longtemps en
+    // arrière-plan. Sans ce traitement, le canvas reste un rectangle blanc
+    // pour toujours. Observé en rendu logiciel, et corrigé ici.
+    if (!(canvas as any).__lossWired) {
+      (canvas as any).__lossWired = true;
+      canvas.addEventListener('webglcontextlost', (e) => {
+        e.preventDefault();
+        const raf = (canvas as any).__raf;
+        if (raf) cancelAnimationFrame(raf);
+        // Repasser en non prêt : la règle CSS remet l'opacité à zéro, donc le
+        // canvas s'efface au lieu de blanchir. La grille CSS du mark reste
+        // dans le masthead, la page ne perd rien.
+        delete host.dataset.ready;
+      });
+      canvas.addEventListener('webglcontextrestored', () => start(host));
+    }
+
     const gl = (canvas.getContext('webgl', {
       alpha: true,
       antialias: true,
@@ -333,6 +351,7 @@ const { size = 340, class: cls = '' } = Astro.props;
       fade += (1 - fade) * 0.05;
       draw(spin);
       raf = requestAnimationFrame(frame);
+      (canvas as any).__raf = raf;
     }
 
     // Le canvas ne tourne que s'il est à l'écran. Onglet en arrière-plan ou
@@ -343,6 +362,7 @@ const { size = 340, class: cls = '' } = Astro.props;
         running = true;
         t0 = 0;
         raf = requestAnimationFrame(frame);
+        (canvas as any).__raf = raf;
       } else if (!visible && running) {
         running = false;
         cancelAnimationFrame(raf);
