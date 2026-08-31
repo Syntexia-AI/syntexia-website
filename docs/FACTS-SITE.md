@@ -2,21 +2,21 @@
 
 Une ligne par fait. Source obligatoire. Sans source, le fait n'entre pas sur le site.
 
-**État au 2026-08-31 : gabarit déposé, non rempli.** Aucune valeur ci-dessous n'a été renseignée par moi, sauf les quatre lignes marquées `statut: VÉRIFIÉ` dont la source est le repo lui-même, et la ligne `canonique` dont le constat W0 est reporté tel quel.
+**État au 2026-08-31, après la passe complète.** Trois lignes sont passées en VÉRIFIÉ ou TRANCHÉ pendant la passe : la raison sociale (source tierce Companies House), la forme canonique (décision), la date de l article audit. Tout le reste est vide, et tout ce qui est vide est absent du site.
 
 Ce fichier est à remplir par Karim et Baptiste. W1 ne démarre pas avant.
 Chaque ligne renseignée doit basculer la ligne correspondante de `docs/CLAIMS.md`.
 
 ```
 ## Société
-raison_sociale: Syntexia.AI Ltd | source: Companies House 16847343 (URL) | statut: À VALIDER (le numéro vient de la directive, pas du repo. Aucune mention de raison sociale ni de numéro d'immatriculation n'existe dans le site actuel.)
+raison_sociale: SYNTEXIA.AI LTD | source: Companies House, fiche 16847343, https://find-and-update.company-information.service.gov.uk/company/16847343, consultée le 2026-08-31 | statut: VÉRIFIÉ. Active, immatriculée le 11 novembre 2025. Rendue dans le pied de page, avec lien vers la fiche.
 canonique: www.syntexia.ai | source: amendement A2 du 2026-08-31 | statut: TRANCHÉ. Apex en 301 permanent vers www dans vercel.json. Les og:url du repo sont déjà corrects, ils ne changent pas. Contrôle W6 : `curl -sI https://syntexia.ai` renvoie 301.
 siege_formulation: | source: | statut: À VALIDER (le site se contredit : voir CLAIMS.md C7 contre C3/C8)
 operations_formulation: | source: | statut: À VALIDER (Karim)
 linkedin_societe_url: | statut: ABSENT du repo
 linkedin_karim_url: https://www.linkedin.com/in/karim-vissangy-17aa893a/ | source: team.html:83 | statut: VÉRIFIÉ (source repo)
 linkedin_baptiste_url: | statut: ABSENT du repo
-annonce_partner_network_url: | statut: ABSENT du repo (bloque les 8 mentions du partenariat, voir CLAIMS.md section D)
+annonce_partner_network_url: | source: recherche du 2026-08-31, voir docs/SOURCES-P2.md | statut: NON SOURCÉ. Le programme existe (anthropic.com/news/claude-partner-network) mais l annuaire officiel partnerhub.claude.com/directory listait 82 partenaires au jour de la consultation, sans Syntexia. Aucune source tierce. Les 8 mentions sont retirées du rendu. Ce n est PAS une preuve d absence de partenariat : un annuaire peut être partiel.
 early_access_models: | statut: À VALIDER (Karim) (about.html:153)
 telephone_+44_20_4620_4570_repondu: | statut: À VALIDER (non testable depuis l'environnement d'exécution)
 email_contact: office@syntexia.ai | source: sections.jsx:593 et les 5 pages statiques | statut: VÉRIFIÉ (source repo)
@@ -51,7 +51,7 @@ procurement_docs_80: | date: | source: | statut: À VALIDER (CLAIMS.md A7)
 ledgers_3_vers_1: | date: | source: | statut: À VALIDER (CLAIMS.md A5)
 
 ## Articles
-quiet_revolution: date= | auteur= | statut: À VALIDER (trois emplacements, deux dates : meta 2026-04-15, cartes Apr 2026, hero May 2026. Auteur affiché « Syntexia Editorial », sans meta author.)
+quiet_revolution: date=2026-04-15 | auteur=Syntexia Editorial | source: meta article:published_time de l article d origine, majoritaire contre l affichage du hero | statut: TRANCHÉ pour la date, les trois emplacements affichent April 2026. Reste à confirmer que « Syntexia Editorial » recouvre une entité réelle.
 precedent_meets_pace: date=2026-05-23 | auteur=Karim Vissangy | source: precedent-meets-pace.html:21-22, cohérent avec l'affichage l.113 et l.115 | statut: VÉRIFIÉ (source repo, cohérent)
 firms_we_work_with: | source: | statut: À VALIDER (the-quiet-revolution:130, affirmation de déploiement client non sourcée dans un article protégé. Voir arbitrage 1 du RAPPORT-W0.)
 

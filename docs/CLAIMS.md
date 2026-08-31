@@ -2,6 +2,33 @@
 
 Registre des affirmations factuelles publiées par le site. Établi en W0, à statuer par l'humain avant W1.
 
+> **Clôture de la passe complète, 2026-08-31.**
+>
+> Ce registre a été établi en W0 sur l'ancien site. La passe complète l'a soldé.
+>
+> - **Trois entrées sont passées SOURCÉES.** La raison sociale et le numéro de
+>   société (Companies House, fiche 16847343, consultée le 2026-08-31, active
+>   depuis le 11/11/2025), et deux affirmations de `/security` démontrables par
+>   le build : absence de cookie et de traceur, polices servies depuis notre
+>   origine.
+> - **Section D, partenariat Anthropic : close en NON SOURCÉ.** L'annuaire
+>   officiel `partnerhub.claude.com/directory` listait 82 partenaires au jour de
+>   la consultation, sans Syntexia, et aucune source tierce ne le nomme. Les huit
+>   mentions sont retirées du rendu. Ce n'est pas une preuve d'absence de
+>   partenariat, c'est une absence de preuve.
+> - **Entrées I1 à I5 : confirmées FAUSSES.** Aucun snapshot Wayback du domaine,
+>   à aucune date, aucune trace d'un ancien site Wix. Les cinq cartes sont
+>   supprimées.
+> - **Sections A, B, C, G : restent non sourcées, donc absentes du rendu**, avec
+>   les blocs qui les portaient.
+> - **Une entrée est apparue puis a été retirée pendant la passe.** Le titre de
+>   la home disait « across our live deployments », formulation proposée par la
+>   directive. Le vérificateur de claims l'a relevée comme affirmation de statut
+>   non sourcée. Segment retiré. Titre final : « One Tuesday. Nobody was on shift. »
+>
+> Ce qui reste retiré et comment le restaurer : `docs/REVIEW.md` section 3.
+> Sources tierces consultées : `docs/SOURCES-P2.md`.
+
 Règle : une affirmation qui n'est pas **VÉRIFIÉ** ne peut pas apparaître dans le rendu. Sans ligne correspondante dans `docs/FACTS-SITE.md`, elle sort.
 
 ## Statuts
@@ -13,7 +40,7 @@ Règle : une affirmation qui n'est pas **VÉRIFIÉ** ne peut pas apparaître dan
 - **SUPPRESSION PAR DÉFAUT** : affirmation non sourcée dans un article. Retirée sans réécriture, réintégrable telle quelle si FACTS-SITE.md la source (amendement A3).
 - **RETIRÉ** : la directive impose déjà sa disparition, indépendamment de sa véracité.
 
-Au 2026-08-31, aucune ligne n'est **VÉRIFIÉ** au titre d'une source externe. Les sept lignes marquées VÉRIFIÉ (E1, E2, E3, F2, H1, H2, H3) le sont au titre d'une source **interne au repo**, ce qui prouve seulement ce que le site déclare, pas que la déclaration est vraie. Conformément à A4, aucune d'elles ne pourra passer VÉRIFIÉ au sens plein sans source externe.
+Au 2026-08-31, **une seule affirmation est adossée à une source externe** : la raison sociale et le numéro de société, confirmés sur Companies House. Les sept lignes marquées VÉRIFIÉ (E1, E2, E3, F2, H1, H2, H3) le sont au titre d une source **interne au repo**, ce qui prouve ce que le site déclare, pas que la déclaration est vraie. Deux affirmations de /security sont sourcées par le **build** lui-même, quatrième type de source admis.
 
 ## Amendements appliqués
 

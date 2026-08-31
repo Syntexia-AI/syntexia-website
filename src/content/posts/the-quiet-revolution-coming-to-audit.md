@@ -17,7 +17,7 @@ Those are not the parts of audit that require professional scepticism. They are 
 
 > The most valuable thing AI can do for an auditor is give them back the hours they currently spend not auditing.
 
-## Where it's *quietly* already happening
+## Where it's quietly already happening
 
 It reads incoming documentation, extracts and classifies the relevant evidence, matches it to the assertions being tested, and surfaces what's missing. It drafts the workpaper narrative for the auditor to review, edit, and sign off. Never the other way around.
 

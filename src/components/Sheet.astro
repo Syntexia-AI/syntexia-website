@@ -12,7 +12,7 @@ const { heading, rows, total } = Astro.props;
       {rows.map((r) => (
         <tr>
           <td>{r.label}</td>
-          <td class="n">{r.redacted ? <span class="black" aria-label="redacted"></span> : r.value}</td>
+          <td class="n">{r.redacted ? <span class="black" role="img" aria-label="Redacted"></span> : r.value}</td>
         </tr>
       ))}
     </tbody>

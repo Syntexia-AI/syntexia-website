@@ -19,11 +19,16 @@ const DAY = [
   { hour: '23:41', kind: 'Documents', text: 'The day is closed. Everything posted is written to an audit trail that survives the people who wrote it.' },
 ];
 
-// « across five companies » dans la maquette. Le nombre n'est pas sourcé,
-// donc la formulation sans nombre est retenue. Voir docs/REVIEW.md.
+// La maquette dit « One Tuesday, across five companies. Nobody was on shift. »
+// Le nombre n'est pas sourcé. La directive proposait de le remplacer par
+// « across our live deployments », mais cette formulation affirme encore un
+// statut de déploiement en production, qui est une affirmation de catégorie B
+// tout autant que le nombre. Le vérificateur de claims l'a relevée.
+// Le segment est donc retiré, pas réécrit. Il revient tel quel dès que
+// deploymentCount est renseigné. Voir docs/REVIEW.md.
 const heading = deploymentCount
   ? `One Tuesday, across ${deploymentCount.value} companies. Nobody was on shift.`
-  : 'One Tuesday, across our live deployments. Nobody was on shift.';
+  : 'One Tuesday. Nobody was on shift.';
 
 const sub =
   'Not a chatbot. Not a co-pilot. The layer that does the work inside the systems these companies already run.';

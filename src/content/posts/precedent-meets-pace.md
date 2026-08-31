@@ -11,7 +11,7 @@ So it is no surprise that legal practices have approached artificial intelligenc
 
 **The real question has changed.** It is no longer whether the technology works, but whether a firm will adopt it on its own terms, or have the new pace dictated by clients who have already stopped waiting.
 
-## What AI is doing in law practices *today*
+## What AI is doing in law practices today
 
 The most useful way to understand the present moment is to look not at what AI might eventually do, but at the concrete, unglamorous work it is already handling well.
 
@@ -23,7 +23,7 @@ The most useful way to understand the present moment is to look not at what AI m
 
 **Drafting and first-pass production.** From engagement letters to standard clauses to client correspondence, AI handles the first draft, not to replace the lawyer's voice, but to remove the blank page. The work that follows is editing and judgement, which is where the value has always been.
 
-## What matters *more* than the capability
+## What matters more than the capability
 
 It is tempting to stop at the list of features. But the legal profession has specific, non-negotiable concerns, and any honest discussion of AI in law has to meet them directly.
 
@@ -31,7 +31,7 @@ Confidentiality and professional secrecy (*sigilo profissional*) are not optiona
 
 Equally, AI in law is not autonomous and should not be sold as such. It produces drafts, comparisons, and candidate answers. A qualified lawyer remains accountable for every output that reaches a client. The firms getting this right treat AI as an exceptionally capable junior, fast, tireless, and well-read, but always supervised.
 
-## What is *coming* down the road
+## What is coming down the road
 
 The trajectory is reasonably clear, even if the timing is not.
 
@@ -41,7 +41,7 @@ Further out, the competitive landscape itself will change. As AI absorbs the rou
 
 > Firms that cannot meet that expectation will not lose on quality; they will lose on relevance.
 
-## Why a *closed* industry knows it must ride the wave
+## Why a closed industry knows it must ride the wave
 
 Legal practice is, by design, a conservative profession. That conservatism is a feature: it protects clients, upholds standards, and resists fashions that would compromise rigour. It is entirely reasonable for a firm to refuse to adopt a technology it does not understand or cannot control.
 
