@@ -10,7 +10,7 @@ Chaque ligne renseignée doit basculer la ligne correspondante de `docs/CLAIMS.m
 ```
 ## Société
 raison_sociale: Syntexia.AI Ltd | source: Companies House 16847343 (URL) | statut: À VALIDER (le numéro vient de la directive, pas du repo. Aucune mention de raison sociale ni de numéro d'immatriculation n'existe dans le site actuel.)
-canonique: | source: RAPPORT-W0 | statut: DÉCISION REQUISE (constat W0 : apex et www répondent tous deux 200, aucune redirection, aucun canonical. Seul indice : tous les og:url pointent sur www.)
+canonique: www.syntexia.ai | source: amendement A2 du 2026-08-31 | statut: TRANCHÉ. Apex en 301 permanent vers www dans vercel.json. Les og:url du repo sont déjà corrects, ils ne changent pas. Contrôle W6 : `curl -sI https://syntexia.ai` renvoie 301.
 siege_formulation: | source: | statut: À VALIDER (le site se contredit : voir CLAIMS.md C7 contre C3/C8)
 operations_formulation: | source: | statut: À VALIDER (Karim)
 linkedin_societe_url: | statut: ABSENT du repo
@@ -24,17 +24,21 @@ email_contact: office@syntexia.ai | source: sections.jsx:593 et les 5 pages stat
 ## Équipe
 karim: titre=CEO & Chief AI Officer (team.html:81) | bio_2_phrases= | photo= | statut: titre VÉRIFIÉ (source repo), bio et photo ABSENTES
 baptiste: titre=CTO (team.html:94) | bio_2_phrases= | photo= | statut: titre VÉRIFIÉ (source repo), bio et photo ABSENTES
-meet_the_founder: | statut: À VALIDER (about.html:185 dit le singulier, install-signature.html publie 3 Co-Founder. Voir CLAIMS.md E6 à E9.)
+meet_the_founder: | statut: À VALIDER (about.html:185 dit le singulier. Le fichier supprimé en W1a en publiait trois portant la fonction de co-fondateur. Voir CLAIMS.md E6 à E9.)
 
-## Secteurs réellement en production (liste fermée)
-secteurs: | source: | statut: DÉCISION REQUISE, BLOQUANTE (quatre listes contradictoires sur le site, huit noms distincts pour un compte affiché de cinq. Voir CLAIMS.md section B.)
-public_sector_live: | source: | statut: À VALIDER
-financial_services_live: | source: | statut: À VALIDER
-hospitality_live: | source: | statut: À VALIDER (nommé sur /about et /team, absent de la grille de la home)
-legal_live: | source: | statut: À VALIDER (sections.jsx:397 affiche « Live »)
-retail_luxury_live: | source: | statut: À VALIDER (sections.jsx:396 affiche « Live »)
-audit_live: | source: | statut: À VALIDER
-procurement_live: | source: | statut: À VALIDER (nommé sur la home uniquement, sections.jsx:300)
+## Secteurs réellement en production (liste fermée, sans compte)
+# Amendement A5 : aucun compte de secteurs n'apparaît sur le site. Ni « five »,
+# ni la stat « 5 », ni aucune formulation équivalente. Une seule liste nommée.
+# Statut binaire par secteur, source obligatoire. Un secteur sans client en
+# production nommé ici ne figure pas sur le site, ET SES CHIFFRES PARTENT AVEC LUI.
+secteurs: | source: | statut: DÉCISION REQUISE, BLOQUANTE (huit noms distincts sur quatre listes contradictoires. Voir CLAIMS.md section B.)
+public_sector_live: | client_en_production: | source: | statut: À VALIDER (emporte A1, A2, A3, A15 s'il tombe)
+financial_services_live: | client_en_production: | source: | statut: À VALIDER (emporte A4, A5, A6, A13 s'il tombe)
+audit_live: | client_en_production: | source: | statut: À VALIDER (emporte A14 s'il tombe)
+legal_live: | client_en_production: | source: | statut: À VALIDER (sections.jsx:397 affiche « Live ». Emporte A17 s'il tombe)
+retail_luxury_live: | client_en_production: | source: | statut: À VALIDER (sections.jsx:396 affiche « Live ». Emporte A10, A11, A12, A16 s'il tombe)
+hospitality_live: | client_en_production: | source: | statut: À VALIDER (nommé sur /about et /team, absent de la grille de la home)
+procurement_live: | client_en_production: | source: | statut: À VALIDER (nommé sur la home uniquement, sections.jsx:300. Emporte A7, A8, A9 s'il tombe)
 
 ## Chiffres (conservateurs, datés, sinon supprimés)
 deployments_live: | date: | source: | statut: À VALIDER (alimente le titre W4 point 2 et la mention W4 point 6)

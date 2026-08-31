@@ -2,7 +2,7 @@
 
 Wagon W0. Confirmation point par point de la section 1 de la directive, contre le code réel.
 
-Repo : Syntexia-AI/syntexia-website, commit `c887605d74b2236bd97689f16799dac08fcec2bd`, auteur Karim Vissangy, 2026-08-18 16:55:45 +0100, commit unique.
+Repo : Syntexia-AI/syntexia-website, commit `c887605d74b2236bd97689f16799dac08fcec2bd`, auteur : voir `git log -1 --format=%an`, 2026-08-18 16:55:45 +0100, commit unique.
 Branche de travail : `refonte-2026-09`, créée depuis `main`. Aucune modification de code en W0.
 Date de l'inventaire : 2026-08-31.
 
@@ -123,7 +123,7 @@ Détails confirmés :
 
 ## 9. `team.html`
 
-**CONFIRMÉ.** Karim Vissangy, `CEO & Chief AI Officer` (l.80-81), LinkedIn `https://www.linkedin.com/in/karim-vissangy-17aa893a/` (l.83). Baptiste Bouault, `CTO` (l.93-94), sans lien. Aucune photo, aucune biographie pour l'un comme pour l'autre.
+**CONFIRMÉ.** Deux fiches. Fiche 1 : nom, fonction et lien LinkedIn (`team.html:80-85`). Fiche 2 : nom et fonction, sans lien (`team.html:93-94`). Aucune photo, aucune biographie pour l une comme pour l autre. Les valeurs ne sont pas reproduites ici, amendement A1.
 
 **PRÉCISION.** `team.html:66-67` donne une **troisième** liste de secteurs, différente des deux autres : `financial services, audit, public sector, retail, hospitality, and now legal`.
 
@@ -135,7 +135,7 @@ Détails confirmés :
 
 **CONFIRMÉ, et la contradiction est triple.** `the-quiet-revolution-coming-to-audit.html` : meta `article:published_time` = `2026-04-15` (l.21), carte blog = `Apr 2026`, carte home = `Apr 2026`, mais le hero de l'article affiche `May 2026` (l.78). Auteur affiché `Syntexia Editorial` (l.80), et **aucune** meta `article:author`.
 
-`precedent-meets-pace.html` : meta `article:published_time` = `2026-05-23` (l.21), meta `article:author` = `Karim Vissangy` (l.22), auteur affiché `Karim Vissangy` (l.115), date affichée `May 2026` (l.113). Cohérent.
+`precedent-meets-pace.html` : meta `article:published_time` = `2026-05-23` (l.21), meta `article:author` (l.22) et auteur affiché (l.115) portent le même nom, non reproduit ici (A1), date affichée `May 2026` (l.113). Cohérent.
 
 **PRÉCISION.** `the-quiet-revolution-coming-to-audit.html:130` affirme `Inside the firms we work with, intelligence is now embedded in the day-to-day workflow of engagement teams.` C'est une affirmation de déploiement client, non sourcée, dans un article que la directive protège de toute modification hors typographie. Arbitrage requis, voir RAPPORT-W0.
 
@@ -173,11 +173,11 @@ Contrôle en production : `Strict-Transport-Security: max-age=63072000` est **pr
 
 | ligne source | personne | rôle publié | email | mobile |
 |---|---|---|---|---|
-| `install-signature.html:278-286` | Karim Vissangy | CEO & Chief AI Officer | nominatif `@syntexia.ai` | mobile UK, 11 chiffres |
-| `install-signature.html:287-295` | Amin Martins | Co-Founder & Chief Commercial Officer | nominatif `@syntexia.ai` | mobile PT, 12 chiffres |
-| `install-signature.html:296-304` | Rui Baião | Chief Technology Officer | nominatif `@syntexia.ai` | mobile PT, 12 chiffres |
-| `install-signature.html:305-313` | Miguel Fiel | Co-Founder | nominatif `@syntexia.ai` | mobile PT, 12 chiffres |
-| `install-signature.html:314-322` | Fernando Carvalho | Co-Founder | nominatif `@syntexia.ai` | mobile PT, 12 chiffres |
+| `install-signature.html:278-286` | personne 1 | fonction de direction | nominatif `@syntexia.ai` | mobile UK, 11 chiffres |
+| `install-signature.html:287-295` | personne 2 | fonction de co-fondateur et de direction | nominatif `@syntexia.ai` | mobile PT, 12 chiffres |
+| `install-signature.html:296-304` | personne 3 | fonction de CTO | nominatif `@syntexia.ai` | mobile PT, 12 chiffres |
+| `install-signature.html:305-313` | personne 4 | fonction de co-fondateur | nominatif `@syntexia.ai` | mobile PT, 12 chiffres |
+| `install-signature.html:314-322` | personne 5 | fonction de co-fondateur | nominatif `@syntexia.ai` | mobile PT, 12 chiffres |
 
 Source : `install-signature.html:277-323`. Extraction confirmée par requête HTTP anonyme sur la page en ligne.
 
@@ -186,12 +186,12 @@ Source : `install-signature.html:277-323`. Extraction confirmée par requête HT
 Trois observations que la directive ne porte pas :
 
 1. La page publie aussi les **fonctions**, pas seulement les coordonnées.
-2. Miguel Fiel et Fernando Carvalho portent le **même** numéro de mobile (`install-signature.html:311` et `:320`). Erreur de saisie probable, qui n'atténue rien.
-3. `install-signature.html` désigne **Rui Baião** comme `Chief Technology Officer` tandis que `team.html:94` désigne **Baptiste Bouault** comme `CTO`. Le site publie deux CTO simultanément.
+2. Les personnes 4 et 5 portent le **même** numéro de mobile (`install-signature.html:311` et `:320`). Erreur de saisie probable, qui n'atténue rien.
+3. `install-signature.html` attribue la fonction de CTO à sa personne 3 (l.296-304) tandis que `team.html:93-94` l attribue à une autre personne. Le site publie deux CTO simultanément.
 
 **CONFIRMÉ.** Le repo est **public** : `visibility: PUBLIC`, `isPrivate: false`. Vérifié sans jeton : `https://api.github.com/repos/Syntexia-AI/syntexia-website` répond 200 en anonyme, et `https://raw.githubusercontent.com/Syntexia-AI/syntexia-website/main/install-signature.html` répond 200 en anonyme.
 
-**CONFIRMÉ.** Le repo contient `_internal/` (144 Ko, six fichiers, dont `Syntexia Email Signatures.html` qui reprend les mêmes coordonnées et ajoute une sixième adresse nominative, pour un Alex Mendez absent de la liste des cinq), `avatars/` (1,6 Mo, dix images personnelles de Karim), `_scripts/build-avatars.js`, `screenshots/` (128 Ko), et `DEPLOY.md`.
+**CONFIRMÉ.** Le repo contient `_internal/` (144 Ko, six fichiers, dont `Syntexia Email Signatures.html` qui reprend les mêmes coordonnées et ajoute une sixième adresse nominative, pour une personne absente de la liste des cinq), `avatars/` (1,6 Mo, dix images personnelles d un dirigeant), `_scripts/build-avatars.js`, `screenshots/` (128 Ko), et `DEPLOY.md`.
 
 **CONFIRMÉ.** `.vercelignore` exclut `_internal/`, `_scripts/`, `avatars/`, `screenshots/`, `DEPLOY.md` du déploiement. `.gitignore` ne les exclut pas. Ils sont donc absents du site et présents sur GitHub.
 
@@ -233,5 +233,5 @@ La forme canonique est une décision, pas un constat. Elle est portée en TODO-H
 | 9 | HSTS à ajouter (W6) | déjà présent, posé par Vercel |
 | 10 | non mentionné | `Procurement` est un secteur nommé sur la home |
 | 11 | non mentionné | trois listes de secteurs contradictoires sur trois pages |
-| 12 | non mentionné | deux CTO publiés simultanément (Rui Baião, Baptiste Bouault) |
+| 12 | non mentionné | deux personnes différentes portent publiquement la fonction de CTO (`install-signature.html:296-304` contre `team.html:93-94`) |
 | 13 | non mentionné | la home ne sert que 32 mots sans JavaScript |

@@ -10,7 +10,7 @@ Date : 2026-08-31.
 
 **1. Repo cloné et lu intégralement.**
 Le repo n'existait pas en local. Cloné dans `C:\Users\bapti\Code\syntexia-website` depuis `https://github.com/Syntexia-AI/syntexia-website.git`.
-Preuve : `git log -1` retourne `c887605d74b2236bd97689f16799dac08fcec2bd`, `Karim Vissangy <karimvissangy@Mac.lan>`, `2026-08-18 16:55:45 +0100`, message `Initial commit: syntexia.ai website`. Commit unique, conforme.
+Preuve : `git log -1` retourne `c887605d74b2236bd97689f16799dac08fcec2bd`, un auteur et une adresse de commit (non reproduits ici, A1), `2026-08-18 16:55:45 +0100`, message `Initial commit: syntexia.ai website`. Commit unique, conforme.
 `git ls-files` : 71 fichiers. Volume : 2,5 Mo dont 1,9 Mo de `.git`.
 
 **2. Section 1 de la directive confirmée point par point.**
@@ -73,10 +73,10 @@ gh repo view : visibility PUBLIC, isPrivate false
 
 Les trois aggravations non portées par la directive :
 1. La page publie aussi les **fonctions** de chacun, pas seulement les coordonnées.
-2. Miguel Fiel et Fernando Carvalho portent le **même** numéro de mobile (`install-signature.html:311` et `:320`).
-3. `install-signature.html:300` désigne **Rui Baião** comme `Chief Technology Officer` pendant que `team.html:94` désigne **Baptiste Bouault** comme `CTO`. Le site publie deux CTO.
+2. Deux des cinq personnes portent le **même** numéro de mobile (`install-signature.html:311` et `:320`).
+3. `install-signature.html:300` attribue la fonction de CTO à une personne, pendant que `team.html:93-94` l attribue à une autre. Le site publie deux CTO.
 
-Le repo contient par ailleurs `_internal/` (qui ajoute une sixième adresse nominative, pour un Alex Mendez absent de la liste des cinq), `avatars/` (1,6 Mo d'images personnelles de Karim, marquées `# Personal assets (NEVER ship)` dans `DEPLOY.md:103`), `_scripts/`, `screenshots/`, et `DEPLOY.md` lui-même qui expose le sous-domaine client `tcaintelligence.syntexia.ai` et la configuration Google Workspace. `.vercelignore` les exclut du site, `.gitignore` ne les exclut pas de GitHub.
+Le repo contient par ailleurs `_internal/` (qui ajoute une sixième adresse nominative, pour une sixième personne absente de la liste des cinq), `avatars/` (1,6 Mo d'images personnelles d un dirigeant, marquées `# Personal assets (NEVER ship)` dans `DEPLOY.md:103`), `_scripts/`, `screenshots/`, et `DEPLOY.md` lui-même qui expose le sous-domaine client `tcaintelligence.syntexia.ai` et la configuration Google Workspace. `.vercelignore` les exclut du site, `.gitignore` ne les exclut pas de GitHub.
 
 C'est le point 0 de W1, et la partie qui compte (réécriture d'historique, force push, désindexation) relève de l'humain. Procédure en TODO-HUMAIN 1.
 

@@ -6,12 +6,18 @@ Règle : une affirmation qui n'est pas **VÉRIFIÉ** ne peut pas apparaître dan
 
 ## Statuts
 
-- **VÉRIFIÉ** : source vérifiable identifiée. Peut être publié.
+- **VÉRIFIÉ** : source vérifiable identifiée. Peut être publié. **Jamais attribué sans source externe** (amendement A4).
 - **À VALIDER** : aucune source. Décision de Karim requise. Ne peut pas être publié en l'état.
-- **CONTRADICTOIRE** : le site affirme deux choses incompatibles. Une des deux au moins est fausse. Décision requise.
+- **CONTRADICTOIRE** : le site affirme deux choses incompatibles. Une des deux au moins est fausse, mais le repo ne dit pas laquelle. Décision requise.
+- **FAUSSE** : la fausseté est démontrable depuis le repo seul. Qualifiée sans validation humaine, en vertu de l'amendement A4.
+- **SUPPRESSION PAR DÉFAUT** : affirmation non sourcée dans un article. Retirée sans réécriture, réintégrable telle quelle si FACTS-SITE.md la source (amendement A3).
 - **RETIRÉ** : la directive impose déjà sa disparition, indépendamment de sa véracité.
 
-Au 2026-08-31, aucune ligne n'est **VÉRIFIÉ** au titre d'une source externe. Les sept lignes marquées VÉRIFIÉ (E1, E2, E3, F2, H1, H2, H3) le sont au titre d'une source **interne au repo**, ce qui prouve seulement ce que le site déclare, pas que la déclaration est vraie.
+Au 2026-08-31, aucune ligne n'est **VÉRIFIÉ** au titre d'une source externe. Les sept lignes marquées VÉRIFIÉ (E1, E2, E3, F2, H1, H2, H3) le sont au titre d'une source **interne au repo**, ce qui prouve seulement ce que le site déclare, pas que la déclaration est vraie. Conformément à A4, aucune d'elles ne pourra passer VÉRIFIÉ au sens plein sans source externe.
+
+## Amendements appliqués
+
+Ce registre intègre les amendements du 2026-08-31 : **A1** (aucune donnée personnelle ici, section E réécrite en références), **A2** (canonique tranchée), **A3** (hiérarchie des règles, entrée H9), **A4** (qualification autonome, entrées I1 à I5 et G1 à G12), **A5** (suppression de tout compte de secteurs, entrées B1 et B5).
 
 ---
 
@@ -49,17 +55,23 @@ C'est le point le plus contradictoire du site. Quatre listes distinctes coexiste
 
 | # | page | fichier:ligne | texte exact | statut |
 |---|---|---|---|---|
-| B1 | / | `src/sections.jsx:534-535` | `5` `Industries live in production` | CONTRADICTOIRE |
+| B1 | / | `src/sections.jsx:534-535` | `5` `Industries live in production` | RETIRÉ (A5 : tout compte disparaît) |
 | B2 | / | `src/sections.jsx:393-397` | Financial Services, Audit & Assurance, Public Sector, Retail & Luxury, Legal Services | CONTRADICTOIRE |
 | B3 | / | `src/sections.jsx:555-556` | `We work across financial and audit services, public sector, legal, retail and hospitality.` | CONTRADICTOIRE |
 | B4 | / | `src/sections.jsx:300` | `industry: 'Procurement'` | CONTRADICTOIRE |
-| B5 | /about | `about.html:110` | `Live in five industries. Processing real operations, every day.` | CONTRADICTOIRE |
+| B5 | /about | `about.html:110` | `Live in five industries. Processing real operations, every day.` | RETIRÉ (A5 : tout compte disparaît) |
 | B6 | /about | `about.html:115-116` | `financial services and audit, public sector, legal, retail and luxury, and hospitality` | CONTRADICTOIRE |
 | B7 | /team | `team.html:66-67` | `across financial services, audit, public sector, retail, hospitality, and now legal` | CONTRADICTOIRE |
 
 **Analyse.** L'union des secteurs nommés sur le site est : Financial Services, Audit, Public Sector, Legal, Retail, Luxury, Hospitality, Procurement, soit **huit noms distincts**, sous un compte affiché de **cinq**. Hospitality apparaît sur `/about` et `/team` mais pas dans la grille de la home. Procurement apparaît sur la home uniquement. La directive annonçait « six nommées » dans `about.html` : ce n'est pas ce que dit le fichier, voir INVENTAIRE.md point 8.
 
-**Décision requise (Karim).** Fixer la liste fermée des secteurs réellement en production, et le compte associé. Toutes les listes du site en découleront. C'est la ligne `secteurs:` de FACTS-SITE.md. Tant qu'elle n'est pas remplie, W4 point 9 et W5 point 2 sont bloqués.
+**Tranché par l'amendement A5.** Tout **compte** de secteurs disparaît du site : `5` (B1), `Live in five industries` (B5), et toute formulation équivalente. Il reste **une seule liste nommée**, avec statut binaire par secteur et source obligatoire.
+
+Conséquence directe : un secteur sans client en production nommé dans FACTS-SITE.md ne figure pas sur le site, **et ses chiffres partent avec lui**. Les entrées A1 à A17 sont donc conditionnées aux lignes `*_live` de FACTS-SITE.md, pas seulement à leur propre source. Si `public_sector_live` n'est pas renseigné, A1, A2, A3 et A15 tombent avec le secteur.
+
+B1 et B5 passent de CONTRADICTOIRE à **RETIRÉ**. La contradiction n'est plus à arbitrer : le compte disparaît.
+
+Reste à décider (Karim) : la liste elle-même, ligne `secteurs:` de FACTS-SITE.md. Tant qu'elle n'est pas remplie, W4 point 9 et W5 point 2 sont bloqués.
 
 | # | page | fichier:ligne | texte exact | statut |
 |---|---|---|---|---|
@@ -120,22 +132,28 @@ Aucune occurrence du mot `Portugal` sur le site. Le seul indice d'opérations po
 
 ## E. Personnes
 
-| # | page | fichier:ligne | texte exact | statut |
+**Application de l'amendement A1.** Cette section ne reproduit aucun nom, aucune fonction, aucune adresse et aucun numéro. Chaque entrée renvoie à `fichier:ligne`. Les valeurs se lisent à la source tant qu'elle existe, et le grep de contrôle vérifie leur disparition sans avoir besoin de ce tableau.
+
+| # | page | fichier:ligne | objet de l'affirmation | statut |
 |---|---|---|---|---|
-| E1 | /team | `team.html:80-81` | `Karim Vissangy` `CEO & Chief AI Officer` | VÉRIFIÉ (source repo) |
-| E2 | /team | `team.html:83` | `https://www.linkedin.com/in/karim-vissangy-17aa893a/` | VÉRIFIÉ (source repo) |
-| E3 | /team | `team.html:93-94` | `Baptiste Bouault` `CTO` | VÉRIFIÉ (source repo) |
-| E4 | /team | absent | URL LinkedIn de Baptiste Bouault | À VALIDER (absente du repo) |
-| E5 | toutes | absent | URL LinkedIn de la société Syntexia.AI | À VALIDER (absente du repo) |
+| E1 | /team | `team.html:80-81` | fiche 1 : nom et fonction | VÉRIFIÉ (source repo) |
+| E2 | /team | `team.html:83` | fiche 1 : URL LinkedIn | VÉRIFIÉ (source repo) |
+| E3 | /team | `team.html:93-94` | fiche 2 : nom et fonction | VÉRIFIÉ (source repo) |
+| E4 | /team | absent | fiche 2 : URL LinkedIn | À VALIDER (absente du repo) |
+| E5 | toutes | absent | URL LinkedIn de la société | À VALIDER (absente du repo) |
 | E6 | /about | `about.html:185` | `Meet the founder.` (singulier) | CONTRADICTOIRE |
-| E7 | /install-signature | `install-signature.html:300` | `Rui Baião` `Chief Technology Officer` | CONTRADICTOIRE avec E3 |
-| E8 | /install-signature | `install-signature.html:291` | `Amin Martins` `Co-Founder & Chief Commercial Officer` | CONTRADICTOIRE avec E6 |
-| E9 | /install-signature | `install-signature.html:309, 318` | `Miguel Fiel` `Co-Founder`, `Fernando Carvalho` `Co-Founder` | CONTRADICTOIRE avec E6 |
+| E7 | /install-signature | `install-signature.html:296-304` | une 3e personne porte la fonction de CTO | CONTRADICTOIRE avec E3 |
+| E8 | /install-signature | `install-signature.html:287-295` | une personne porte la fonction de co-fondateur | CONTRADICTOIRE avec E6 |
+| E9 | /install-signature | `install-signature.html:305-322` | deux autres personnes portent la fonction de co-fondateur | CONTRADICTOIRE avec E6 |
 | E10 | /team | absent | biographies, photos des deux fiches | À VALIDER (absentes) |
 
-**Analyse E6 contre E7 à E9.** `/about` dit « le fondateur » au singulier. `/install-signature`, servi sur le même domaine, publie **trois** personnes portant le titre `Co-Founder`. Et deux pages du site publient simultanément deux titulaires du poste de CTO : Rui Baião (E7) et Baptiste Bouault (E3).
+**Analyse E6 contre E7 à E9.** `/about` dit « le fondateur » au singulier. `/install-signature`, servi sur le même domaine, publie **trois** personnes portant la fonction de co-fondateur. Et deux pages du site publient simultanément **deux** titulaires de la fonction de CTO (E3 et E7).
 
-Ces contradictions disparaissent mécaniquement en W1 avec la suppression de `install-signature.html`, mais la ligne `meet_the_founder: singulier/pluriel` de FACTS-SITE.md doit être statuée, car le singulier engage sur la structure de la société.
+Ces contradictions disparaissent mécaniquement avec la suppression de `install-signature.html` en W1a, mais la ligne `meet_the_founder: singulier/pluriel` de FACTS-SITE.md doit être statuée, car le singulier engage sur la structure de la société.
+
+**Note sur les deux coordonnées de contact conservées en clair (entrées F1 et F2).** L'adresse `office@syntexia.ai` et le numéro de standard `+44 20 4620 4570` sont conservés en clair dans ce registre et dans `INVENTAIRE.md`. Ce sont les coordonnées **fonctionnelles** de la société, publiées volontairement sur les six pages du site, rattachées à aucune personne. Elles ne figurent dans aucun des motifs du grep de contrôle A1, dont les huit motifs visent exclusivement les cinq personnes exposées par le fichier supprimé en W1a.
+
+Interprétation retenue : A1 interdit la republication de données **personnelles**, et énumère les marqueurs qui les trahissent. Une adresse de contact d'entreprise n'en est pas une, et la retirer rendrait les entrées F1 et F2 instatuables. Arbitrage journalisé ici, réversible d'une ligne si tu préfères la lecture stricte.
 
 ---
 
@@ -178,7 +196,7 @@ W1 point 12 le neutralise (en-tête remplacé par `Illustration. Typical operati
 | # | page | fichier:ligne | texte exact | statut |
 |---|---|---|---|---|
 | H1 | /posts/precedent-meets-pace | `precedent-meets-pace.html:21` | `article:published_time` = `2026-05-23` | VÉRIFIÉ (source repo, cohérent) |
-| H2 | idem | `precedent-meets-pace.html:22, 115` | auteur `Karim Vissangy` | VÉRIFIÉ (source repo, cohérent) |
+| H2 | idem | `precedent-meets-pace.html:22, 115` | auteur nominatif, non reproduit (A1) | VÉRIFIÉ (source repo, cohérent) |
 | H3 | idem | `precedent-meets-pace.html:113`, `blog.html:83`, `src/sections.jsx:442` | date affichée `May 2026` | VÉRIFIÉ (cohérent avec H1) |
 | H4 | /posts/the-quiet-revolution | `the-quiet-revolution:21` | `article:published_time` = `2026-04-15` | CONTRADICTOIRE |
 | H5 | idem | `the-quiet-revolution:78` | date affichée dans l'article : `May 2026` | CONTRADICTOIRE avec H4 |
@@ -188,11 +206,11 @@ W1 point 12 le neutralise (en-tête remplacé par `Illustration. Typical operati
 
 **Analyse H4 à H6.** Trois emplacements, deux dates. Deux sources sur trois disent avril (meta et cartes), une dit mai (le hero de l'article). W1 point 15 impose d'aligner sur le statut de ce registre. **Recommandation : retenir `2026-04-15`**, majoritaire et portée par la meta, et corriger le hero. À confirmer par Karim, qui seul sait la date réelle de publication.
 
-**H7.** Deux signatures différentes sur deux articles du même site (`Syntexia Editorial` et `Karim Vissangy`). Si `Syntexia Editorial` ne recouvre aucune entité réelle, c'est un auteur fictif.
+**H7.** Deux signatures différentes sur deux articles du même site (`Syntexia Editorial` sur un article, un auteur nominatif sur l autre). Si `Syntexia Editorial` ne recouvre aucune entité réelle, c'est un auteur fictif.
 
 | # | page | fichier:ligne | texte exact | statut |
 |---|---|---|---|---|
-| H9 | /posts/the-quiet-revolution | `the-quiet-revolution:130` | `Inside the firms we work with, intelligence is now embedded in the day-to-day workflow of engagement teams.` | À VALIDER |
+| H9 | /posts/the-quiet-revolution | `the-quiet-revolution:130` | `Inside the firms we work with, intelligence is now embedded in the day-to-day workflow of engagement teams.` | **SUPPRESSION PAR DÉFAUT** (A3) |
 
 **Point d'arbitrage H9.** Affirmation de déploiement client, sans nom ni source. Elle tombe sous le critère d'acceptation « zéro affirmation non VÉRIFIÉ visible » (section 5), mais la directive protège les articles de toute modification hors typographie (section 0). Les deux règles se contredisent sur cette phrase. Arbitrage porté au rapport W0. Aucun autre chiffre des deux articles n'est sourcé, mais tous les autres sont explicitement narratifs (`Consider a transaction involving ten commercial contracts...`), donc hors périmètre du registre.
 
@@ -202,11 +220,11 @@ W1 point 12 le neutralise (en-tête remplacé par `Illustration. Typical operati
 
 | # | page | fichier:ligne | texte exact | statut |
 |---|---|---|---|---|
-| I1 | /blog | `blog.html:100-105` | `Boost B2B sales with operational AI analytics.` `Playbook` `Apr 2026`, `href="#"` | RETIRÉ (W1 point 8) |
-| I2 | /blog | `blog.html:110-115` | `Hospitality intelligence, beyond the dashboard.` `Sector` `Mar 2026`, `href="#"` | RETIRÉ (W1 point 8) |
-| I3 | /blog | `blog.html:120-125` | `Why "embedded" beats "co-pilot" in regulated industries.` `Field Note` `Feb 2026`, `href="#"` | RETIRÉ (W1 point 8) |
-| I4 | /blog | `blog.html:130-135` | `What public sector teams actually want from AI.` `Sector` `Jan 2026`, `href="#"` | RETIRÉ (W1 point 8) |
-| I5 | / | `src/sections.jsx:458-466` | `Hospitality intelligence, beyond the dashboard.` `Mar 2026`, `href="/blog"` | RETIRÉ (W1 point 8) |
+| I1 | /blog | `blog.html:100-105` | `Boost B2B sales with operational AI analytics.` `Playbook` `Apr 2026`, `href="#"` | **FAUSSE** (A4) : date de publication affichée pour un contenu inexistant |
+| I2 | /blog | `blog.html:110-115` | `Hospitality intelligence, beyond the dashboard.` `Sector` `Mar 2026`, `href="#"` | **FAUSSE** (A4) : date de publication affichée pour un contenu inexistant |
+| I3 | /blog | `blog.html:120-125` | `Why "embedded" beats "co-pilot" in regulated industries.` `Field Note` `Feb 2026`, `href="#"` | **FAUSSE** (A4) : date de publication affichée pour un contenu inexistant |
+| I4 | /blog | `blog.html:130-135` | `What public sector teams actually want from AI.` `Sector` `Jan 2026`, `href="#"` | **FAUSSE** (A4) : date de publication affichée pour un contenu inexistant |
+| I5 | / | `src/sections.jsx:458-466` | `Hospitality intelligence, beyond the dashboard.` `Mar 2026`, `href="/blog"` | **FAUSSE** (A4) : date de publication affichée pour un contenu inexistant |
 
 Ces cinq entrées annoncent des articles qui n'existent pas. I1 reprend un titre du blog Wix de l'ancien site. Quatre dates de publication sont affichées pour du contenu inexistant.
 
@@ -230,15 +248,22 @@ Ces cinq entrées annoncent des articles qui n'existent pas. I1 reprend un titre
 
 Décompte par statut principal (une entrée mixte est comptée sur son statut le plus fort).
 
+Décompte après application des amendements A3, A4 et A5.
+
 | statut | nombre | entrées |
 |---|---|---|
-| VÉRIFIÉ (source repo interne uniquement) | 7 | E1, E2, E3, F2, H1, H2, H3 |
-| À VALIDER | 41 | A1 à A17, B8 à B10, C3 à C6, C9 à C11, D3 à D9, E4, E5, E10, F1, H7 à H9 |
-| CONTRADICTOIRE | 16 | B1 à B7, C7, C8, E6 à E9, H4 à H6 |
-| RETIRÉ par la directive | 11 | B11, B12, C1, C2, D1, D2, I1 à I5 |
-| FAUX ou INVENTÉ, qualifié sans attendre validation | 12 | G1 à G12 |
+| VÉRIFIÉ (source repo interne uniquement, jamais au sens plein) | 7 | E1, E2, E3, F2, H1, H2, H3 |
+| À VALIDER | 40 | A1 à A17, B8 à B10, C3 à C6, C9 à C11, D3 à D9, E4, E5, E10, F1, H7, H8 |
+| CONTRADICTOIRE | 14 | B2, B3, B4, B6, B7, C7, C8, E6 à E9, H4 à H6 |
+| **FAUSSE**, qualifiée sans validation humaine (A4) | **17** | G1 à G12, I1 à I5 |
+| SUPPRESSION PAR DÉFAUT (A3) | 1 | H9 |
+| RETIRÉ par la directive ou par A5 | 8 | B1, B5, B11, B12, C1, C2, D1, D2 |
 | Formulation interdite, indépendamment de la véracité | 7 | J1 à J7 |
 | **total** | **94** | |
+
+Mouvements dus aux amendements : B1 et B5 passent de CONTRADICTOIRE à RETIRÉ (A5). I1 à I5 passent de RETIRÉ à FAUSSE (A4). H9 passe de À VALIDER à SUPPRESSION PAR DÉFAUT (A3).
+
+**Justification de la qualification autonome des entrées I1 à I5 (A4).** `blog.html` affiche quatre dates de publication (`Apr 2026`, `Mar 2026`, `Feb 2026`, `Jan 2026`) et la home une cinquième (`Mar 2026`), pour des articles dont aucun n'existe : `posts/` ne contient que deux fichiers, et les cinq liens pointent vers `#` ou vers `/blog`. Afficher une date de publication pour un contenu qui n'a jamais été publié est faux, et la démonstration ne demande rien d'autre que le repo. Aucune validation humaine n'est requise pour cette qualification.
 
 **Aucune ligne de ce registre n'est adossée à une source externe vérifiable à ce jour.**
 
