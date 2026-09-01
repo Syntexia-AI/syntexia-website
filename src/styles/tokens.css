@@ -60,14 +60,14 @@
 :root {
   /* Couleur */
   --bg: #0B0A08;
-  --bg-2: #110F0C;
-  --surface: #181612;
+  --bg-2: #15120E;
+  --surface: #201C16;
   --line: #2A2622;
   --line-strong: #655C52;
   --line-soft: #1E1B17;
   --ink: #F4F0E6;
   --ink-2: #C9C3B5;
-  --mute: #867E71;
+  --mute: #8B8376;
   --mute-2: #7F796C;
   --accent: #EDA968;
   --accent: oklch(0.79 0.12 65);
@@ -106,4 +106,35 @@
   /* Mesure */
   --shell: 1180px;
   --measure: 68ch;
+}
+
+/* ------------------------------------------------------------------ */
+/* Inversion                                                           */
+/*                                                                     */
+/* Direction Aplat, bloc .d3 de design/syntexia-home-4da.html : « les  */
+/* deux mêmes couleurs, inversées ». Le crème passe au fond, le noir    */
+/* chaud à la typo. Aucune teinte nouvelle n'entre dans la palette :    */
+/* tout vient de --ink et --bg, plus des intermédiaires calculés dans   */
+/* la même famille.                                                     */
+/*                                                                     */
+/* En redéfinissant les tokens dans la portée, tous les composants      */
+/* enfants s'adaptent sans une ligne de code en plus.                   */
+/* ------------------------------------------------------------------ */
+
+.invert {
+  --bg: #F4F0E6;
+  --bg-2: #EBE6D9;
+  --surface: #E2DCCC;
+  --line: #C6BFAE;
+  --line-soft: #DAD4C4;
+  --ink: #0B0A08;
+  --ink-2: #2E2A24;
+  --mute: #5F5A50;
+  --mute-2: #6B6459;
+  --accent: #7A4A16;
+  --accent-ink: #F4F0E6;
+  --selection: #D8CEB8;
+
+  background: var(--bg);
+  color: var(--ink);
 }

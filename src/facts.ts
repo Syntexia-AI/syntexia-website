@@ -43,9 +43,15 @@ export const companiesHouseUrl =
 /** URL LinkedIn de la société. Absente du repo au 2026-08-31. */
 export const linkedinCompany: SourcedFact<string> | null = NONE;
 
-/** Implantation. Le site se contredisait (Londres seul contre Londres et
-    Lisbonne). Aucune formulation n'est sourcée, donc aucune n'est rendue. */
-export const location: SourcedFact<string> | null = NONE;
+/** Implantation. Tranché par Karim le 2026-09-01 : « Working in Portugal is
+    a strength in our market, no reason to hide it. » La société est
+    immatriculée au Royaume-Uni, le travail se fait au Portugal. Les deux sont
+    vrais et se disent séparément, ce qui lève la contradiction de l'ancien
+    site entre « Londres » et « Londres et Lisbonne ». */
+export const location: SourcedFact<string> = {
+  value: 'Registered in the UK. The work happens in Portugal.',
+  source: 'décision Karim, 2026-09-01, plus Companies House pour la partie UK',
+};
 
 /** Adresse de contact fonctionnelle. Publiée sur les six pages du site
     d'origine, rattachée à personne. */
@@ -76,6 +82,22 @@ export const phone: SourcedFact<string> | null = NONE;
     partiel ou en retard. C'est pourquoi le statut est « non sourcé » et non
     « faux ». Question de revue ouverte, voir docs/REVIEW.md. */
 export const partnerNetworkUrl: SourcedFact<string> | null = NONE;
+
+/** Appartenance au réseau partenaire, sans URL publique.
+ *
+ *  Karim, le 2026-09-01 : « the partner directory is only for higher-tier
+ *  companies and we're not at that tier yet, which is why you found nothing. »
+ *  Cela explique le résultat de la recherche du 2026-08-31 et lève le doute :
+ *  l'absence de l'annuaire n'était pas une absence de partenariat.
+ *
+ *  La source est donc une validation interne, pas une page publique. La
+ *  mention est rendue, sobrement et sans lien, tant qu'aucune URL n'existe.
+ *  Dès qu'une annonce publique sort, renseigner partnerNetworkUrl au dessus :
+ *  la mention deviendra cliquable toute seule. */
+export const partnerNetwork: SourcedFact<string> | null = {
+  value: 'Member of the Anthropic Claude Partner Network.',
+  source: 'validation Karim, 2026-09-01. Pas encore listé publiquement, tier inférieur.',
+};
 
 /* ------------------------------------------------------------------ */
 /* Déploiements et secteurs                                            */

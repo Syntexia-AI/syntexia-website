@@ -8,7 +8,7 @@ import AuditFlow from '../components/AuditFlow.astro';
 import Pillars from '../components/Pillars.astro';
 import Strip from '../components/Strip.astro';
 import { getCollection } from 'astro:content';
-import { sectors, partnerNetworkUrl } from '../facts';
+import { sectors, partnerNetworkUrl, partnerNetwork, location } from '../facts';
 
 // Copy repris de l'ancien site, commit c887605, src/sections.jsx.
 // C'est le meilleur matériau dont nous disposons, et il n'est pas centré sur la
@@ -120,7 +120,7 @@ const fmt = (d: Date) => d.toLocaleDateString('en-GB', { month: 'long', year: 'n
     </section>
   )}
 
-  <section class="section" id="about">
+  <section class="section invert" id="about">
     <div class="shell about-grid">
       <div data-anim>
         <h2>An intelligence company, not an AI vendor.</h2>
@@ -136,6 +136,14 @@ const fmt = (d: Date) => d.toLocaleDateString('en-GB', { month: 'long', year: 'n
           rather their people did something else. Our products run inside the software
           those firms already use.
         </p>
+        {location && <p class="about-where">{location.value}</p>}
+        {partnerNetwork && (
+          <p class="about-partner">
+            {partnerNetworkUrl
+              ? <a href={partnerNetworkUrl.value} rel="noopener">{partnerNetwork.value}</a>
+              : partnerNetwork.value}
+          </p>
+        )}
         <p><a href="/about">More about the company</a></p>
       </div>
     </div>
@@ -316,6 +324,8 @@ const fmt = (d: Date) => d.toLocaleDateString('en-GB', { month: 'long', year: 'n
   }
   .about-grid h2 { max-width: 16ch; }
   .about-body { display: flex; flex-direction: column; gap: var(--s-5); }
+  .about-where { color: var(--ink); font-weight: 500; }
+  .about-partner { color: var(--mute); font-size: var(--t-small); }
   @media (max-width: 900px) {
     .about-grid { grid-template-columns: 1fr; gap: var(--s-6); }
   }

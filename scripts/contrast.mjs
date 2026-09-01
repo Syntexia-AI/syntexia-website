@@ -23,9 +23,9 @@ function oklch(L, C, Hdeg) {
 }
 
 const T = {
-  bg: hex('#0B0A08'), 'bg-2': hex('#110F0C'), surface: hex('#181612'),
+  bg: hex('#0B0A08'), 'bg-2': hex('#15120E'), surface: hex('#201C16'),
   line: hex('#2A2622'), 'line-strong': hex('#655C52'), ink: hex('#F4F0E6'), 'ink-2': hex('#C9C3B5'),
-  mute: hex('#867E71'), 'mute-2': hex('#7F796C'),
+  mute: hex('#8B8376'), 'mute-2': hex('#7F796C'),
   'accent-fallback': hex('#EDA968'), 'accent-oklch': oklch(0.79, 0.12, 65),
   'accent-ink': hex('#0B0A08'),
 };
