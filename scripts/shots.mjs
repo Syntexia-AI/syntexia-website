@@ -23,6 +23,7 @@ const ROUTES_AFTER = [
   ['security', '/security'],
   ['post-precedent', '/posts/precedent-meets-pace'],
   ['post-quiet-revolution', '/posts/the-quiet-revolution-coming-to-audit'],
+  ['legal', '/legal'],
   ['404', '/404'],
 ];
 const ROUTES_BEFORE = ROUTES_AFTER.filter(([n]) => n !== 'security' && n !== '404');

@@ -40,8 +40,16 @@ export const legalEntity: SourcedFact<string> = {
 export const companiesHouseUrl =
   'https://find-and-update.company-information.service.gov.uk/company/16847343';
 
-/** URL LinkedIn de la société. Absente du repo au 2026-08-31. */
-export const linkedinCompany: SourcedFact<string> | null = NONE;
+/** URL LinkedIn de la société.
+    Absente du repo, retrouvée et vérifiée le 2026-09-01 par requête directe :
+    https://www.linkedin.com/company/syntexia-ai renvoie 200, titre de page
+    « Syntexia.AI | LinkedIn », secteur Software Development. Le slug court
+    /company/syntexia renvoie 404 et n'existe pas.
+    Sa tagline y est déjà « Intelligence that lives in your ecosystem ». */
+export const linkedinCompany: SourcedFact<string> = {
+  value: 'https://www.linkedin.com/company/syntexia-ai',
+  source: 'vérifié par requête directe le 2026-09-01, HTTP 200',
+};
 
 /** Implantation. Tranché par Karim le 2026-09-01 : « Working in Portugal is
     a strength in our market, no reason to hide it. » La société est
@@ -60,9 +68,15 @@ export const contactEmail: SourcedFact<string> = {
   source: 'repo, src/sections.jsx:593 et les cinq pages statiques',
 };
 
-/** Standard téléphonique. Sourcé dans le repo, mais on ignore s'il est
-    répondu. Question de revue ouverte, donc non rendu pour l'instant. */
-export const phone: SourcedFact<string> | null = NONE;
+/** Standard téléphonique. Publié sur les six pages de l'ancien site, remis à
+    la demande de Baptiste le 2026-09-01.
+    La question « ce numéro est-il effectivement répondu » a été posée à Karim
+    et n'a pas reçu de réponse. Elle reste ouverte dans docs/REVIEW.md : un
+    numéro qui sonne dans le vide coûte plus cher qu'un numéro absent. */
+export const phone: SourcedFact<{ display: string; dial: string }> = {
+  value: { display: '+44 20 4620 4570', dial: '+442046204570' },
+  source: 'repo, sections.jsx:597 et les cinq pages statiques',
+};
 
 /* ------------------------------------------------------------------ */
 /* Partenariat                                                         */
@@ -116,29 +130,50 @@ export const dayTotals: SourcedFact<{
   people: string;
 }> | null = NONE;
 
-/** Ce que nous faisons réellement.
+/** Les secteurs pour lesquels nous construisons.
  *
- *  Établi le 2026-08-31 en lisant les treize dépôts de l'organisation, pas en
- *  reprenant la maquette. Détail et sources dans docs/FACTS-PRODUIT.md.
+ *  Libellés et descriptions repris de l'ancien site, commit c887605,
+ *  src/sections.jsx INDUSTRIES, validés par Karim.
  *
- *  La liste précédente affichait cinq secteurs. Quatre n'existaient nulle part :
- *  une recherche sur l'organisation entière retourne zéro occurrence de
- *  « public sector », « financial services », « banking » et « retail ».
- *  Ils sont retirés. Ce qui reste est adossé à des dépôts en production.
+ *  DIFFÉRENCE IMPORTANTE AVEC L'ORIGINAL, à connaître avant de toucher au
+ *  titre de la section qui les affiche.
  *
- *  Ce sont des descriptions de ce que le système fait, catégorie A. Aucun
- *  client n'est nommé : ce sont des cabinets d'audit, la confidentialité est
- *  structurelle à leur métier. */
+ *  L'ancien site les présentait sous « Live in real organisations, processing
+ *  real operations, every day » et leur accolait des KPI (« −60 % », « ~70 % »,
+ *  « Live »). Vérification du 2026-08-31 sur les treize dépôts : seuls l'audit
+ *  et l'accueil téléphonique ont un déploiement. Une recherche sur
+ *  l'organisation entière retourne zéro occurrence de « public sector »,
+ *  « financial services », « banking » et « retail ».
+ *
+ *  Ces secteurs sont donc rendus comme ce qu'ils sont : les marchés pour
+ *  lesquels le produit est construit. Ni statut, ni chiffre, ni « live ». Le
+ *  titre de la section doit rester au futur ou au général, jamais au présent
+ *  de constatation. Voir docs/FACTS-PRODUIT.md. */
 export const sectors: { name: string; blurb: string }[] = [
   {
     name: 'Audit and assurance',
-    blurb:
-      'Client acceptance, anti-money-laundering checks, working papers, trial balances and timesheets. Prepared against the source, with the reference kept and the conclusion dated.',
+    blurb: 'Evidence-grade workpapers, client acceptance and anti-money-laundering checks. Methodical at machine speed.',
   },
   {
-    name: 'Front desk',
+    name: 'Financial services',
+    blurb: 'Cross-ledger answers, plain-language reports, decisions on current data.',
+  },
+  {
+    name: 'Legal services',
     blurb:
-      'Inbound calls answered in Portuguese and English. Transfer to a person, call-back, message taken. The line stays open outside office hours.',
+      "Contract analysis, due diligence at scale, and the knowledge bench: the firm's own expertise made queryable.",
+  },
+  {
+    name: 'Public sector',
+    blurb: 'Triage incoming requests, route them across departments, draft the responses.',
+  },
+  {
+    name: 'Retail and luxury',
+    blurb: 'Customer foresight, inventory risk, trends caught before the peak.',
+  },
+  {
+    name: 'Hospitality',
+    blurb: 'Calls answered at any hour, bookings taken, supplier paperwork read overnight.',
   },
 ];
 

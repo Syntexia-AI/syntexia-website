@@ -14,6 +14,7 @@ import { legalEntity, companiesHouseUrl, linkedinCompany, contactEmail, security
     <div class="footer-links">
       {linkedinCompany && <a href={linkedinCompany.value} rel="noopener">LinkedIn</a>}
       {securityIsLinked && <a href="/security">Security</a>}
+      <a href="/legal">Legal</a>
       <a href={`mailto:${contactEmail.value}`}>Contact</a>
     </div>
   </div>

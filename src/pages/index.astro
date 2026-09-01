@@ -1,6 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
-import ContactForm from '../components/ContactForm.astro';
+import ContactBlock from '../components/ContactBlock.astro';
 import MarkCanvas from '../components/MarkCanvas.astro';
 import DocumentStack from '../components/DocumentStack.astro';
 import ProductDemo from '../components/ProductDemo.astro';
@@ -51,7 +51,7 @@ const fmt = (d: Date) => d.toLocaleDateString('en-GB', { month: 'long', year: 'n
     </div>
   </section>
 
-  <Strip />
+  
 
   <section class="band" id="product">
     <div class="shell">
@@ -96,7 +96,7 @@ const fmt = (d: Date) => d.toLocaleDateString('en-GB', { month: 'long', year: 'n
 
   <section class="band" id="sectors">
     <div class="shell">
-      <h2 class="section-title" data-anim>What we run today</h2>
+      <h2 class="section-title" data-anim>Built for the work that cannot be wrong.</h2>
       <div class="sectors">
         {sectors.map((s) => (
           <div class="sector" data-anim>
@@ -172,7 +172,7 @@ const fmt = (d: Date) => d.toLocaleDateString('en-GB', { month: 'long', year: 'n
         Tell us what you want it to do. We answer within a working day, and if you
         would rather describe it out loud, say so and we will call you.
       </p>
-      <ContactForm />
+      <ContactBlock />
     </div>
   </section>
 </Base>

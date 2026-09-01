@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import { linkedinCompany, contactEmail } from '../facts';
 
 // Deux fiches. Nom et fonction viennent de team.html, seule source existante.
 // Les biographies et les photos ne sont pas sourcées, donc rien n'est rendu à
@@ -25,7 +26,12 @@ const PEOPLE = [
 >
   <section class="section first">
     <div class="shell">
-      <h1>The team</h1>
+      <h1>The team behind Syntexia.AI</h1>
+      <p class="team-lead">
+        A small team of engineers and former practitioners who have seen the work from the
+        inside, and decided the right way to apply intelligence is alongside the people
+        doing it.
+      </p>
       <div class="people">
         {PEOPLE.map((p) => (
           <div class="person">
@@ -50,4 +56,13 @@ const PEOPLE = [
   .person { border-top: 1px solid var(--line); padding-top: var(--s-5); }
   .role { margin-top: var(--s-2); color: var(--mute); }
   .person p + p { margin-top: var(--s-4); }
+  .team-lead { margin-top: var(--s-6); font-size: 19px; line-height: 1.55; max-width: 54ch; }
+  .team-more {
+    margin-top: var(--s-9);
+    padding-top: var(--s-6);
+    border-top: 1px solid var(--line);
+    max-width: 60ch;
+  }
+  .team-links { display: flex; flex-wrap: wrap; gap: var(--s-6); margin-top: var(--s-5); }
+  .team-links a { color: var(--ink); }
 </style>

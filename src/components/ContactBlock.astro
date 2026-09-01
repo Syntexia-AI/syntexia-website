@@ -1,0 +1,58 @@
+---
+import { contactEmail, phone, linkedinCompany, location } from '../facts';
+
+// Remplace le formulaire. L'ancien site donnait ses coordonnées directement,
+// sans champ à remplir : on revient à cela.
+//
+// Chaque ligne n'est rendue que si le fait existe. Le LinkedIn société
+// n'apparaît que le jour où son URL est renseignée dans facts.ts : pas de
+// lien mort, pas de pictogramme qui ne mène nulle part.
+const items = [
+  { label: 'Email', value: contactEmail.value, href: `mailto:${contactEmail.value}` },
+  phone && { label: 'Phone', value: phone.value.display, href: `tel:${phone.value.dial}` },
+  linkedinCompany && { label: 'LinkedIn', value: 'Syntexia.AI', href: linkedinCompany.value },
+  location && { label: 'Where', value: location.value, href: null },
+].filter(Boolean) as { label: string; value: string; href: string | null }[];
+---
+
+<ul class="contact-list">
+  {items.map((it) => (
+    <li>
+      <span class="contact-label">{it.label}</span>
+      {it.href
+        ? <a href={it.href} rel={it.href.startsWith('http') ? 'noopener' : undefined}>{it.value}</a>
+        : <span class="contact-value">{it.value}</span>}
+    </li>
+  ))}
+</ul>
+
+<style>
+  .contact-list {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: var(--s-6) var(--s-8);
+    border-top: 1px solid var(--line);
+    padding-top: var(--s-6);
+  }
+
+  .contact-list li { display: flex; flex-direction: column; gap: var(--s-2); }
+
+  .contact-label {
+    font-size: var(--t-small);
+    line-height: var(--lh-small);
+    color: var(--mute);
+  }
+
+  .contact-list a,
+  .contact-value {
+    font-size: 19px;
+    line-height: 1.35;
+    color: var(--ink);
+    text-decoration: none;
+    letter-spacing: -0.01em;
+  }
+
+  .contact-list a { border-bottom: 1px solid var(--line); padding-bottom: 2px; width: fit-content; }
+  .contact-list a:hover { border-bottom-color: var(--accent); color: var(--accent); }
+</style>
