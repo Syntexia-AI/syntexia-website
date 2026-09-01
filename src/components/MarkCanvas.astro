@@ -401,9 +401,11 @@ const { size = 340, class: cls = '' } = Astro.props;
 
 <style>
   .mark3d {
-    width: var(--mark3d-size);
-    height: var(--mark3d-size);
-    max-width: 100%;
+    /* La taille passée en prop est un plafond, pas une valeur fixe. Sans
+       min(), le style inline écrasait le media query mobile et le mark
+       débordait de l'écran : 400 px de large dans un viewport de 390. */
+    width: min(var(--mark3d-size), 100%);
+    height: auto;
     aspect-ratio: 1;
     /* Tant que WebGL n'a pas confirmé, le bloc ne réserve rien de visible.
        La grille CSS du mark reste seule à l'écran, dans le masthead. */

@@ -1,0 +1,371 @@
+---
+// La démonstration du produit : l'agent prépare un dossier d'acceptation,
+// étape par étape, et s'arrête pour demander la validation de l'auditeur.
+// C'est le positionnement rendu visible plutôt qu'écrit.
+//
+// Terminologie relevée dans le code, pas supposée. Sources exactes :
+//   app/main.py ROTULOS_4A .... libellés des pièces de l'Anexo 4a
+//   app/engines/bcft.py ....... Anexo 4b, Medidas simplificadas / reforçadas
+//   app/engines/aceitacao.py .. seuils 0.20 non-EIP et 0.15 EIP
+//   app/db.py ................. états por_iniciar, em_curso, concluido
+//   app/models.py ............. NIPC, 9 chiffres, checksum mod-11
+//   les gabarits Jinja ........ « Concluir fase de Aceitação », « Executar
+//                               pesquisas », « Exportar Anexo 4 preenchido »
+//
+// Deux corrections apportées après vérification, car je les avais supposées :
+// « Lista de sócios » et « Balancete analítico » ne font pas partie des
+// pièces d'acceptation. Le balancete existe bien, mais ailleurs dans le
+// produit. Ils sont remplacés par les libellés réels.
+//
+// Le modèle à 8 questions est propre à un cabinet : un autre utilise un
+// score pondéré. La démonstration montre donc un cas, pas une norme.
+//
+// Aucune donnée client, aucune raison sociale, aucun NIPC réel. Le numéro de
+// dossier est fictif et la contrepartie est caviardée, comme dans le produit.
+//
+// Remplace l'ancien AppFrame, qui était un tableau à largeur minimale de
+// 520 px et déclenchait une barre de défilement horizontale sous 720 px.
+// Ici, aucune table : une grille qui se replie.
+
+const DOCS = [
+  'Questionário de identificação do cliente',
+  'Certidão permanente atualizada',
+  'Estrutura de propriedade e de controlo',
+];
+
+const FIELDS = [
+  { label: 'BCFT', value: 'Medidas simplificadas', at: 2 },
+  { label: 'PEPDATA', value: 'Sem correspondência', at: 3 },
+  { label: 'Independência', value: '18,4 % · abaixo de 20 % (não-EIP)', at: 4 },
+];
+---
+
+<figure class="demo" data-demo data-step="0">
+  <figcaption class="demo-cap">
+    Syntexia preparing a client acceptance file, in the firm's own interface.
+    Fictional case, no customer data.
+  </figcaption>
+
+  <div class="demo-frame">
+    <header class="demo-head">
+      <div class="demo-id">
+        <span class="demo-ref">NIPC 5<span class="black" role="img" aria-label="Redacted"></span></span>
+        <span class="demo-phase">Aceitação</span>
+      </div>
+      <div class="demo-status">
+        <span class="demo-dot" aria-hidden="true"></span>
+        <span class="demo-status-text" data-status>A ler documentos</span>
+      </div>
+    </header>
+
+    <div class="demo-body">
+      <section class="demo-block">
+        <h4>Documentos</h4>
+        <ul class="demo-docs">
+          {DOCS.map((d, i) => (
+            <li data-doc={i}>
+              <span class="demo-check" aria-hidden="true"></span>
+              <span>{d}</span>
+            </li>
+          ))}
+          <li class="demo-redacted" data-doc="3">
+            <span class="demo-check" aria-hidden="true"></span>
+            <span>Cartão de identificação</span>
+          </li>
+        </ul>
+      </section>
+
+      <section class="demo-block">
+        <h4>Conclusões</h4>
+        <dl class="demo-fields">
+          {FIELDS.map((f) => (
+            <div class="demo-field" data-field={f.at}>
+              <dt>{f.label}</dt>
+              <dd>{f.value}</dd>
+            </div>
+          ))}
+        </dl>
+      </section>
+    </div>
+
+    <footer class="demo-foot">
+      <p class="demo-hand">The agent prepares. The auditor validates.</p>
+      <span class="demo-btn" data-validate aria-hidden="true">Concluir fase de Aceitação</span>
+    </footer>
+  </div>
+</figure>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-demo]').forEach((root) => {
+    const status = root.querySelector<HTMLElement>('[data-status]');
+    if (!status) return;
+
+    const LABELS = [
+      'A ler documentos',
+      'A avaliar BCFT (Anexo 4b)',
+      'A executar pesquisas',
+      'A verificar independência',
+      'Pendente de validação',
+    ];
+
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+    // En mouvement réduit, on affiche directement le dossier terminé : le
+    // visiteur voit le même résultat, sans que rien ne bouge.
+    if (reduced.matches) {
+      root.dataset.step = '5';
+      status.textContent = LABELS[4];
+      return;
+    }
+
+    let step = 0;
+    let timer = 0;
+
+    const tick = () => {
+      step = (step + 1) % 7;
+      root.dataset.step = String(step);
+      // Les étapes 1 à 5 portent un libellé, 6 est la pause finale et 0 le
+      // retour à l'état vide.
+      if (step >= 1 && step <= 5) status.textContent = LABELS[step - 1];
+      else if (step === 0) status.textContent = LABELS[0];
+    };
+
+    const start = () => { if (!timer) timer = window.setInterval(tick, 1500); };
+    const stop = () => { if (timer) { clearInterval(timer); timer = 0; } };
+
+    if ('IntersectionObserver' in window) {
+      const io = new IntersectionObserver(
+        (entries) => { for (const e of entries) (e.isIntersecting ? start : stop)(); },
+        { threshold: 0.25 }
+      );
+      io.observe(root);
+    } else {
+      start();
+    }
+
+    reduced.addEventListener('change', (e) => {
+      if (!e.matches) return;
+      stop();
+      root.dataset.step = '5';
+      status.textContent = LABELS[4];
+    });
+  });
+</script>
+
+<style>
+  .demo { margin: 0; }
+
+  .demo-cap {
+    font-size: var(--t-small);
+    line-height: var(--lh-small);
+    color: var(--mute-2);
+    margin-bottom: var(--s-4);
+  }
+
+  .demo-frame {
+    border: 1px solid var(--line);
+    background: var(--bg-2);
+  }
+
+  /* ---------- En-tête ---------- */
+
+  .demo-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--s-3) var(--s-5);
+    padding: var(--s-4) var(--s-5);
+    border-bottom: 1px solid var(--line);
+    background: var(--surface);
+  }
+
+  .demo-id { display: flex; align-items: baseline; gap: var(--s-4); }
+
+  .demo-ref {
+    font-family: var(--font-mono);
+    font-size: var(--t-small);
+    color: var(--mute);
+  }
+
+  .demo-phase { font-size: 14.5px; font-weight: 500; color: var(--ink); }
+
+  .demo-status { display: flex; align-items: center; gap: 9px; }
+
+  .demo-status-text {
+    font-size: var(--t-small);
+    color: var(--mute);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Le point d'activité. Il ne pulse pas : il respire, une fois par cycle,
+     et s'arrête quand l'agent rend la main. */
+  .demo-dot {
+    width: 6px;
+    height: 6px;
+    background: var(--accent);
+    flex: none;
+    animation: demoBreathe 1.5s ease-in-out infinite;
+  }
+
+  .demo[data-step='5'] .demo-dot,
+  .demo[data-step='6'] .demo-dot { animation: none; opacity: 0.35; }
+
+  @keyframes demoBreathe {
+    0%, 100% { opacity: 0.28; }
+    50% { opacity: 1; }
+  }
+
+  /* ---------- Corps. Une grille, jamais un tableau. ---------- */
+
+  .demo-body {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+
+  .demo-block { padding: var(--s-5); }
+  .demo-block + .demo-block { border-left: 1px solid var(--line); }
+
+  .demo-block h4 {
+    font-size: var(--t-small);
+    font-weight: 500;
+    color: var(--mute);
+    margin-bottom: var(--s-4);
+  }
+
+  .demo-docs { list-style: none; display: flex; flex-direction: column; gap: var(--s-3); }
+
+  .demo-docs li {
+    display: flex;
+    align-items: center;
+    gap: var(--s-3);
+    font-size: 14.5px;
+    color: var(--mute-2);
+    opacity: 0.4;
+    transition: opacity 0.4s ease, color 0.4s ease;
+  }
+
+  /* Chaque document s'allume à son tour. Le quatrième, caviardé, arrive avec
+     le troisième : c'est la pièce que nous ne montrons jamais. */
+  .demo[data-step='1'] .demo-docs li[data-doc='0'],
+  .demo[data-step='2'] .demo-docs li[data-doc='0'],
+  .demo[data-step='2'] .demo-docs li[data-doc='1'],
+  .demo[data-step='3'] .demo-docs li,
+  .demo[data-step='4'] .demo-docs li,
+  .demo[data-step='5'] .demo-docs li,
+  .demo[data-step='6'] .demo-docs li {
+    opacity: 1;
+    color: var(--ink-2);
+  }
+
+  .demo-check {
+    width: 12px;
+    height: 12px;
+    border: 1px solid var(--line-strong);
+    flex: none;
+    position: relative;
+  }
+
+  /* Le pseudo-élément est défini sans condition : un sélecteur composé se
+     transformait mal sous le CSS à portée d'Astro et la coche n'existait
+     jamais. */
+  .demo-check::after {
+    content: '';
+    position: absolute;
+    inset: 2px;
+    background: var(--accent);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .demo[data-step='1'] .demo-docs li[data-doc='0'] .demo-check::after,
+  .demo[data-step='2'] .demo-docs li[data-doc='0'] .demo-check::after,
+  .demo[data-step='2'] .demo-docs li[data-doc='1'] .demo-check::after,
+  .demo[data-step='3'] .demo-check::after,
+  .demo[data-step='4'] .demo-check::after,
+  .demo[data-step='5'] .demo-check::after,
+  .demo[data-step='6'] .demo-check::after {
+    opacity: 1;
+  }
+
+  .black {
+    display: inline-block;
+    width: 104px;
+    height: 10px;
+    background: var(--ink);
+    vertical-align: middle;
+  }
+
+  /* ---------- Conclusions ---------- */
+
+  .demo-fields { display: flex; flex-direction: column; gap: var(--s-4); }
+
+  .demo-field {
+    display: grid;
+    grid-template-columns: 116px minmax(0, 1fr);
+    gap: var(--s-3);
+    align-items: baseline;
+    opacity: 0;
+    transform: translateY(6px);
+    transition: opacity 0.45s ease, transform 0.45s cubic-bezier(0.22, 0.61, 0.36, 1);
+  }
+
+  .demo[data-step='2'] .demo-field[data-field='2'],
+  .demo[data-step='3'] .demo-field[data-field='2'],
+  .demo[data-step='3'] .demo-field[data-field='3'],
+  .demo[data-step='4'] .demo-field,
+  .demo[data-step='5'] .demo-field,
+  .demo[data-step='6'] .demo-field {
+    opacity: 1;
+    transform: none;
+  }
+
+  .demo-field dt { font-size: var(--t-small); color: var(--mute); }
+  .demo-field dd { margin: 0; font-size: 14.5px; color: var(--ink); }
+
+  /* ---------- Pied. C'est ici que l'agent rend la main. ---------- */
+
+  .demo-foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--s-4);
+    padding: var(--s-4) var(--s-5);
+    border-top: 1px solid var(--line);
+  }
+
+  .demo-hand { font-size: var(--t-small); color: var(--mute-2); margin: 0; }
+
+  /* Le bouton n'est pas cliquable : c'est une reproduction, pas un formulaire.
+     Il s'active visuellement quand l'agent a fini son travail. */
+  .demo-btn {
+    font-size: 14px;
+    font-weight: 500;
+    padding: 9px 16px;
+    border: 1px solid var(--line);
+    color: var(--mute-2);
+    transition: background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease;
+  }
+
+  .demo[data-step='5'] .demo-btn,
+  .demo[data-step='6'] .demo-btn {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--accent-ink);
+  }
+
+  @media (max-width: 720px) {
+    .demo-body { grid-template-columns: 1fr; }
+    .demo-block + .demo-block { border-left: 0; border-top: 1px solid var(--line); }
+    .demo-field { grid-template-columns: 1fr; gap: 2px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .demo-dot { animation: none; }
+    .demo-docs li,
+    .demo-field,
+    .demo-btn,
+    .demo-check::after { transition: none; }
+  }
+</style>
