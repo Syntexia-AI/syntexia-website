@@ -283,6 +283,10 @@ const { size = 340, class: cls = '' } = Astro.props;
     let curX = 0;
     let curY = 0;
     let fade = 0;
+    // Contribution du défilement à la rotation. Lue dans la boucle déjà
+    // existante plutôt que dans un écouteur de scroll : aucun coût ajouté,
+    // et rien ne tourne quand le mark est hors écran.
+    let scrollSpin = 0;
 
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
 
@@ -345,7 +349,12 @@ const { size = 340, class: cls = '' } = Astro.props;
       const elapsed = (t - t0) / 1000;
       // Une rotation complète en 44 secondes. Assez lent pour qu'on ne
       // regarde pas le mouvement, assez présent pour qu'on sente la matière.
-      const spin = (elapsed * Math.PI * 2) / 44;
+      // Rotation propre, lente. Plus la contribution du défilement, bornée à
+      // un demi-tour sur la hauteur du premier écran.
+      const r = host.getBoundingClientRect();
+      const progress = Math.max(-1, Math.min(1, -r.top / Math.max(1, window.innerHeight)));
+      scrollSpin += (progress * Math.PI - scrollSpin) * 0.06;
+      const spin = (elapsed * Math.PI * 2) / 44 + scrollSpin;
       curX += (targetX - curX) * 0.045;
       curY += (targetY - curY) * 0.045;
       fade += (1 - fade) * 0.05;

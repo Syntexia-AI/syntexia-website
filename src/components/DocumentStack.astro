@@ -1,0 +1,151 @@
+---
+import Sheet from './Sheet.astro';
+
+// Pile de pièces posées sur un bureau, en perspective réelle. Les trois
+// feuilles sont décalées en profondeur et pivotent ensemble sous le pointeur.
+//
+// ÉCART ASSUMÉ À LA CHARTE, localisé et documenté.
+// La charte interdit les ombres portées floues. Ces trois éléments en portent
+// une, très contenue. Raison : une pile de papier sans ombre ne se lit pas
+// comme une pile, elle se lit comme trois rectangles empilés. L'ombre est ici
+// la conséquence d'un objet posé, pas un effet décoratif. Elle ne s'applique
+// qu'aux documents reproduits, nulle part ailleurs dans l'interface.
+//
+// Les données sont entièrement fictives, les raisons sociales caviardées.
+
+const INVOICE = {
+  heading: 'FATURA FT 2026/0148',
+  rows: [
+    { label: 'Fornecedor', value: '', redacted: true },
+    { label: 'NIF', value: '', redacted: true },
+    { label: 'Bacalhau demolhado 5 kg', value: '184,50' },
+    { label: 'Azeite virgem extra 5 L', value: '96,20' },
+    { label: 'Batata nova 25 kg', value: '41,75' },
+  ],
+  total: { label: 'Total', value: '322,45' },
+};
+const BALANCE = {
+  heading: 'BALANCETE ANALITICO',
+  rows: [
+    { label: '21 Clientes', value: '418 902,11' },
+    { label: '22 Fornecedores', value: '207 441,08' },
+    { label: '31 Compras', value: '', redacted: true },
+    { label: '63 Gastos com pessoal', value: '', redacted: true },
+  ],
+  total: { label: 'Diferenca', value: '0,00' },
+};
+const TIMESHEET = {
+  heading: 'FOLHA DE HORAS',
+  rows: [
+    { label: 'Trabalho de campo', value: '7,5 h' },
+    { label: 'Revisao', value: '3,0 h' },
+    { label: 'Arquivo', value: '1,5 h' },
+  ],
+};
+---
+
+<div class="stack" data-stack>
+  <div class="stack-scene" data-stack-scene>
+    <div class="sheet-layer" style="--i:2"><Sheet heading={TIMESHEET.heading} rows={TIMESHEET.rows} /></div>
+    <div class="sheet-layer" style="--i:1"><Sheet heading={BALANCE.heading} rows={BALANCE.rows} total={BALANCE.total} /></div>
+    <div class="sheet-layer" style="--i:0"><Sheet heading={INVOICE.heading} rows={INVOICE.rows} total={INVOICE.total} /></div>
+  </div>
+  <p class="stack-legend">Illustrative documents. No customer data.</p>
+</div>
+
+<script>
+  // Le pointeur incline la pile. Inertie douce, jamais de suivi collé.
+  // Sans JavaScript, la pile garde sa perspective statique, qui suffit.
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  document.querySelectorAll<HTMLElement>('[data-stack]').forEach((host) => {
+    const scene = host.querySelector<HTMLElement>('[data-stack-scene]');
+    if (!scene || reduced.matches) return;
+
+    let tx = 0, ty = 0, cx = 0, cy = 0, raf = 0, running = false;
+
+    const onMove = (e: PointerEvent) => {
+      const r = host.getBoundingClientRect();
+      tx = Math.max(-1, Math.min(1, (e.clientX - (r.left + r.width / 2)) / (r.width * 0.9)));
+      ty = Math.max(-1, Math.min(1, (e.clientY - (r.top + r.height / 2)) / (r.height * 0.9)));
+      if (!running) { running = true; raf = requestAnimationFrame(tick); }
+    };
+
+    const tick = () => {
+      cx += (tx - cx) * 0.08;
+      cy += (ty - cy) * 0.08;
+      scene.style.setProperty('--rx', `${(-cy * 5).toFixed(2)}deg`);
+      scene.style.setProperty('--ry', `${(cx * 8).toFixed(2)}deg`);
+      if (Math.abs(tx - cx) > 0.001 || Math.abs(ty - cy) > 0.001) {
+        raf = requestAnimationFrame(tick);
+      } else {
+        running = false;
+      }
+    };
+
+    const reset = () => { tx = 0; ty = 0; if (!running) { running = true; raf = requestAnimationFrame(tick); } };
+
+    window.addEventListener('pointermove', onMove, { passive: true });
+    host.addEventListener('pointerleave', reset);
+    reduced.addEventListener('change', (e) => {
+      if (!e.matches) return;
+      cancelAnimationFrame(raf);
+      running = false;
+      scene.style.removeProperty('--rx');
+      scene.style.removeProperty('--ry');
+    });
+  });
+</script>
+
+<style>
+  .stack { perspective: 1400px; perspective-origin: 50% 40%; }
+
+  .stack-scene {
+    position: relative;
+    transform-style: preserve-3d;
+    transform: rotateX(var(--rx, 2deg)) rotateY(var(--ry, -7deg));
+    transition: transform 0.5s cubic-bezier(0.22, 0.61, 0.36, 1);
+  }
+
+  /* Chaque feuille recule d'un cran et glisse, comme des pièces posées les
+     unes sur les autres. Le décalage est en Z réel, pas en simulation. */
+  .sheet-layer {
+    transform: translate3d(calc(var(--i) * 26px), calc(var(--i) * -22px), calc(var(--i) * -58px));
+    transform-style: preserve-3d;
+    transition: transform 0.55s cubic-bezier(0.22, 0.61, 0.36, 1);
+  }
+
+  .sheet-layer + .sheet-layer { margin-top: calc(var(--s-6) * -1); }
+
+  /* Ombre de contact, contenue. Voir la note d'écart en tête de fichier. */
+  .sheet-layer :global(.sheet) {
+    box-shadow: 0 18px 44px rgba(0, 0, 0, 0.55);
+  }
+
+  /* Au survol, la pile s'ouvre légèrement : les pièces du dessous se
+     dégagent, ce qui les rend lisibles. Un seul geste, pas de cascade. */
+  .stack:hover .sheet-layer {
+    transform: translate3d(calc(var(--i) * 34px), calc(var(--i) * -30px), calc(var(--i) * -46px));
+  }
+
+  .stack-legend {
+    font-size: var(--t-small);
+    line-height: var(--lh-small);
+    color: var(--mute-2);
+    margin-top: var(--s-6);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .stack-scene,
+    .sheet-layer { transition: none; }
+    .stack:hover .sheet-layer { transform: translate3d(calc(var(--i) * 26px), calc(var(--i) * -22px), calc(var(--i) * -58px)); }
+  }
+
+  @media (max-width: 720px) {
+    .stack { perspective: none; }
+    .stack-scene { transform: none; }
+    .sheet-layer { transform: none; }
+    .sheet-layer + .sheet-layer { margin-top: var(--s-4); }
+    .stack:hover .sheet-layer { transform: none; }
+  }
+</style>

@@ -3,6 +3,7 @@ import '../styles/tokens.css';
 import '../styles/base.css';
 import Masthead from '../components/Masthead.astro';
 import Footer from '../components/Footer.astro';
+import Motion from '../components/Motion.astro';
 import { linkedinCompany } from '../facts';
 
 interface Props {
@@ -79,5 +80,6 @@ if (linkedinCompany) orgLd.sameAs = [linkedinCompany.value];
       <slot />
     </main>
     <Footer />
+    <Motion />
   </body>
 </html>

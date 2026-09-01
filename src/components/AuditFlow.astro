@@ -72,6 +72,18 @@ const PHASES = [
     background: var(--surface);
   }
 
+  .flow-step {
+    transition: transform 0.28s cubic-bezier(0.22, 0.61, 0.36, 1), background-color 0.28s ease;
+  }
+  .flow-step:hover {
+    transform: translateY(-4px);
+    background: var(--surface);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .flow-step { transition: none; }
+    .flow-step:hover { transform: none; }
+  }
+
   .flow-index {
     font-size: var(--t-small);
     color: var(--mute);

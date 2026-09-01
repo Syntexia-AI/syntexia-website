@@ -113,6 +113,21 @@ const ROWS = [
 
   tbody tr:last-child td { border-bottom: 0; }
 
+  /* Relief au survol : la ligne avance et son fond se densifie. Aucun flou,
+     aucune ombre : le relief vient du déplacement et du contraste. */
+  tbody tr {
+    transition: background-color 0.22s ease, transform 0.22s cubic-bezier(0.22, 0.61, 0.36, 1);
+  }
+  tbody tr:hover {
+    background: var(--surface);
+    transform: translateX(3px);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    tbody tr { transition: none; }
+    tbody tr:hover { transform: none; }
+  }
+
   .mono {
     font-family: var(--font-mono);
     font-size: var(--t-small);
