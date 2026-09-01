@@ -5,6 +5,8 @@ import MarkCanvas from '../components/MarkCanvas.astro';
 import DocumentStack from '../components/DocumentStack.astro';
 import AppFrame from '../components/AppFrame.astro';
 import AuditFlow from '../components/AuditFlow.astro';
+import Pillars from '../components/Pillars.astro';
+import Strip from '../components/Strip.astro';
 import { getCollection } from 'astro:content';
 import { sectors, partnerNetworkUrl } from '../facts';
 
@@ -18,37 +20,10 @@ import { sectors, partnerNetworkUrl } from '../facts';
 //   - « Live in real organizations, every day » retiré, statut non sourcé.
 // Les emphases dans les titres sont retirées, elles sont interdites.
 
-const heading = 'The intelligence layer for serious operations.';
+const eyebrow = 'Intelligence Layer';
+const heading = 'Intelligence that lives in your ecosystem.';
 const sub =
-  'Not a chatbot. Not a co-pilot. Intelligence that runs inside the systems your business already uses, where the work actually happens.';
-
-// Les quatre piliers. Structure et texte de l'ancien site, nettoyés.
-const PILLARS = [
-  {
-    label: 'It lives inside your systems',
-    title: 'Intelligence that runs where your business already runs.',
-    body:
-      'Your intelligence is not a separate platform staff log into. It runs inside the systems you already use: the phone line, the inbox, the documents, the accounting and audit software.',
-  },
-  {
-    label: 'It communicates with your teams',
-    title: 'It picks up the phone, drafts the report, pulls the number.',
-    body:
-      'It speaks the language of the people who run your business, answering internal questions, drafting reports and surfacing the numbers that matter, inside the tools the team already uses.',
-  },
-  {
-    label: 'It acts alongside them',
-    title: 'Not advice. It does the work, end to end.',
-    body:
-      "The repetitive operations that consume your team's time happen automatically, accurately and continuously, escalating only what needs a human.",
-  },
-  {
-    label: 'It shows you what is next',
-    title: 'Foresight that surfaces what matters before it becomes urgent.',
-    body:
-      'It does not only describe what already happened. It looks forward, at your data, patterns and risks, and tells your team what to act on now to change the outcome.',
-  },
-];
+  'Not a chatbot. Not a co-pilot. A real intelligence layer that runs inside the systems your business already uses: quiet, embedded, always on.';
 
 const posts = (await getCollection('posts')).sort(
   (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
@@ -57,13 +32,14 @@ const fmt = (d: Date) => d.toLocaleDateString('en-GB', { month: 'long', year: 'n
 ---
 
 <Base
-  title="Syntexia. The intelligence layer for serious operations."
+  title="Syntexia. Intelligence that lives in your ecosystem."
   description={sub}
   path="/"
 >
   <section class="hero">
     <div class="shell hero-grid">
       <div class="hero-text" data-anim>
+        <p class="eyebrow">{eyebrow}</p>
         <h1>{heading}</h1>
         <p class="lead">{sub}</p>
         <div class="acts">
@@ -74,6 +50,8 @@ const fmt = (d: Date) => d.toLocaleDateString('en-GB', { month: 'long', year: 'n
       <MarkCanvas class="hero-mark" size={400} />
     </div>
   </section>
+
+  <Strip />
 
   <section class="band" id="product">
     <div class="shell">
@@ -90,15 +68,8 @@ const fmt = (d: Date) => d.toLocaleDateString('en-GB', { month: 'long', year: 'n
 
   <section class="band" id="what">
     <div class="shell">
-      <div class="pillars">
-        {PILLARS.map((p) => (
-          <article class="pillar" data-anim>
-            <p class="pillar-label">{p.label}</p>
-            <h2>{p.title}</h2>
-            <p class="pillar-body">{p.body}</p>
-          </article>
-        ))}
-      </div>
+      <h2 class="section-title" data-anim>Four things your Intelligence does, every day.</h2>
+      <div data-anim><Pillars /></div>
     </div>
   </section>
 
@@ -149,6 +120,27 @@ const fmt = (d: Date) => d.toLocaleDateString('en-GB', { month: 'long', year: 'n
     </section>
   )}
 
+  <section class="section" id="about">
+    <div class="shell about-grid">
+      <div data-anim>
+        <h2>An intelligence company, not an AI vendor.</h2>
+      </div>
+      <div class="about-body" data-anim>
+        <p>
+          Syntexia is an intelligence company. We help organisations put intelligence
+          at the core of how they operate, decide, and grow: intelligence that lives in
+          their business ecosystem, runs their present, and shows them the future.
+        </p>
+        <p>
+          We work across audit and assurance, and answer the phone for firms that would
+          rather their people did something else. Our products run inside the software
+          those firms already use.
+        </p>
+        <p><a href="/about">More about the company</a></p>
+      </div>
+    </div>
+  </section>
+
   <section class="section" id="insights">
     <div class="shell">
       <h2 class="section-title" data-anim>Insights</h2>
@@ -166,10 +158,11 @@ const fmt = (d: Date) => d.toLocaleDateString('en-GB', { month: 'long', year: 'n
 
   <section class="band" id="contact">
     <div class="shell">
-      <h2 class="section-title" data-anim>Tell us what you want it to do</h2>
-      <p class="contact-lead">
-        We answer within a working day. If you would rather describe it out loud, say
-        so and we will call you.
+      <p class="eyebrow" data-anim>Let's put intelligence inside your business</p>
+      <h2 class="cta-title" data-anim>Run your present. See your future.</h2>
+      <p class="contact-lead" data-anim>
+        Tell us what you want it to do. We answer within a working day, and if you
+        would rather describe it out loud, say so and we will call you.
       </p>
       <ContactForm />
     </div>
@@ -198,6 +191,13 @@ const fmt = (d: Date) => d.toLocaleDateString('en-GB', { month: 'long', year: 'n
   }
 
   .hero h1 { max-width: 15ch; }
+
+  .eyebrow {
+    font-size: var(--t-small);
+    line-height: var(--lh-small);
+    color: var(--accent);
+    margin-bottom: var(--s-5);
+  }
 
   .lead {
     font-size: 19px;
@@ -297,7 +297,28 @@ const fmt = (d: Date) => d.toLocaleDateString('en-GB', { month: 'long', year: 'n
     .insight:hover { transform: none; }
   }
 
-  .contact-lead { margin-bottom: var(--s-7); }
+  .contact-lead { margin-bottom: var(--s-7); max-width: 52ch; }
+
+  .cta-title {
+    font-size: var(--t-display);
+    line-height: var(--lh-display);
+    letter-spacing: var(--ls-display);
+    font-weight: 700;
+    max-width: 18ch;
+    margin-bottom: var(--s-6);
+  }
+
+  .about-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+    gap: var(--s-9);
+    align-items: start;
+  }
+  .about-grid h2 { max-width: 16ch; }
+  .about-body { display: flex; flex-direction: column; gap: var(--s-5); }
+  @media (max-width: 900px) {
+    .about-grid { grid-template-columns: 1fr; gap: var(--s-6); }
+  }
 
   /* ---------- Adaptation ---------- */
 

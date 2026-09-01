@@ -1,0 +1,298 @@
+---
+import { pillarMetrics } from '../facts';
+
+// Les quatre piliers, en onglets. C'est le dispositif qui rendait l'ancien
+// site vivant : on clique, ça change, et ça avance tout seul si on ne touche
+// à rien. Structure et wording repris du commit c887605, src/sections.jsx,
+// validés par Karim.
+//
+// Deux différences avec l'original, et deux seulement :
+//   1. Les tirets cadratins sont remplacés. C'est de la typographie, pas du
+//      wording : la règle vaut pour tout ce que produit la maison.
+//   2. Les métriques ne sont rendues que si elles sont sourcées dans
+//      facts.ts. L'original affichait « ~70 % », « 60 % », « 3 vers 1 » sans
+//      aucune source. Le wording est validé, pas les chiffres.
+//
+// L'auto-avance s'arrête dès que le visiteur prend la main, et ne repart pas.
+
+const PILLARS = [
+  {
+    verb: 'Lives',
+    label: 'It lives inside your systems',
+    title: 'Intelligence that runs where your business already runs.',
+    body:
+      'Your Intelligence is not a separate platform staff log into. It runs inside the systems you already use: phones, inbox, documents, CRM, accounting, operations stack. Quiet, embedded, always on.',
+    key: 'lives',
+  },
+  {
+    verb: 'Communicates',
+    label: 'It communicates with your teams',
+    title: 'It picks up the phone, drafts the report, pulls the number.',
+    body:
+      'Your Intelligence speaks the language of the people who run your business, answering internal questions, drafting reports, surfacing the numbers that matter, inside the tools the team already uses.',
+    key: 'communicates',
+  },
+  {
+    verb: 'Acts',
+    label: 'It acts alongside them',
+    title: 'Not advice. It does the work, end to end.',
+    body:
+      "Scheduling, processing, routing, drafting, reconciling, escalating. The repetitive operations that consume your team's time happen automatically, accurately, and continuously, escalating only what needs a human.",
+    key: 'acts',
+  },
+  {
+    verb: 'Shows',
+    label: 'It shows you what is next',
+    title: 'Foresight that surfaces what matters before it becomes urgent.',
+    body:
+      'Your Intelligence does not only describe what already happened. It looks forward, at your data, patterns, risks and opportunities, and tells your team what to act on now to change the outcome.',
+    key: 'shows',
+  },
+];
+---
+
+<div class="pillars" data-pillars>
+  <div class="pillar-tabs" role="tablist" aria-label="What it does">
+    {PILLARS.map((p, i) => (
+      <button
+        type="button"
+        role="tab"
+        class="pillar-tab"
+        id={`tab-${p.key}`}
+        aria-controls={`panel-${p.key}`}
+        aria-selected={i === 0 ? 'true' : 'false'}
+        tabindex={i === 0 ? 0 : -1}
+        data-tab={i}
+      >
+        <span class="pt-verb">{p.verb}</span>
+        <span class="pt-label">{p.label}</span>
+      </button>
+    ))}
+  </div>
+
+  <div class="pillar-panels">
+    {PILLARS.map((p, i) => (
+      <section
+        role="tabpanel"
+        class="pillar-panel"
+        id={`panel-${p.key}`}
+        aria-labelledby={`tab-${p.key}`}
+        data-panel={i}
+      >
+        <h3>{p.title}</h3>
+        <p class="pd-body">{p.body}</p>
+        {pillarMetrics[p.key] && (
+          <dl class="pd-metrics">
+            {pillarMetrics[p.key].map((m) => (
+              <div>
+                <dt class="tabular">{m.value}</dt>
+                <dd>{m.label}</dd>
+              </div>
+            ))}
+          </dl>
+        )}
+      </section>
+    ))}
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-pillars]').forEach((root) => {
+    const tabs = Array.from(root.querySelectorAll<HTMLButtonElement>('[data-tab]'));
+    const panels = Array.from(root.querySelectorAll<HTMLElement>('[data-panel]'));
+    if (!tabs.length) return;
+
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+    // Les panneaux sont tous rendus visibles par le HTML. C'est le script,
+    // et lui seul, qui les replie en onglets. Sans JavaScript, le visiteur
+    // lit les quatre piliers à la suite : il perd l'interaction, jamais le
+    // contenu. Même principe que Motion.astro.
+    root.dataset.tabs = 'on';
+
+    let current = 0;
+    let timer = 0;
+    let userTook = false;
+
+    const show = (next: number) => {
+      current = (next + tabs.length) % tabs.length;
+      tabs.forEach((t, i) => {
+        const on = i === current;
+        t.setAttribute('aria-selected', String(on));
+        t.tabIndex = on ? 0 : -1;
+      });
+      panels.forEach((p, i) => {
+        p.hidden = i !== current;
+        if (i === current) {
+          // Réamorce la transition d'entrée du panneau.
+          p.dataset.enter = '';
+          void p.offsetWidth;
+          delete p.dataset.enter;
+        }
+      });
+    };
+
+    // L'auto-avance s'arrête définitivement au premier geste du visiteur.
+    // Un carrousel qui continue de bouger pendant qu'on lit est une nuisance.
+    const stop = () => {
+      userTook = true;
+      if (timer) clearInterval(timer);
+      timer = 0;
+    };
+
+    tabs.forEach((tab, i) => {
+      tab.addEventListener('click', () => {
+        stop();
+        show(i);
+      });
+      tab.addEventListener('keydown', (e) => {
+        const k = e.key;
+        if (k !== 'ArrowRight' && k !== 'ArrowLeft' && k !== 'Home' && k !== 'End') return;
+        e.preventDefault();
+        stop();
+        const next =
+          k === 'ArrowRight' ? current + 1 : k === 'ArrowLeft' ? current - 1 : k === 'Home' ? 0 : tabs.length - 1;
+        show(next);
+        tabs[(next + tabs.length) % tabs.length].focus();
+      });
+    });
+
+    // Repli initial : le script prend la main et n'affiche que le premier.
+    show(0);
+
+    root.addEventListener('pointerenter', () => { if (timer) { clearInterval(timer); timer = 0; } });
+    root.addEventListener('pointerleave', () => { if (!userTook && !timer && !reduced.matches) start(); });
+
+    function start() {
+      timer = window.setInterval(() => show(current + 1), 7000);
+    }
+
+    // On ne démarre que si le bloc est à l'écran, et jamais en reduced-motion.
+    if (!reduced.matches && 'IntersectionObserver' in window) {
+      const io = new IntersectionObserver((entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting && !timer && !userTook) start();
+          else if (!e.isIntersecting && timer) { clearInterval(timer); timer = 0; }
+        }
+      }, { threshold: 0.3 });
+      io.observe(root);
+    }
+  });
+</script>
+
+<style>
+  .pillars {
+    display: grid;
+    grid-template-columns: minmax(0, 340px) minmax(0, 1fr);
+    gap: var(--s-9);
+    align-items: start;
+  }
+
+  .pillar-tabs {
+    display: flex;
+    flex-direction: column;
+    border-top: 1px solid var(--line);
+  }
+
+  .pillar-tab {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    align-items: flex-start;
+    text-align: left;
+    padding: var(--s-5) 0;
+    background: none;
+    border: 0;
+    border-bottom: 1px solid var(--line-soft);
+    border-left: 2px solid transparent;
+    padding-left: var(--s-4);
+    margin-left: -2px;
+    cursor: pointer;
+    font-family: var(--font-ui);
+    transition: border-color 0.25s ease, padding-left 0.25s cubic-bezier(0.22, 0.61, 0.36, 1);
+  }
+
+  .pillar-tab:hover { padding-left: calc(var(--s-4) + 4px); }
+
+  /* L'onglet actif est marqué par le filet cuivré, seul emploi de l'accent
+     ici. Pas de fond, pas de pastille. */
+  .pillar-tab[aria-selected='true'] {
+    border-left-color: var(--accent);
+  }
+
+  .pt-verb {
+    font-size: 21px;
+    font-weight: 600;
+    letter-spacing: -0.014em;
+    color: var(--mute);
+    transition: color 0.25s ease;
+  }
+
+  .pillar-tab[aria-selected='true'] .pt-verb { color: var(--ink); }
+
+  .pt-label {
+    font-size: var(--t-small);
+    line-height: var(--lh-small);
+    color: var(--mute-2);
+  }
+
+  /* Sans script, les quatre panneaux s'empilent et se lisent tous. */
+  .pillar-panel + .pillar-panel { margin-top: var(--s-8); }
+  [data-tabs='on'] .pillar-panel + .pillar-panel { margin-top: 0; }
+
+  .pillar-panel h3 {
+    font-size: var(--t-h2);
+    line-height: var(--lh-h2);
+    letter-spacing: -0.018em;
+    max-width: 20ch;
+  }
+
+  .pd-body {
+    margin-top: var(--s-5);
+    font-size: 17px;
+    line-height: 1.6;
+    max-width: 54ch;
+  }
+
+  .pd-metrics {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-8);
+    margin-top: var(--s-7);
+  }
+  .pd-metrics div { display: flex; flex-direction: column; gap: var(--s-2); }
+  .pd-metrics dt { font-size: 38px; font-weight: 600; color: var(--accent); line-height: 1; }
+  .pd-metrics dd { margin: 0; font-size: var(--t-small); color: var(--mute); max-width: 22ch; }
+
+  /* Entrée du panneau : une translation courte, le même geste que partout. */
+  .pillar-panel:not([hidden]) {
+    animation: panelEnter 0.42s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+  }
+  .pillar-panel[data-enter] { animation: none; }
+
+  @keyframes panelEnter {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: none; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pillar-panel:not([hidden]) { animation: none; }
+    .pillar-tab { transition: none; }
+    .pillar-tab:hover { padding-left: var(--s-4); }
+  }
+
+  @media (max-width: 900px) {
+    .pillars { grid-template-columns: 1fr; gap: var(--s-7); }
+    .pillar-tabs { flex-direction: row; overflow-x: auto; border-top: 0; }
+    .pillar-tab {
+      border-bottom: 2px solid var(--line-soft);
+      border-left: 0;
+      margin-left: 0;
+      padding: var(--s-4) var(--s-5) var(--s-4) 0;
+      white-space: nowrap;
+    }
+    .pillar-tab[aria-selected='true'] { border-bottom-color: var(--accent); border-left-color: transparent; }
+    .pillar-tab:hover { padding-left: 0; }
+    .pt-label { display: none; }
+  }
+</style>

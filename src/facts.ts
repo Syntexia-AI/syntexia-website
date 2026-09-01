@@ -163,6 +163,22 @@ export const contractAnswers: { title: string; body: string; source: string }[] 
   },
 ];
 
+/** Métriques des quatre piliers. L'ancien site en affichait douze, dont
+ *  « ~70 % », « 60 % », « ~80 % » et « 3 vers 1 », aucune sourcée. Le wording
+ *  des piliers est validé, les chiffres ne le sont pas : ils reviennent dès
+ *  qu'une source existe, pilier par pilier, sans toucher au composant.
+ *
+ *  Exemple de ce qu'il faut écrire pour rallumer un bloc :
+ *    lives: [{ value: '~70%', label: 'Requests handled without a person',
+ *              source: 'mesure client X, mars 2026' }]
+ */
+export const pillarMetrics: Record<string, { value: string; label: string }[]> = {
+  // lives: [],
+  // communicates: [],
+  // acts: [],
+  // shows: [],
+};
+
 /** Nombre d'entrées sourcées requis pour lier /security depuis la navigation
     et le pied de page. */
 export const SECURITY_LINK_THRESHOLD = 3;
