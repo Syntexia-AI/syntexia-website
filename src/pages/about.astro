@@ -77,13 +77,7 @@ import { partnerNetworkUrl, partnerNetwork, location, sectors } from '../facts';
           We work where the regulation is serious, where the operations are real, and
           where the cost of being wrong is high. That is the standard we build to.
         </p>
-        {partnerNetwork && (
-          <p class="partner">
-            {partnerNetworkUrl
-              ? <a href={partnerNetworkUrl.value} rel="noopener">{partnerNetwork.value}</a>
-              : partnerNetwork.value}
-          </p>
-        )}
+        
       </div>
     </div>
   </section>

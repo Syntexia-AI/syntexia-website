@@ -108,10 +108,45 @@ export const partnerNetworkUrl: SourcedFact<string> | null = NONE;
  *  mention est rendue, sobrement et sans lien, tant qu'aucune URL n'existe.
  *  Dès qu'une annonce publique sort, renseigner partnerNetworkUrl au dessus :
  *  la mention deviendra cliquable toute seule. */
-export const partnerNetwork: SourcedFact<string> | null = {
-  value: 'Member of the Anthropic Claude Partner Network.',
-  source: 'validation Karim, 2026-09-01. Pas encore listé publiquement, tier inférieur.',
+export const partnerNetwork: SourcedFact<{ tier: string; programme: string }> | null = {
+  value: { tier: 'Registered Partner', programme: 'Anthropic Claude Partner Network' },
+  // Le niveau exact vient du post public de la société : « Syntexia.AI is an
+  // official Registered Partner in the Anthropic Claude Partner Network, the
+  // programme through which Anthropic supports the firms putting Claude into
+  // production ». C'est publié, donc citable, même si la source reste la
+  // société. Cela explique aussi l'annuaire : il ne référence que les tiers
+  // supérieurs, et la Services Track est la voie pour y monter.
+  source: 'publication LinkedIn de Syntexia.AI, plus validation Karim du 2026-09-01',
 };
+
+/** Les deux règles dures du produit, énoncées publiquement par le CTO.
+    Elles disent en une ligne ce que la page /security développe. */
+export const hardRules: string[] = [
+  'Client data never trains a model.',
+  'Every result points back to its source document.',
+];
+
+/** Les fiches de l'équipe. Biographies tirées des profils LinkedIn publics,
+    seule source disponible. Aucun client n'y est nommé. */
+export const team: {
+  name: string;
+  role: string;
+  bio: string;
+  linkedin: string | null;
+}[] = [
+  {
+    name: 'Karim Vissangy',
+    role: 'CEO and Chief AI Officer',
+    bio: 'Two decades at the intersection of digital innovation, data and emerging technology. Economics at ISEG Lisbon, MBA at UCL. Ran strategy and operations for international hotel groups, co-founded a European voice AI platform, and now leads Syntexia between London and Lisbon.',
+    linkedin: 'https://www.linkedin.com/in/karim-vissangy-17aa893a/',
+  },
+  {
+    name: 'Baptiste Bouault',
+    role: 'CTO and Lead AI Engineer',
+    bio: 'Owns the technical side end to end. Starts every build with a refusal list: the things the model is not allowed to do. Deterministic engines handle the numbers, the model only writes around figures already calculated and locked, and nothing reaches a user without clearing an automated check first. Every system is tested on both failure modes: giving a wrong answer, and refusing a question it should have answered. ESSEC and UC Berkeley.',
+    linkedin: 'https://www.linkedin.com/in/baptiste-bouault/',
+  },
+];
 
 /* ------------------------------------------------------------------ */
 /* Déploiements et secteurs                                            */

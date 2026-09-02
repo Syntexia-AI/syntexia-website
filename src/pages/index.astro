@@ -4,6 +4,7 @@ import ContactBlock from '../components/ContactBlock.astro';
 import MarkCanvas from '../components/MarkCanvas.astro';
 import DocumentStack from '../components/DocumentStack.astro';
 import ProductDemo from '../components/ProductDemo.astro';
+import PartnerBlock from '../components/PartnerBlock.astro';
 import AuditFlow from '../components/AuditFlow.astro';
 import Pillars from '../components/Pillars.astro';
 import Strip from '../components/Strip.astro';
@@ -58,6 +59,8 @@ const fmt = (d: Date) => d.toLocaleDateString('en-GB', { month: 'long', year: 'n
       <div data-anim><ProductDemo /></div>
     </div>
   </section>
+
+  <PartnerBlock />
 
   <section class="section" id="flow">
     <div class="shell">
@@ -137,13 +140,7 @@ const fmt = (d: Date) => d.toLocaleDateString('en-GB', { month: 'long', year: 'n
           those firms already use.
         </p>
         {location && <p class="about-where">{location.value}</p>}
-        {partnerNetwork && (
-          <p class="about-partner">
-            {partnerNetworkUrl
-              ? <a href={partnerNetworkUrl.value} rel="noopener">{partnerNetwork.value}</a>
-              : partnerNetwork.value}
-          </p>
-        )}
+        
         <p><a href="/about">More about the company</a></p>
       </div>
     </div>

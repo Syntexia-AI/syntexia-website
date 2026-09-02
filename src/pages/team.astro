@@ -1,22 +1,11 @@
 ---
 import Base from '../layouts/Base.astro';
-import { linkedinCompany, contactEmail } from '../facts';
+import { linkedinCompany, contactEmail, team, hardRules } from '../facts';
 
 // Deux fiches. Nom et fonction viennent de team.html, seule source existante.
 // Les biographies et les photos ne sont pas sourcées, donc rien n'est rendu à
 // leur place : ni texte d'attente, ni silhouette générique.
-const PEOPLE = [
-  {
-    name: 'Karim Vissangy',
-    role: 'CEO and Chief AI Officer',
-    linkedin: 'https://www.linkedin.com/in/karim-vissangy-17aa893a/',
-  },
-  {
-    name: 'Baptiste Bouault',
-    role: 'CTO',
-    linkedin: null,
-  },
-];
+
 ---
 
 <Base
@@ -33,12 +22,13 @@ const PEOPLE = [
         doing it.
       </p>
       <div class="people">
-        {PEOPLE.map((p) => (
-          <div class="person">
+        {team.map((p) => (
+          <article class="person">
             <h2>{p.name}</h2>
             <p class="role">{p.role}</p>
+            <p class="bio">{p.bio}</p>
             {p.linkedin && <p><a href={p.linkedin} rel="noopener">LinkedIn</a></p>}
-          </div>
+          </article>
         ))}
       </div>
     </div>
@@ -57,6 +47,20 @@ const PEOPLE = [
   .role { margin-top: var(--s-2); color: var(--mute); }
   .person p + p { margin-top: var(--s-4); }
   .team-lead { margin-top: var(--s-6); font-size: 19px; line-height: 1.55; max-width: 54ch; }
+  .bio { margin-top: var(--s-4); font-size: var(--t-body); line-height: 1.6; }
+  .rules {
+    margin-top: var(--s-9);
+    padding: var(--s-7) 0 0;
+    border-top: 1px solid var(--line);
+  }
+  .rules ol {
+    margin: var(--s-5) 0 0 var(--s-5);
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-4);
+  }
+  .rules li { font-size: 19px; line-height: 1.45; color: var(--ink); max-width: 46ch; }
+  .rules-note { margin-top: var(--s-5); max-width: 56ch; }
   .team-more {
     margin-top: var(--s-9);
     padding-top: var(--s-6);

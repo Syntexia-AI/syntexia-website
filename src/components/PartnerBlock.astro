@@ -1,0 +1,89 @@
+---
+import { partnerNetwork, partnerNetworkUrl } from '../facts';
+
+// Le partenariat, en grand. Demandé le 2026-09-02 : il était rendu en petit
+// texte gris au bas du bloc About, il devient une bande à lui.
+//
+// Trois choses qu'il ne fait pas, volontairement :
+//   1. Aucun logo Anthropic. Nous n'avons pas d'autorisation d'usage de leur
+//      marque. Citer le nom du programme en toutes lettres est légitime,
+//      reproduire leur identité visuelle ne l'est pas.
+//   2. Aucun niveau de partenariat affiché. L'ancien site écrivait « Frontier
+//      model partner », que rien ne soutient. Karim a confirmé l'inverse : le
+//      tier actuel est en dessous de celui qui figure à l'annuaire public.
+//   3. Aucun lien, tant que partnerNetworkUrl est vide. Le jour où une
+//      annonce publique existe, le titre devient cliquable tout seul.
+//
+// Le bloc entier disparaît si partnerNetwork n'est pas renseigné.
+---
+
+{partnerNetwork && (
+  <section class="partner-band">
+    <div class="shell partner-grid">
+      <div class="partner-name" data-anim>
+        <p class="partner-kicker">{partnerNetwork.value.tier} in the</p>
+        <h2>
+          {partnerNetworkUrl ? (
+            <a href={partnerNetworkUrl.value} rel="noopener">{partnerNetwork.value.programme}</a>
+          ) : (
+            partnerNetwork.value.programme
+          )}
+        </h2>
+      </div>
+
+      <div class="partner-text" data-anim>
+        <p>
+          We build with Claude, the model family we believe sets the standard for the kind
+          of careful, high-stakes work our customers operate in.
+        </p>
+        <p class="partner-note">
+          The models change. What does not change is that a person signs the conclusion.
+        </p>
+      </div>
+    </div>
+  </section>
+)}
+
+<style>
+  .partner-band {
+    padding: var(--s-9) 0;
+    background: var(--surface);
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .partner-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+    gap: var(--s-9);
+    align-items: start;
+  }
+
+  .partner-kicker {
+    font-size: var(--t-small);
+    line-height: var(--lh-small);
+    color: var(--mute);
+    margin-bottom: var(--s-3);
+  }
+
+  /* Le nom du programme est traité comme un titre de section, pas comme une
+     mention de bas de page. C'est tout l'objet de ce bloc. */
+  .partner-name h2 {
+    font-size: var(--t-h2);
+    line-height: var(--lh-h2);
+    letter-spacing: -0.02em;
+    max-width: 14ch;
+  }
+
+  .partner-name h2 a { color: inherit; text-decoration-color: var(--line); }
+  .partner-name h2 a:hover { color: var(--accent); }
+
+  .partner-text { display: flex; flex-direction: column; gap: var(--s-5); }
+  .partner-text p { font-size: 17px; line-height: 1.6; }
+  .partner-note { color: var(--mute); font-size: var(--t-small); line-height: var(--lh-small); }
+
+  @media (max-width: 900px) {
+    .partner-grid { grid-template-columns: 1fr; gap: var(--s-6); }
+    .partner-name h2 { max-width: none; }
+  }
+</style>
