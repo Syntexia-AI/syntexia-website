@@ -202,3 +202,108 @@ dirigeant en poste. Un numéro personnel n'a pas davantage vocation à figurer
 dans un dépôt parce que la personne est encore dans la société.
 
 **Le fichier part en entier, pour tout le monde.**
+
+---
+
+# Journal d'exécution, 2026-09-02
+
+Option B exécutée localement, sur décision de Baptiste, motivée par le fait que
+seuls deux comptes ont accès au dépôt.
+
+## Sauvegardes, avant toute modification
+
+Dans `C:\Users\bapti\Code\_sauvegarde-syntexia-website-2026-09-02\` :
+
+| Sauvegarde | Taille | Contenu |
+|---|---|---|
+| `syntexia-website-avant-purge.bundle` | 31 Mo | les 3 branches, état d'origine |
+| `syntexia-website-avant-purge.git` | 36 Mo | clone miroir complet |
+
+SHA d'origine conservés : `main` à `c887605`, `refonte-2026-09` à `1f836de`,
+`hotfix-install-signature` à `e87ecf7`.
+
+## Périmètre réel, établi par mesure et non par supposition
+
+Le scan des 194 occurrences sensibles réparties sur tous les commits a montré
+que les données nominatives sont confinées à **deux fichiers** :
+
+- `install-signature.html`
+- `_internal/Syntexia Email Signatures.html`
+
+Contre-épreuve utile : les `tel:` présents dans `about.html`, `blog.html`,
+`team.html`, `src/sections.jsx` et `docs/INVENTAIRE.md` sont tous le standard
+public de l'entreprise, pas des mobiles personnels. Ces fichiers ont donc été
+conservés intacts. Retirer les pages du vieux site aurait été une purge à
+l'aveugle, sans gain.
+
+## Ce qui a été retiré de tous les commits
+
+`install-signature.html`, `_internal/` (6 fichiers), `avatars/` (10 images).
+
+Commande effectivement passée :
+
+```bash
+FILTER_BRANCH_SQUELCH_WARNING=1 git filter-branch --force --index-filter \
+  'git rm -r --cached --ignore-unmatch install-signature.html _internal avatars' \
+  --prune-empty --tag-name-filter cat -- --all
+```
+
+puis suppression de `refs/original/*`, `git reflog expire --expire=now --all`,
+`git gc --prune=now --aggressive`.
+
+## Vérifications passées
+
+| Contrôle | Avant | Après |
+|---|---|---|
+| commits contenant `install-signature.html` | 3 | 0 |
+| commits contenant `_internal` | 2 | 0 |
+| commits contenant `avatars` | 2 | 0 |
+| emails nominatifs, tous commits | 64 | 0 |
+| numéros portugais, tous commits | 40 | 0 |
+| standard public de l'entreprise | 88 | 88, conservé |
+| `git fsck` | | aucune erreur |
+| `npm run build` | | 11 pages, vert |
+| poids du `.git` | 36 Mo | 30 Mo |
+
+Un objet subsiste dont le **nom** contient « avatars » : `_scripts/build-avatars.js`.
+Il ne contient aucune donnée personnelle, c'est un script qui dessine des SVG.
+Faux positif du filtre par nom, laissé en place, hors périmètre approuvé.
+
+## SHA après réécriture
+
+| Branche | Avant | Après |
+|---|---|---|
+| `main` | `c887605` | `c7c113f` |
+| `refonte-2026-09` | `1f836de` | `3b3a0d2` |
+| `hotfix-install-signature` | `e87ecf7` | `ab5dbec` |
+
+22 commits conservés sur `refonte-2026-09`, 23 au total. Aucun travail perdu.
+
+## Effet du push sur la production : aucun
+
+Vérifié : `gh api repos/Syntexia-AI/syntexia-website/hooks` ne renvoie **aucun
+webhook**. Vercel n'est pas branché sur GitHub, le déploiement passe par le CLI
+et le dossier `.vercel` local. Pousser sur GitHub ne déclenche donc aucune mise
+en production.
+
+Corollaire : **`/install-signature` reste en ligne après le push.** La purge Git
+et la fermeture de la page en production sont deux actions distinctes.
+
+## Reste à faire par un humain
+
+La poussée a été bloquée par le garde-fou de la session. Les deux commandes,
+à passer depuis `C:\Users\bapti\Code\syntexia-website` :
+
+```bash
+git push --force origin main
+git push origin refonte-2026-09
+```
+
+Puis contrôle que le distant est propre :
+
+```bash
+git ls-remote --heads origin
+gh api repos/Syntexia-AI/syntexia-website/contents/install-signature.html   # doit renvoyer 404
+```
+
+Les backups restent en place tant que ce contrôle n'a pas été passé.
