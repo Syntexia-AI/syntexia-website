@@ -60,7 +60,7 @@ const FIELDS = [
 
     <div class="demo-body">
       <section class="demo-block">
-        <h4>Documentos</h4>
+        <p class="demo-col">Documentos</p>
         <ul class="demo-docs">
           {DOCS.map((d, i) => (
             <li data-doc={i}>
@@ -76,7 +76,7 @@ const FIELDS = [
       </section>
 
       <section class="demo-block">
-        <h4>Conclusões</h4>
+        <p class="demo-col">Conclusões</p>
         <dl class="demo-fields">
           {FIELDS.map((f) => (
             <div class="demo-field" data-field={f.at}>
@@ -226,7 +226,9 @@ const FIELDS = [
   .demo-block { padding: var(--s-5); }
   .demo-block + .demo-block { border-left: 1px solid var(--line); }
 
-  .demo-block h4 {
+  /* En-tête de colonne d une interface reproduite, pas une section de la
+     page. En faire un titre cassait la hiérarchie : h1 puis h4. */
+  .demo-col {
     font-size: var(--t-small);
     font-weight: 500;
     color: var(--mute);

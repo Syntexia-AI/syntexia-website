@@ -15,6 +15,10 @@ const { links } = Astro.props;
 
 <script>
   // Menu plein écran sous 768px. Focus piégé, fermeture Escape.
+  // Le script confirme qu'il est en état de marche. Tant que cette classe
+  // n'est pas posée, la navigation reste visible en ligne, même sous 768px.
+  document.documentElement.classList.add('menu-js');
+
   const menu = document.getElementById('mobile-menu');
   const open = document.getElementById('menu-open');
   const close = document.getElementById('menu-close');

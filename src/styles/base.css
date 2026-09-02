@@ -292,11 +292,23 @@ a:hover {
   text-decoration: none;
 }
 
+/* Le repli en menu déroulant n'a lieu que si le script tourne, la classe
+   menu-js étant posée par MobileMenu. Sans JavaScript, la navigation reste en
+   ligne et utilisable : un bouton inerte qui cache les liens est pire qu'une
+   barre un peu serrée. */
 @media (max-width: 768px) {
   .nav-links {
+    gap: var(--s-4);
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+  .nav-links a {
+    font-size: 13.5px;
+  }
+  .menu-js .nav-links {
     display: none;
   }
-  .menu-toggle {
+  .menu-js .menu-toggle {
     display: inline-block;
   }
 }

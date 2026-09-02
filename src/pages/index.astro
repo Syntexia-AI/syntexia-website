@@ -148,7 +148,10 @@ const fmt = (d: Date) => d.toLocaleDateString('en-GB', { month: 'long', year: 'n
 
   <section class="section" id="insights">
     <div class="shell">
-      <h2 class="section-title" data-anim>Insights</h2>
+      <div class="insights-head" data-anim>
+        <h2 class="section-title">Insights</h2>
+        <a href="/blog">All insights</a>
+      </div>
       <div class="insights">
         {posts.map((p) => (
           <a class="insight" href={`/posts/${p.id}`} data-anim>
@@ -269,6 +272,15 @@ const fmt = (d: Date) => d.toLocaleDateString('en-GB', { month: 'long', year: 'n
   /* ---------- Secteurs, insights, contact ---------- */
 
   .section-title { margin-bottom: var(--s-7); }
+  .insights-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--s-4);
+  }
+  .insights-head .section-title { margin-bottom: 0; }
+  .insights-head + .insights { margin-top: var(--s-7); }
 
   .sectors {
     display: grid;

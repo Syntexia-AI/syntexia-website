@@ -29,6 +29,11 @@ const orgLd: Record<string, unknown> = {
   logo: `${site}/syntexia-mark-dark.svg`,
 };
 if (linkedinCompany) orgLd.sameAs = [linkedinCompany.value];
+
+// Échappe les caractères qui pourraient fermer la balise script. JSON.stringify
+// ne le fait pas. Nos valeurs sont contrôlées, ceci protège les suivantes.
+const safeJsonLd = (o: unknown) =>
+  JSON.stringify(o).replace(/</g, '\u003c').replace(/>/g, '\u003e');
 ---
 
 <!doctype html>
@@ -65,7 +70,7 @@ if (linkedinCompany) orgLd.sameAs = [linkedinCompany.value];
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={`${site}/og-image.png`} />
 
-    <script type="application/ld+json" set:html={JSON.stringify(orgLd)} />
+    <script type="application/ld+json" set:html={safeJsonLd(orgLd)} />
 
     {/* Analytics, disabled. While this stays commented out the site loads no
         third-party script, and /security can say so truthfully. Account and

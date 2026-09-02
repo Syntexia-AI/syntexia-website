@@ -13,6 +13,11 @@ const { Content } = await render(post);
 const iso = post.data.date.toISOString().slice(0, 10);
 const human = post.data.date.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
 
+// Même durcissement que dans le layout : JSON.stringify ne neutralise pas
+// une séquence de fermeture de balise script.
+const safeJsonLd = (o: unknown) =>
+  JSON.stringify(o).replace(/</g, '\u003c').replace(/>/g, '\u003e');
+
 const articleLd = {
   '@context': 'https://schema.org',
   '@type': 'Article',
@@ -37,7 +42,7 @@ const articleLd = {
       <p class="back"><a href="/blog">All insights</a></p>
     </div>
   </article>
-  <script type="application/ld+json" set:html={JSON.stringify(articleLd)} />
+  <script type="application/ld+json" set:html={safeJsonLd(articleLd)} />
 </Base>
 
 <style>
