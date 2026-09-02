@@ -126,24 +126,43 @@ export const hardRules: string[] = [
   'Every result points back to its source document.',
 ];
 
-/** Les fiches de l'équipe. Biographies tirées des profils LinkedIn publics,
-    seule source disponible. Aucun client n'y est nommé. */
+/** Les fiches de l'équipe.
+ *
+ *  Biographies construites depuis les profils LinkedIn publics des deux
+ *  intéressés, seule source disponible, sur le moule d'une notice de
+ *  consultant : le parcours qui justifie la place, puis ce qui est fait
+ *  concrètement, du prototype au déploiement.
+ *
+ *  Deux prudences volontaires.
+ *  Les chiffres de missions passées chez d'autres employeurs (croissance
+ *  d'EBITDA, revenus générés) ne sont pas repris : ils portent sur des
+ *  clients tiers et ne se vérifient pas depuis ce site.
+ *  « 2 500 utilisateurs » est repris tel qu'il figure sur le profil public,
+ *  qui dit « 2,500+ paying users on the initial prototype ». Le texte interne
+ *  d'origine parlait de « 2 500 praticiens », ce que la source ne dit pas :
+ *  ce sont des utilisateurs, pas nécessairement tous des praticiens. */
 export const team: {
   name: string;
   role: string;
-  bio: string;
+  bio: string[];
   linkedin: string | null;
 }[] = [
   {
     name: 'Karim Vissangy',
     role: 'CEO and Chief AI Officer',
-    bio: 'Two decades at the intersection of digital innovation, data and emerging technology. Economics at ISEG Lisbon, MBA at UCL. Ran strategy and operations for international hotel groups, co-founded a European voice AI platform, and now leads Syntexia between London and Lisbon.',
+    bio: [
+      'Co-founder and chief executive of a European voice AI platform, after two decades running strategy and operations for international hotel groups. Economics at ISEG Lisbon, MBA at UCL.',
+      'He leads Syntexia between London and Lisbon, from the strategy conversation with a leadership team through to the product that ends up running in their systems.',
+    ],
     linkedin: 'https://www.linkedin.com/in/karim-vissangy-17aa893a/',
   },
   {
     name: 'Baptiste Bouault',
     role: 'CTO and Lead AI Engineer',
-    bio: 'Owns the technical side end to end. Starts every build with a refusal list: the things the model is not allowed to do. Deterministic engines handle the numbers, the model only writes around figures already calculated and locked, and nothing reaches a user without clearing an automated check first. Every system is tested on both failure modes: giving a wrong answer, and refusing a question it should have answered. ESSEC and UC Berkeley.',
+    bio: [
+      'Co-founder of an AI health-tech product that reached 2,500 users, then Data and AI consultant to CAC 40 groups, where he took use cases from prototype through to deployment inside client teams. ESSEC and UC Berkeley.',
+      'He owns the technical side of Syntexia end to end. Every build starts with a refusal list: the things the model is not allowed to do. Deterministic engines handle the numbers, the model only writes around figures already calculated and locked, and nothing reaches a user without clearing an automated check. Each system is tested on both failure modes, giving a wrong answer and refusing a question it should have answered.',
+    ],
     linkedin: 'https://www.linkedin.com/in/baptiste-bouault/',
   },
 ];

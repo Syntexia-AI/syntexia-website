@@ -26,10 +26,33 @@ import { linkedinCompany, contactEmail, team, hardRules } from '../facts';
           <article class="person">
             <h2>{p.name}</h2>
             <p class="role">{p.role}</p>
-            <p class="bio">{p.bio}</p>
+            {p.bio.map((para) => <p class="bio">{para}</p>)}
             {p.linkedin && <p><a href={p.linkedin} rel="noopener">LinkedIn</a></p>}
           </article>
         ))}
+      </div>
+
+      <div class="rules">
+        <h2>The two rules we build under</h2>
+        <ol>
+          {hardRules.map((r) => <li>{r}</li>)}
+        </ol>
+        <p class="rules-note">
+          In regulated work, an almost-right answer costs more than no answer at all.
+          These two hold on every build, without exception.
+        </p>
+      </div>
+
+      <div class="team-more">
+        <p>
+          We are hiring for the work we cannot do fast enough. If you have run audits,
+          answered phones for a living, or built systems that other people depend on,
+          write to us.
+        </p>
+        <p class="team-links">
+          <a href={`mailto:${contactEmail.value}`}>{contactEmail.value}</a>
+          {linkedinCompany && <a href={linkedinCompany.value} rel="noopener">LinkedIn</a>}
+        </p>
       </div>
     </div>
   </section>
