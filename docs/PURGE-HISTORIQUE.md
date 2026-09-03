@@ -122,7 +122,7 @@ celui du premier commit après réécriture avec `git log --oneline | tail -1`.
 git log --all --oneline -- install-signature.html    # doit être vide
 git log --all --oneline -- _internal                 # doit être vide
 git log --all --oneline -- avatars                   # doit être vide
-git grep -aE "7757 998|932 733|966 660|amin\.martins|rui\.baiao|miguel\.fiel|fernando\.carvalho|alex@syntexia" $(git rev-list --all) 2>/dev/null | head
+git grep -aE "$MOTIF_PII" $(git rev-list --all) 2>/dev/null | head
 ```
 La dernière commande fouille **tous les commits** et non l'arbre courant. Elle
 doit ne rien retourner, hors les fichiers de `docs/` qui citent la commande de

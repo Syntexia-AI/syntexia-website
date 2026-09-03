@@ -4,11 +4,13 @@ Recette de la passe complète. Chaque ligne porte sa commande et sa sortie réel
 Exécutée le 2026-08-31 sur la branche `refonte-2026-09`, serveur local `astro dev` sur le port 4321.
 
 ```
-$ git grep -nE "7757 998|932 733|966 660|amin\.martins|rui\.baiao|miguel\.fiel|fernando\.carvalho|alex@syntexia"
-docs/RAPPORT-W1a.md:29:git grep -nE "7757 998|932 733|966 660|amin\.martins|rui\.baiao|miguel\.fiel|fernando\.carvalho|alex@syntexia"
+$ git grep -nE "$MOTIF_PII"
+docs/RAPPORT-W1a.md:29:git grep -nE "$MOTIF_PII"
 
 # La seule occurrence possible est la commande elle-même, citée dans un
-# rapport. Contrôle ciblé sur une vraie donnée plutôt que sur le motif :
+# rapport. Le motif lui-même n'est plus écrit dans le dépôt, voir la note de
+# docs/RAPPORT-W1a.md. Contrôle ciblé sur une vraie donnée plutôt que sur le
+# motif :
 $ git grep -oE "\+(44|351) ?[0-9]{2,4} ?[0-9]{3} ?[0-9]{3}|[a-z]+\.[a-z]+@syntexia\.ai" | sort -u
 docs/INVENTAIRE.md:+442046204570
 

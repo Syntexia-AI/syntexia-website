@@ -26,10 +26,16 @@ Date : 2026-08-31.
 
 **2. Grep de contrôle imposé par la directive : vide.**
 ```
-git grep -nE "7757 998|932 733|966 660|amin\.martins|rui\.baiao|miguel\.fiel|fernando\.carvalho|alex@syntexia"
+git grep -nE "$MOTIF_PII"
 -> aucun résultat
 ```
 Conformément à l'amendement A1, ce contrôle porte sur **tout le repo, `docs/` inclus**, et il est rejoué à chaque wagon, pas seulement en W6.
+
+`$MOTIF_PII` est l'alternation des trois fragments de numéros et des cinq
+fragments nominatifs relevés en W0. **Elle n'est pas écrite dans le dépôt** : la
+recopier ici republierait, sous forme de motif de recherche, exactement ce que la
+purge a retiré. Elle se reconstruit depuis les lignes source listées dans
+`docs/INVENTAIRE.md`, ou depuis la sauvegarde d'avant purge.
 
 **3. Redirection déclarée.**
 `vercel.json` reçoit un bloc `redirects` :
