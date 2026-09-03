@@ -18,6 +18,11 @@
       "source": "/install-signature",
       "destination": "/",
       "permanent": true
+    },
+    {
+      "source": "/install-signature.html",
+      "destination": "/",
+      "permanent": true
     }
   ],
   "headers": [
