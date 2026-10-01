@@ -1,0 +1,236 @@
+---
+// Le flux réel d'un cabinet portugais, tel qu'il est implémenté dans les
+// plateformes : Aceitação/Continuação, Planeamento, Execução, Conclusão.
+// L'exécution est verrouillée tant que l'acceptation et le contrôle
+// anti-blanchiment ne sont pas conclus, par entité. Les conclusions sont
+// datées, ce qui constitue la chronologie de la preuve d'audit.
+//
+// Source : README de ctng-intelligence, lu le 2026-08-31. Voir
+// docs/FACTS-PRODUIT.md. Aucun nom de client, aucune donnée.
+//
+// Dessin : une ligne pleine tant que la voie est libre, un cadenas à la
+// frontière, une ligne pointillée pour ce qui reste verrouillé. La
+// numérotation est légitime ici : c'est une séquence réelle.
+
+const PHASES = [
+  {
+    pt: 'Aceitação',
+    en: 'Acceptance',
+    detail: 'Beneficial owners, sanctions, politically exposed persons.',
+  },
+  { pt: 'Planeamento', en: 'Planning', detail: 'Scope, materiality, the team and the calendar.' },
+  { pt: 'Execução', en: 'Fieldwork', detail: 'Working papers, balances, timesheets.', gate: true },
+  { pt: 'Conclusão', en: 'Conclusion', detail: 'Dated, signed, and kept as evidence.' },
+];
+---
+
+<div class="flow">
+  <ol class="phases">
+    {PHASES.map((p, i) => (
+      <li class={`phase ${i >= 2 ? 'is-locked' : ''}`.trim()}>
+        <span class="phase-i tabular">{`0${i + 1}`}</span>
+        <span class="track" aria-hidden="true">
+          {p.gate && (
+            <span class="gate">
+              <svg viewBox="0 0 13 15">
+                <rect x="0.75" y="6.25" width="11.5" height="8"></rect>
+                <path d="M3.25 6.25V4.2a3.25 3.25 0 0 1 6.5 0v2.05"></path>
+              </svg>
+            </span>
+          )}
+          <i class="node"></i>
+          <i class="line"></i>
+        </span>
+        <span class="phase-pt">{p.pt}</span>
+        <span class="phase-en">{p.en}</span>
+        <span class="phase-detail">{p.detail}</span>
+      </li>
+    ))}
+  </ol>
+
+  <div class="grid flow-note">
+    <p>
+      <svg viewBox="0 0 13 15" aria-hidden="true">
+        <rect x="0.75" y="6.25" width="11.5" height="8"></rect>
+        <path d="M3.25 6.25V4.2a3.25 3.25 0 0 1 6.5 0v2.05"></path>
+      </svg>
+      <span>
+        Fieldwork stays locked until acceptance and the anti-money-laundering check are
+        concluded, entity by entity. Every conclusion carries the date it was reached.
+      </span>
+    </p>
+  </div>
+</div>
+
+<style>
+  .phases {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    column-gap: var(--gap);
+    margin-top: clamp(56px, 7vw, 108px);
+  }
+
+  .phase {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  .phase-i {
+    font-size: var(--t-small);
+    color: var(--meta);
+  }
+
+  .track {
+    position: relative;
+    display: flex;
+    align-items: center;
+    height: 28px;
+    margin: 12px 0 26px;
+  }
+
+  .node {
+    position: relative;
+    z-index: 1;
+    width: 12px;
+    height: 12px;
+    flex: none;
+    border-radius: 50%;
+    background: var(--fg);
+  }
+
+  /* Chaque segment court jusqu'au nœud suivant, à travers la gouttière. */
+  .line {
+    flex: 1;
+    height: 0;
+    border-top: 2px solid var(--fg);
+    margin-right: calc(-1 * var(--gap));
+  }
+
+  .phase:last-child .line {
+    margin-right: 0;
+  }
+
+  .is-locked .line {
+    border-top-style: dashed;
+  }
+
+  .gate {
+    position: absolute;
+    z-index: 2;
+    left: calc(-0.5 * var(--gap) - 10px);
+    top: 50%;
+    width: 26px;
+    height: 26px;
+    display: grid;
+    place-items: center;
+    transform: translate(-50%, -50%);
+    background: var(--bg);
+    border: 1.5px solid var(--fg);
+  }
+
+  .gate svg,
+  .flow-note svg {
+    width: 10px;
+    height: 12px;
+    fill: none;
+    stroke: var(--fg);
+    stroke-width: 1.6;
+  }
+
+  .phase-pt {
+    font-size: clamp(28px, 3vw, 44px);
+    line-height: 1.04;
+    letter-spacing: -0.032em;
+    font-weight: var(--w-title);
+    color: var(--fg);
+  }
+
+  .phase-en {
+    margin-top: 6px;
+    font-size: var(--t-small);
+    color: var(--meta);
+  }
+
+  .phase-detail {
+    margin-top: 16px;
+    font-size: 16px;
+    line-height: 1.5;
+    color: var(--fg-2);
+    max-width: 24ch;
+  }
+
+  .flow-note {
+    margin-top: clamp(44px, 5.4vw, 72px);
+  }
+
+  .flow-note p {
+    grid-column: 7 / span 5;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    font-size: 15px;
+    line-height: 1.55;
+    color: var(--fg-2);
+    max-width: 54ch;
+  }
+
+  .flow-note svg {
+    width: 13px;
+    height: 15px;
+    flex: none;
+    margin-top: 3px;
+    stroke-width: 1.5;
+  }
+
+  /* Sous 900 px, le rail devient vertical : la ligne descend, le cadenas
+     se pose entre la planification et l'exécution. */
+  @media (max-width: 900px) {
+    .phases {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .phase {
+      display: grid;
+      grid-template-columns: 28px minmax(0, 1fr);
+      column-gap: 18px;
+      padding-bottom: 40px;
+    }
+    /* :not(.track) plutôt que *, sinon le sélecteur, une fois scopé par
+       Astro, devient plus fort que .track et repousse la ligne à droite. */
+    .phase > :not(.track) {
+      grid-column: 2;
+    }
+    .track {
+      grid-column: 1;
+      grid-row: 1 / span 5;
+      flex-direction: column;
+      height: auto;
+      margin: 0;
+      padding-top: 5px;
+    }
+    .line {
+      width: 0;
+      height: auto;
+      border-top: 0;
+      border-left: 2px solid var(--fg);
+      margin: 0 0 -45px;
+    }
+    .is-locked .line {
+      border-left-style: dashed;
+    }
+    .phase:last-child .line {
+      margin-bottom: 0;
+    }
+    .gate {
+      left: 50%;
+      top: -20px;
+    }
+    .phase-detail {
+      max-width: 46ch;
+    }
+    .flow-note p {
+      grid-column: 1 / -1;
+    }
+  }
+</style>

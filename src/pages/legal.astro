@@ -1,0 +1,122 @@
+---
+import Base from '../layouts/Base.astro';
+import { legalEntity, companiesHouseUrl, contactEmail, phone, location } from '../facts';
+
+// Mentions légales. Tout ce qui figure ici est vérifiable : la société sur le
+// registre officiel, les coordonnées sur le site, l'absence de traceur dans
+// le code servi. Rien d'autre n'y entre.
+---
+
+<Base
+  title="Legal notice"
+  description="Company details, contact, and what this website does with your data."
+  path="/legal"
+>
+  <section class="section first">
+    <div class="shell">
+      <h1>Legal notice</h1>
+
+      <div class="legal">
+        <section>
+          <h2>The company</h2>
+          <dl>
+            <div><dt>Registered name</dt><dd>Syntexia.AI Ltd</dd></div>
+            <div><dt>Company number</dt><dd class="tabular">16847343</dd></div>
+            <div><dt>Registered in</dt><dd>England and Wales</dd></div>
+            <div>
+              <dt>Public record</dt>
+              <dd><a href={companiesHouseUrl} rel="noopener">Companies House register</a></dd>
+            </div>
+            {location && <div><dt>Where we work</dt><dd>{location.value}</dd></div>}
+          </dl>
+        </section>
+
+        <section>
+          <h2>Contact</h2>
+          <dl>
+            <div>
+              <dt>Email</dt>
+              <dd><a href={`mailto:${contactEmail.value}`}>{contactEmail.value}</a></dd>
+            </div>
+            {phone && (
+              <div>
+                <dt>Phone</dt>
+                <dd><a href={`tel:${phone.value.dial}`}>{phone.value.display}</a></dd>
+              </div>
+            )}
+          </dl>
+          <p>
+            Write to the address above for anything concerning this website, including a
+            request to access, correct or erase personal data.
+          </p>
+        </section>
+
+        <section>
+          <h2>What this website does with your data</h2>
+          <p>
+            Nothing. This site sets no cookies, loads no analytics, embeds no third-party
+            script and asks for no consent, because there is nothing to consent to. Every
+            font and every image is served from this domain.
+          </p>
+          <p>
+            There is no form on this site. If you write to us by email, we keep that email
+            in order to answer it, and for no other purpose.
+          </p>
+          <p>
+            You can check all of this yourself: open the network panel of your browser and
+            reload the page. Nothing leaves this domain.
+          </p>
+        </section>
+
+        <section>
+          <h2>Content and hosting</h2>
+          <dl>
+            <div><dt>Publication</dt><dd>{legalEntity.value.replace(/\.$/, '')}</dd></div>
+            <div><dt>Hosting</dt><dd>Vercel Inc.</dd></div>
+          </dl>
+          <p>
+            The text, the mark and the layout of this site belong to Syntexia.AI Ltd. The
+            documents reproduced on this site are illustrative and contain no customer
+            data.
+          </p>
+        </section>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .first { border-top: 0; }
+
+  .legal {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-8);
+    margin-top: var(--s-8);
+    max-width: 68ch;
+  }
+
+  .legal h2 {
+    font-size: var(--t-h3);
+    line-height: var(--lh-h3);
+    padding-bottom: var(--s-4);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .legal dl { margin: var(--s-5) 0 0; display: flex; flex-direction: column; gap: var(--s-4); }
+
+  .legal dl > div {
+    display: grid;
+    grid-template-columns: 190px minmax(0, 1fr);
+    gap: var(--s-4);
+    align-items: baseline;
+  }
+
+  .legal dt { font-size: var(--t-small); color: var(--mute); }
+  .legal dd { margin: 0; color: var(--ink); }
+  .legal p { margin-top: var(--s-5); }
+
+  @media (max-width: 640px) {
+    .legal dl > div { grid-template-columns: 1fr; gap: 2px; }
+  }
+</style>

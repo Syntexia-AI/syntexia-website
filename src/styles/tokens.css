@@ -1,0 +1,182 @@
+/* tokens.css
+   Source unique des variables. Direction « le point au cœur », octobre 2026,
+   décrite dans docs/DA-2026-10.md.
+
+   Trois surfaces :
+     papier (blanc)  la page, Syntexia qui parle ;
+     bureau (gris)   ce qui appartient au client, son interface et ses pièces ;
+     noir            ce que fait l'intelligence, et l'invitation à parler.
+   Un seul accent : le cuivre du cœur du mark. Il ne marque que ce que fait
+   l'intelligence (point final des titres, coches de l'agent, verbe actif).
+   Ce qui revient à une personne s'écrit en noir.
+
+   Contrastes mesurés dans docs/CONTRAST.md, recalculables avec
+   node scripts/contrast.mjs. */
+
+/* Polices auto-hébergées, servies depuis notre origine : font-src 'self'
+   suffit et la page /security peut continuer à l'affirmer.
+   Schibsted Grotesk, Bakken & Bæck et Henrik Kongsvoll pour Schibsted,
+   licence SIL OFL 1.1 (public/fonts/schibsted-grotesk-OFL.txt). Fichiers
+   variables 400 à 900, découpés comme Google Fonts : latin couvre tout le
+   portugais, latin-ext le reste. */
+
+@font-face {
+  font-family: 'Schibsted Grotesk';
+  font-style: normal;
+  font-weight: 400 900;
+  font-display: swap;
+  src: url('/fonts/schibsted-grotesk-latin-ext-wght-normal.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308,
+    U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113,
+    U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Schibsted Grotesk';
+  font-style: normal;
+  font-weight: 400 900;
+  font-display: swap;
+  src: url('/fonts/schibsted-grotesk-latin-wght-normal.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304,
+    U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* La mono ne sert que dans un document reproduit. */
+@font-face {
+  font-family: 'Courier Prime';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/courier-prime-400.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Courier Prime';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/courier-prime-700.woff2') format('woff2');
+}
+
+:root {
+  color-scheme: light;
+
+  /* Palette */
+  --white: #ffffff; /* papier : la page et les documents */
+  --desk: #eeedea; /* bureau : ce qui appartient au client */
+  --black: #000000; /* encre */
+  --graphite: #3d3b37; /* texte secondaire sur papier */
+  --stone: #6a6761; /* légendes et métadonnées, papier et bureau */
+  --hairline: #d9d7d2; /* filets sur papier */
+  --pebble: #dad7d1; /* points discrets du mark, sur papier */
+  --frame: #d3d0ca; /* bords de l'interface reproduite */
+  --paper-2: #f7f6f4; /* rail latéral de l'interface reproduite */
+  --typewriter: #1e1d1b; /* encre des documents reproduits */
+  --copper: #b36a2a; /* cœur du mark, sur papier et bureau */
+  --copper-lit: #e39b5e; /* le même cuivre, sur noir */
+  --ash: #c9c6c0; /* texte secondaire sur noir */
+  --ash-2: #8f8b84; /* légendes sur noir */
+  --soot: #2b2a28; /* filets sur noir */
+  --soot-2: #66635e; /* verbes au repos sur noir */
+
+  /* Ombres. Réservées aux objets reproduits : la fenêtre d'interface et le
+     papier. Rien d'autre sur le site ne porte d'ombre. */
+  --shadow-win: 0 1px 0 rgb(0 0 0 / 0.03), 0 56px 90px -56px rgb(38 28 18 / 0.45);
+  --shadow-sheet: 0 1px 1px rgb(0 0 0 / 0.07), 0 22px 36px -22px rgb(38 28 18 / 0.4);
+  --shadow-lift: 0 2px 2px rgb(0 0 0 / 0.06), 0 34px 52px -26px rgb(38 28 18 / 0.48);
+
+  /* Familles */
+  --font-ui: 'Schibsted Grotesk', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --font-mono: 'Courier Prime', 'Courier New', Courier, monospace;
+
+  /* Échelle. Le display ne sert qu'aux deux grands titres de l'accueil. */
+  --t-display: clamp(46px, 9.6vw, 146px);
+  --lh-display: 0.9;
+  --ls-display: -0.045em;
+  --t-title: clamp(40px, 6.2vw, 92px);
+  --t-h2: clamp(36px, 5.6vw, 84px);
+  --lh-h2: 0.96;
+  --t-h2-page: clamp(28px, 3.6vw, 52px);
+  --t-h3: clamp(24px, 2.4vw, 34px);
+  --lh-h3: 1.12;
+  --t-lead: clamp(19px, 1.55vw, 23px);
+  --t-body: 17px;
+  --lh-body: 1.6;
+  --t-small: 14px;
+  --lh-small: 1.5;
+  --w-title: 560;
+
+  /* Espacement */
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 24px;
+  --s-6: 32px;
+  --s-7: 48px;
+  --s-8: 64px;
+  --s-9: 96px;
+  --s-10: 128px;
+
+  /* Grille */
+  --gutter: clamp(16px, 3.3vw, 48px);
+  --gap: clamp(16px, 1.7vw, 24px);
+  --max: 1600px;
+  --section: clamp(80px, 9vw, 136px);
+  --measure: 68ch;
+  --shell: var(--max);
+}
+
+/* ------------------------------------------------------------------ */
+/* Surfaces                                                            */
+/* ------------------------------------------------------------------ */
+
+:root {
+  --bg: var(--white);
+  --fg: var(--black);
+  --fg-2: var(--graphite);
+  --meta: var(--stone);
+  --rule: var(--hairline);
+  --dot: var(--copper);
+  --quiet: var(--pebble);
+}
+
+.on-desk {
+  --bg: var(--desk);
+  background: var(--bg);
+}
+
+/* .invert est l'ancien nom de la surface inversée. Elle passe du crème au
+   noir, pour toutes les pages qui l'emploient encore. */
+.on-black,
+.invert {
+  --bg: var(--black);
+  --fg: var(--white);
+  --fg-2: var(--ash);
+  --meta: var(--ash-2);
+  --rule: var(--soot);
+  --dot: var(--copper-lit);
+  --quiet: var(--soot);
+  color-scheme: dark;
+  background: var(--bg);
+  color: var(--fg);
+}
+
+/* Anciens noms, conservés pour les pages pas encore redessinées. Ils sont
+   recalculés sur chaque surface : une variable qui en cite une autre se
+   résout là où elle est déclarée, pas là où elle est lue. */
+:root,
+.on-desk,
+.on-black,
+.invert {
+  --bg-2: var(--desk);
+  --surface: var(--paper-2);
+  --line: var(--rule);
+  --line-soft: var(--rule);
+  --line-strong: var(--meta);
+  --ink: var(--fg);
+  --ink-2: var(--fg-2);
+  --mute: var(--meta);
+  --mute-2: var(--meta);
+  --accent: var(--dot);
+  --accent-ink: var(--bg);
+  --selection: var(--desk);
+}

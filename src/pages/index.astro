@@ -1,0 +1,217 @@
+---
+import Base from '../layouts/Base.astro';
+import ContactBlock from '../components/ContactBlock.astro';
+import DocumentStack from '../components/DocumentStack.astro';
+import ProductDemo from '../components/ProductDemo.astro';
+import PartnerBlock from '../components/PartnerBlock.astro';
+import AuditFlow from '../components/AuditFlow.astro';
+import Pillars from '../components/Pillars.astro';
+import BrandMark from '../components/BrandMark.astro';
+import FullStop from '../components/FullStop.astro';
+import { getCollection } from 'astro:content';
+import { sectors, partnerNetworkUrl, location } from '../facts';
+import '../styles/home.css';
+
+// Copy repris de l'ancien site, commit c887605, src/sections.jsx, validé tel
+// quel. Direction artistique d'octobre 2026, « le point au cœur » : voir
+// docs/DA-2026-10.md.
+//
+// Le titre est composé en trois lignes fixes. Son point final est le cœur du
+// mark, en cuivre, et l'ancien sur-titre « Intelligence Layer » devient sa
+// légende : il dit ce que désigne ce point. La légende est dessinée en CSS
+// (data-callout) pour que le texte du h1 reste exactement le titre, pour les
+// moteurs comme pour le copier-coller. Le sur-titre reste lu en premier par
+// les lecteurs d'écran, comme avant.
+
+const eyebrow = 'Intelligence Layer';
+const sub =
+  'Not a chatbot. Not a co-pilot. A real intelligence layer that runs inside the systems your business already uses: quiet, embedded, always on.';
+
+const posts = (await getCollection('posts')).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
+);
+const fmt = (d: Date) => d.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+---
+
+<Base
+  title="Syntexia. Intelligence that lives in your ecosystem."
+  description={sub}
+  path="/"
+>
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="wrap">
+      <p class="sr-only">{eyebrow}</p>
+      <h1 class="hero-title" id="hero-title"><span class="l">Intelligence that</span> <span class="l">lives in your</span> <span class="l nw">ecosystem<span class="sr-only">.</span><span class="hero-point" aria-hidden="true" data-callout={eyebrow}><i class="dot"></i></span></span></h1>
+      <p class="legend" aria-hidden="true"><i class="dot"></i>{eyebrow}</p>
+
+      <div class="grid hero-foot">
+        <p class="lead">{sub}</p>
+        <div class="actions">
+          <a class="btn btn-primary" href="#contact">Book a call</a>
+          <a class="text-link" href="#what">See what it does</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band on-desk" id="product" aria-label="Product">
+    <div class="wrap">
+      <ProductDemo />
+    </div>
+  </section>
+
+  <PartnerBlock />
+
+  <div class="wrap" aria-hidden="true"><hr class="divider" /></div>
+
+  <section class="band" id="flow" aria-labelledby="flow-title">
+    <div class="wrap">
+      <h2 class="h2" id="flow-title">The order a firm actually works <FullStop>in</FullStop></h2>
+      <AuditFlow />
+    </div>
+  </section>
+
+  <section class="band on-black" id="what" aria-labelledby="what-title">
+    <div class="wrap">
+      <h2 class="h2 h2-wide" id="what-title">Four things your Intelligence does, every <FullStop>day</FullStop></h2>
+      <Pillars />
+    </div>
+  </section>
+
+  <section class="band on-desk" id="paperwork" aria-labelledby="paper-title">
+    <div class="wrap grid paper-grid">
+      <div class="paper-text">
+        <h2 class="h2" id="paper-title">We read the paperwork nobody wants to <FullStop>read</FullStop></h2>
+        <p>
+          Supplier invoices, trial balances, timesheets, audit working papers. Read,
+          checked against the source, and prepared inside the software your team
+          already uses.
+        </p>
+        <p class="paper-note">
+          The agent prepares the file. The auditor validates it. Nothing is concluded
+          without a person signing it.
+        </p>
+        <p><a class="text-link" href="/security">What we can put in a contract</a></p>
+      </div>
+      <div class="paper-pile">
+        <DocumentStack />
+      </div>
+      <p class="paper-legend">Illustrative documents. No customer data.</p>
+    </div>
+  </section>
+
+  <section class="band" id="sectors" aria-labelledby="sectors-title">
+    <div class="wrap">
+      <h2 class="h2" id="sectors-title">Built for the work that cannot be <FullStop>wrong</FullStop></h2>
+      <ul class="sector-index">
+        {sectors.map((s) => (
+          <li>
+            <h3>{s.name}</h3>
+            <p>{s.blurb}</p>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  {partnerNetworkUrl && (
+    <section class="band partner-announce">
+      <div class="wrap">
+        <h2 class="h2">Anthropic Claude Partner Network</h2>
+        <p>
+          Syntexia is a member of the network.
+          <a href={partnerNetworkUrl.value} rel="noopener">Read the announcement</a>.
+        </p>
+      </div>
+    </section>
+  )}
+
+  <div class="wrap" aria-hidden="true"><hr class="divider" /></div>
+
+  <section class="band" id="about" aria-labelledby="about-title">
+    <div class="wrap grid about-grid">
+      <h2 class="h2 about-title" id="about-title">An intelligence company, not an AI <FullStop>vendor</FullStop></h2>
+      <div class="about-mark">
+        <BrandMark size="xl" draw />
+      </div>
+      <div class="about-body">
+        <p>
+          Syntexia is an intelligence company. We help organisations put intelligence
+          at the core of how they operate, decide, and grow: intelligence that lives in
+          their business ecosystem, runs their present, and shows them the future.
+        </p>
+        <p>
+          We work across audit and assurance, and answer the phone for firms that would
+          rather their people did something else. Our products run inside the software
+          those firms already use.
+        </p>
+        {location && <p class="about-where">{location.value}</p>}
+        <p><a class="text-link" href="/about">More about the company</a></p>
+      </div>
+    </div>
+  </section>
+
+  <div class="wrap" aria-hidden="true"><hr class="divider" /></div>
+
+  <section class="band" id="insights" aria-labelledby="insights-title">
+    <div class="wrap">
+      <div class="insights-head">
+        <h2 class="h2" id="insights-title">Insights</h2>
+        <a class="text-link" href="/blog">All insights</a>
+      </div>
+      <ol class="posts">
+        {posts.map((p) => (
+          <li>
+            <a class="post" href={`/posts/${p.id}`}>
+              <span class="post-date tabular">{fmt(p.data.date)}</span>
+              <span class="post-title">{p.data.title}</span>
+              <span class="post-desc">{p.data.description}</span>
+            </a>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <section class="band on-black contact" id="contact" aria-labelledby="contact-title">
+    <div class="wrap">
+      <p class="contact-intro">Let’s put intelligence inside your business</p>
+      <h2 class="contact-title" id="contact-title"><span class="l">Run your present.</span> <span class="l">See your <FullStop>future</FullStop></span></h2>
+      <div class="grid contact-grid">
+        <p class="contact-lead">
+          Tell us what you want it to do. We answer within a working day, and if you
+          would rather describe it out loud, say so and we will call you.
+        </p>
+        <div class="contact-block">
+          <ContactBlock />
+        </div>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<script>
+  // Le grand mark de la section About se pose point par point quand il entre
+  // à l'écran. On ne masque jamais un mark déjà visible au chargement, et
+  // rien ne bouge en mouvement réduit.
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  document.querySelectorAll<HTMLElement>('[data-mark="draw"]').forEach((mark) => {
+    if (reduced.matches || !('IntersectionObserver' in window)) return;
+    const r = mark.getBoundingClientRect();
+    if (r.top < window.innerHeight && r.bottom > 0) return;
+
+    mark.classList.add('is-pending');
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (!e.isIntersecting) continue;
+          requestAnimationFrame(() => mark.classList.remove('is-pending'));
+          io.disconnect();
+        }
+      },
+      { threshold: 0.4 }
+    );
+    io.observe(mark);
+  });
+</script>

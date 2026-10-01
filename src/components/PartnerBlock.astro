@@ -1,0 +1,99 @@
+---
+import { partnerNetwork, partnerNetworkUrl } from '../facts';
+
+// Le partenariat, en grand. Demandé le 2026-09-02 : il était rendu en petit
+// texte gris au bas du bloc About, il devient une bande à lui.
+//
+// Trois choses qu'il ne fait pas, volontairement :
+//   1. Aucun logo Anthropic. Nous n'avons pas d'autorisation d'usage de leur
+//      marque. Citer le nom du programme en toutes lettres est légitime,
+//      reproduire leur identité visuelle ne l'est pas.
+//   2. Aucun niveau de partenariat inventé. Le niveau affiché vient de
+//      facts.ts, qui en porte la source.
+//   3. Aucun lien, tant que partnerNetworkUrl est vide. Le jour où une
+//      annonce publique existe, le titre devient cliquable tout seul.
+//
+// Le bloc entier disparaît si partnerNetwork n'est pas renseigné.
+---
+
+{partnerNetwork && (
+  <section class="band partner" aria-labelledby="partner-title">
+    <div class="wrap grid partner-grid">
+      <div class="partner-name">
+        <p class="partner-kicker">{partnerNetwork.value.tier} in the</p>
+        <h2 id="partner-title">
+          {partnerNetworkUrl ? (
+            <a href={partnerNetworkUrl.value} rel="noopener">{partnerNetwork.value.programme}</a>
+          ) : (
+            partnerNetwork.value.programme
+          )}
+        </h2>
+      </div>
+
+      <div class="partner-text">
+        <p>
+          We build with Claude, the model family we believe sets the standard for the kind
+          of careful, high-stakes work our customers operate in.
+        </p>
+        <p class="partner-note">
+          The models change. What does not change is that a person signs the conclusion.
+        </p>
+      </div>
+    </div>
+  </section>
+)}
+
+<style>
+  .partner-grid {
+    align-items: end;
+    row-gap: 32px;
+  }
+
+  .partner-name {
+    grid-column: 1 / span 7;
+  }
+
+  .partner-kicker {
+    font-size: var(--t-small);
+    line-height: var(--lh-small);
+    color: var(--meta);
+    margin-bottom: 14px;
+  }
+
+  .partner-name h2 {
+    font-size: clamp(32px, 4.3vw, 64px);
+    line-height: 1;
+    letter-spacing: -0.035em;
+    max-width: 13ch;
+  }
+
+  .partner-name h2 a {
+    text-decoration: none;
+  }
+
+  .partner-text {
+    grid-column: 8 / span 5;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .partner-text p {
+    font-size: 19px;
+    line-height: 1.5;
+    color: var(--fg);
+    max-width: 42ch;
+  }
+
+  .partner-text .partner-note {
+    font-size: 15px;
+    color: var(--meta);
+  }
+
+  @media (max-width: 900px) {
+    .partner-name,
+    .partner-text {
+      grid-column: 1 / -1;
+    }
+  }
+</style>
