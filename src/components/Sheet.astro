@@ -1,11 +1,31 @@
 ---
 // Document reproduit. C'est le seul endroit du site où la mono est du
 // contenu et non de la décoration. Données entièrement fictives.
-interface Row { label: string; value: string; redacted?: boolean; }
-interface Props { heading: string; rows: Row[]; total?: Row; }
-const { heading, rows, total } = Astro.props;
+//
+// Chaque ligne lue et rapprochée de sa source porte une coche cuivre, la
+// marque de l'agent. Les lignes caviardées n'en portent pas : ce que nous ne
+// montrons pas, nous ne prétendons pas l'avoir montré.
+//
+// tick : numéro d'ordre de la première coche, pour que la page puisse les
+// tracer l'une après l'autre (variable --k).
+interface Row {
+  label: string;
+  value: string;
+  redacted?: boolean;
+}
+interface Props {
+  heading: string;
+  rows: Row[];
+  total?: Row;
+  tick?: number;
+  class?: string;
+}
+const { heading, rows, total, tick = 0, class: cls = '' } = Astro.props;
+
+let k = tick;
+const next = () => k++;
 ---
-<div class="sheet">
+<div class={`sheet ${cls}`.trim()}>
   <p class="sheet-head">{heading}</p>
   <table>
     <tbody>
@@ -13,6 +33,13 @@ const { heading, rows, total } = Astro.props;
         <tr>
           <td>{r.label}</td>
           <td class="n">{r.redacted ? <span class="black" role="img" aria-label="Redacted"></span> : r.value}</td>
+          <td class="t">
+            {!r.redacted && (
+              <svg class="tick" style={`--k:${next()}`} viewBox="0 0 16 16" aria-hidden="true">
+                <path d="M3 8.6l3.2 3.1L13 4.6"></path>
+              </svg>
+            )}
+          </td>
         </tr>
       ))}
     </tbody>
@@ -20,40 +47,99 @@ const { heading, rows, total } = Astro.props;
   {total && (
     <>
       <div class="sheet-rule"></div>
-      <table><tbody><tr><td>{total.label}</td><td class="n">{total.value}</td></tr></tbody></table>
+      <table>
+        <tbody>
+          <tr>
+            <td>{total.label}</td>
+            <td class="n">{total.value}</td>
+            <td class="t">
+              <svg class="tick" style={`--k:${next()}`} viewBox="0 0 16 16" aria-hidden="true">
+                <path d="M3 8.6l3.2 3.1L13 4.6"></path>
+              </svg>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </>
   )}
 </div>
 
 <style>
+  /* Une feuille de papier posée : blanc, encre presque noire, ombre de
+     contact. L'ombre est la conséquence d'un objet posé, pas un effet. */
   .sheet {
-    background: var(--surface);
-    border: 1px solid var(--line);
-    border-radius: 0;
-    padding: var(--s-5);
+    background: var(--white);
+    color: var(--typewriter);
     font-family: var(--font-mono);
-    font-size: var(--t-small);
-    color: var(--ink-2);
+    font-size: 14.5px;
+    line-height: 1.5;
+    padding: 26px 28px 30px;
+    box-shadow: var(--shadow-sheet);
   }
-  /* En-tête d une pièce reproduite, pas une section de la page. Le rendre
-     titre cassait la hiérarchie (h1 puis h4) et le lecteur d écran annoncait
-     une structure qui n existe pas. */
+
+  /* En-tête d'une pièce reproduite, pas une section de la page. */
   .sheet-head {
     font-family: var(--font-mono);
-    font-size: var(--t-small);
     font-weight: 700;
-    color: var(--ink);
-    margin-bottom: var(--s-4);
+    color: var(--black);
+    letter-spacing: 0.02em;
+    margin-bottom: 16px;
+    max-width: none;
   }
-  .sheet table { width: 100%; border-collapse: collapse; }
-  .sheet td { padding: 3px 0; vertical-align: baseline; }
-  .sheet td.n { text-align: right; font-variant-numeric: tabular-nums; }
-  .sheet-rule { border-top: 1px solid var(--line); margin: var(--s-3) 0; }
+
+  .sheet table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .sheet td {
+    padding: 3px 0;
+    vertical-align: baseline;
+  }
+
+  .sheet td.n {
+    text-align: right;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .sheet td.t {
+    width: 28px;
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  .sheet-rule {
+    border-top: 1px solid var(--typewriter);
+    margin: 10px 0 6px;
+  }
+
   .black {
     display: inline-block;
     width: 84px;
     height: 11px;
-    background: var(--ink);
+    background: var(--black);
     vertical-align: middle;
+  }
+
+  .tick {
+    display: inline-block;
+    width: 15px;
+    height: 15px;
+    vertical-align: -2px;
+    fill: none;
+    stroke: var(--copper);
+    stroke-width: 1.9;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 20;
+    stroke-dashoffset: 0;
+  }
+
+  @media (max-width: 760px) {
+    .sheet {
+      font-size: 13.5px;
+      padding: 22px 20px 24px;
+    }
   }
 </style>

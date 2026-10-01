@@ -1,0 +1,430 @@
+/* home.css
+   Mise en page de l'accueil. Les composants portent leurs propres styles
+   (ProductDemo, AuditFlow, Pillars, DocumentStack, ContactBlock) ; ce
+   fichier ne règle que la page : l'accroche, les titres de section et les
+   grilles qui les accueillent. Direction décrite dans docs/DA-2026-10.md. */
+
+/* ---------- Titres de section ---------- */
+
+.h2 {
+  font-size: var(--t-h2);
+  line-height: var(--lh-h2);
+  letter-spacing: -0.038em;
+  max-width: 16ch;
+}
+
+.h2-wide {
+  max-width: 22ch;
+}
+
+/* ---------- Accroche ----------
+   Le titre est composé en trois lignes fixes. Son point final est le cœur du
+   mark, annoté « Intelligence Layer » comme on légende une pièce. */
+
+.hero {
+  padding-block: clamp(36px, 5.6vw, 84px) clamp(72px, 7.4vw, 112px);
+}
+
+.hero-title {
+  font-size: var(--t-display);
+  line-height: var(--lh-display);
+  letter-spacing: var(--ls-display);
+  max-width: none;
+}
+
+.hero-title .l {
+  display: block;
+}
+
+.hero-point {
+  position: relative;
+  display: inline-block;
+  width: 0.175em;
+  height: 0.175em;
+  margin-left: 0.04em;
+  vertical-align: baseline;
+}
+
+.hero-point .dot {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+
+/* La légende du point : un filet, puis « Intelligence Layer ». Les deux
+   sont des pseudo-éléments, hors du texte du titre. */
+.hero-point {
+  --callout-line: clamp(28px, 4vw, 64px);
+}
+
+.hero-point::before {
+  content: '';
+  position: absolute;
+  left: calc(100% + 14px);
+  top: 50%;
+  width: var(--callout-line);
+  height: 1px;
+  background: var(--fg);
+  transform-origin: left center;
+}
+
+.hero-point::after {
+  content: attr(data-callout);
+  position: absolute;
+  left: calc(100% + 26px + var(--callout-line));
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 15px;
+  line-height: 1;
+  font-weight: 560;
+  letter-spacing: 0;
+  white-space: nowrap;
+  color: var(--fg);
+}
+
+.legend {
+  display: none;
+}
+
+/* Le seul mouvement au chargement : le point se pose, puis le filet de la
+   légende se trace. Le texte de la légende, lui, ne dépend d'aucune
+   animation. */
+@media (prefers-reduced-motion: no-preference) {
+  .hero-point .dot {
+    animation: land 0.8s cubic-bezier(0.2, 0.9, 0.25, 1.2) 0.35s both;
+  }
+  .hero-point::before {
+    animation: draw-line 0.5s cubic-bezier(0.3, 0.7, 0.2, 1) 1.05s both;
+  }
+}
+
+@keyframes land {
+  0% {
+    transform: translateY(-0.55em) scale(0.4);
+    opacity: 0;
+  }
+  65% {
+    transform: translateY(0) scale(1.14);
+    opacity: 1;
+  }
+  100% {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+@keyframes draw-line {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.hero-foot {
+  margin-top: clamp(44px, 5.4vw, 80px);
+  row-gap: 34px;
+}
+
+.lead {
+  grid-column: 7 / span 5;
+  font-size: var(--t-lead);
+  line-height: 1.42;
+  letter-spacing: -0.006em;
+  color: var(--fg-2);
+  max-width: 36ch;
+}
+
+.actions {
+  grid-column: 7 / span 5;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px 34px;
+}
+
+/* ---------- Paperasse ---------- */
+
+.paper-grid {
+  row-gap: 40px;
+  align-items: start;
+}
+
+.paper-text {
+  grid-column: 1 / span 5;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.paper-text .h2 {
+  font-size: clamp(36px, 4.6vw, 70px);
+  max-width: 12ch;
+  margin-bottom: 14px;
+}
+
+.paper-text p {
+  font-size: 18px;
+  line-height: 1.6;
+  color: var(--fg-2);
+  max-width: 40ch;
+}
+
+.paper-text .paper-note {
+  color: var(--fg);
+}
+
+.paper-pile,
+.paper-legend {
+  grid-column: 6 / -1;
+}
+
+.paper-legend {
+  font-size: var(--t-small);
+  color: var(--meta);
+}
+
+/* ---------- Secteurs ---------- */
+
+.sector-index {
+  margin-top: clamp(56px, 7vw, 108px);
+  border-bottom: 1px solid var(--rule);
+}
+
+.sector-index li {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: var(--gap);
+  row-gap: 10px;
+  align-items: baseline;
+  padding-block: clamp(22px, 2.4vw, 34px);
+  border-top: 1px solid var(--rule);
+}
+
+.sector-index h3 {
+  grid-column: 1 / span 5;
+  font-size: clamp(24px, 2.6vw, 38px);
+  line-height: 1.1;
+  letter-spacing: -0.028em;
+}
+
+.sector-index p {
+  grid-column: 7 / span 5;
+  font-size: 17px;
+  line-height: 1.55;
+  color: var(--fg-2);
+  max-width: 48ch;
+}
+
+/* ---------- La société ---------- */
+
+.about-grid {
+  row-gap: clamp(56px, 6.5vw, 96px);
+}
+
+.about-title {
+  grid-column: 1 / span 10;
+  max-width: 14ch;
+}
+
+.about-mark {
+  grid-column: 1 / span 4;
+}
+
+.about-body {
+  grid-column: 6 / span 6;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.about-body p {
+  font-size: 18px;
+  line-height: 1.6;
+  color: var(--fg-2);
+  max-width: 52ch;
+}
+
+.about-body .about-where {
+  color: var(--fg);
+  font-weight: 560;
+}
+
+/* Bloc partenaire, rendu seulement quand une annonce publique existe. */
+.partner-announce p {
+  margin-top: var(--s-5);
+}
+
+/* ---------- Insights ---------- */
+
+.insights-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px 32px;
+  margin-bottom: clamp(44px, 5.4vw, 80px);
+}
+
+.posts {
+  border-bottom: 1px solid var(--rule);
+}
+
+.post {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: var(--gap);
+  row-gap: 8px;
+  align-items: baseline;
+  padding-block: clamp(22px, 2.4vw, 32px);
+  border-top: 1px solid var(--rule);
+  text-decoration: none;
+}
+
+.post-date {
+  grid-column: 1 / span 2;
+  font-size: var(--t-small);
+  color: var(--meta);
+}
+
+.post-title {
+  grid-column: 3 / span 5;
+  font-size: clamp(21px, 1.9vw, 27px);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  font-weight: var(--w-title);
+  color: var(--fg);
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+  transition: text-decoration-color 0.2s ease;
+}
+
+.post:hover .post-title {
+  text-decoration-color: currentColor;
+}
+
+.post-desc {
+  grid-column: 8 / span 5;
+  font-size: 16px;
+  line-height: 1.55;
+  color: var(--fg-2);
+  max-width: 46ch;
+}
+
+/* ---------- Contact ---------- */
+
+.contact {
+  padding-bottom: clamp(80px, 9vw, 132px);
+}
+
+.contact-intro {
+  font-size: var(--t-lead);
+  color: var(--meta);
+  margin-bottom: 24px;
+}
+
+.contact-title {
+  font-size: clamp(44px, 8.6vw, 132px);
+  line-height: 0.92;
+  letter-spacing: -0.045em;
+  max-width: none;
+}
+
+.contact-title .l {
+  display: block;
+}
+
+.contact-grid {
+  margin-top: clamp(56px, 6.5vw, 100px);
+  row-gap: 44px;
+}
+
+.contact-lead {
+  grid-column: 1 / span 5;
+  font-size: 18px;
+  line-height: 1.6;
+  color: var(--fg-2);
+  max-width: 40ch;
+}
+
+.contact-block {
+  grid-column: 7 / span 6;
+}
+
+/* ---------- Écrans plus étroits ---------- */
+
+@media (max-width: 1180px) {
+  .lead,
+  .actions {
+    grid-column: 6 / -1;
+  }
+  .paper-text {
+    grid-column: 1 / span 9;
+  }
+  .paper-pile,
+  .paper-legend {
+    grid-column: 1 / -1;
+  }
+  .post-title {
+    grid-column: 3 / span 6;
+  }
+  .post-desc {
+    grid-column: 9 / span 4;
+  }
+}
+
+@media (max-width: 900px) {
+  .lead,
+  .actions {
+    grid-column: 1 / span 10;
+  }
+  .sector-index h3,
+  .sector-index p,
+  .about-mark,
+  .about-body,
+  .contact-lead,
+  .contact-block {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 760px) {
+  .lead,
+  .actions,
+  .paper-text,
+  .paper-pile,
+  .paper-legend,
+  .about-title,
+  .post-date,
+  .post-title,
+  .post-desc {
+    grid-column: 1 / -1;
+  }
+  .hero-title .l,
+  .contact-title .l {
+    display: inline;
+  }
+  .hero-point::before,
+  .hero-point::after {
+    display: none;
+  }
+  .legend {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 22px;
+    font-size: 14px;
+    font-weight: 560;
+    color: var(--fg);
+  }
+  .legend .dot {
+    width: 9px;
+    height: 9px;
+    margin: 0;
+  }
+}

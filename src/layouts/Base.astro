@@ -3,7 +3,6 @@ import '../styles/tokens.css';
 import '../styles/base.css';
 import Masthead from '../components/Masthead.astro';
 import Footer from '../components/Footer.astro';
-import Motion from '../components/Motion.astro';
 import { linkedinCompany } from '../facts';
 
 interface Props {
@@ -46,14 +45,19 @@ const safeJsonLd = (o: unknown) =>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
 
-    <link rel="preload" href="/fonts/archivo-400.woff2" as="font" type="font/woff2" crossorigin />
-    <link rel="preload" href="/fonts/archivo-700.woff2" as="font" type="font/woff2" crossorigin />
+    <link
+      rel="preload"
+      href="/fonts/schibsted-grotesk-latin-wght-normal.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
 
     <link rel="icon" href="/favicon.ico" sizes="any" />
     <link rel="icon" href="/syntexia-mark-dark.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
-    <meta name="theme-color" content="#0B0A08" />
+    <meta name="theme-color" content="#FFFFFF" />
 
     <meta property="og:type" content={ogType} />
     <meta property="og:site_name" content="Syntexia" />
@@ -85,6 +89,5 @@ const safeJsonLd = (o: unknown) =>
       <slot />
     </main>
     <Footer />
-    <Motion />
   </body>
 </html>

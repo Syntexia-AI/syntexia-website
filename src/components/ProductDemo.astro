@@ -1,7 +1,10 @@
 ---
 // La démonstration du produit : l'agent prépare un dossier d'acceptation,
-// étape par étape, et s'arrête pour demander la validation de l'auditeur.
-// C'est le positionnement rendu visible plutôt qu'écrit.
+// étape par étape, puis s'arrête et rend la main à l'auditeur.
+//
+// Code couleur de la direction (docs/DA-2026-10.md) : le travail de l'agent
+// est en cuivre (point d'activité, coches), la décision de la personne est en
+// noir (le bouton « Concluir fase de Aceitação » s'allume quand c'est à elle).
 //
 // Terminologie relevée dans le code, pas supposée. Sources exactes :
 //   app/main.py ROTULOS_4A .... libellés des pièces de l'Anexo 4a
@@ -12,362 +15,537 @@
 //   les gabarits Jinja ........ « Concluir fase de Aceitação », « Executar
 //                               pesquisas », « Exportar Anexo 4 preenchido »
 //
-// Deux corrections apportées après vérification, car je les avais supposées :
-// « Lista de sócios » et « Balancete analítico » ne font pas partie des
-// pièces d'acceptation. Le balancete existe bien, mais ailleurs dans le
-// produit. Ils sont remplacés par les libellés réels.
+// Le rail de gauche reprend les quatre phases du flux (voir AuditFlow) et les
+// états de app/db.py, rendus « Em curso » et « Por iniciar ». L'exécution y
+// porte un cadenas : elle est verrouillée tant que l'acceptation n'est pas
+// conclue.
 //
 // Le modèle à 8 questions est propre à un cabinet : un autre utilise un
 // score pondéré. La démonstration montre donc un cas, pas une norme.
 //
-// Aucune donnée client, aucune raison sociale, aucun NIPC réel. Le numéro de
-// dossier est fictif et la contrepartie est caviardée, comme dans le produit.
+// Aucune donnée client, aucune raison sociale, aucun NIPC réel. La
+// contrepartie est caviardée, comme dans le produit.
 //
-// Remplace l'ancien AppFrame, qui était un tableau à largeur minimale de
-// 520 px et déclenchait une barre de défilement horizontale sous 720 px.
-// Ici, aucune table : une grille qui se replie.
+// Sans JavaScript, le dossier s'affiche terminé, en attente de validation.
 
 const DOCS = [
   'Questionário de identificação do cliente',
   'Certidão permanente atualizada',
   'Estrutura de propriedade e de controlo',
+  'Cartão de identificação',
 ];
 
 const FIELDS = [
   { label: 'BCFT', value: 'Medidas simplificadas', at: 2 },
   { label: 'PEPDATA', value: 'Sem correspondência', at: 3 },
-  { label: 'Independência', value: '18,4 % · abaixo de 20 % (não-EIP)', at: 4 },
+  { label: 'Independência', value: '18,4 % · abaixo de 20 % (não-EIP)', at: 4 },
+];
+
+const PHASES = [
+  { name: 'Aceitação', state: 'Em curso', current: true },
+  { name: 'Planeamento', state: 'Por iniciar' },
+  { name: 'Execução', state: null },
+  { name: 'Conclusão', state: 'Por iniciar' },
 ];
 ---
 
-<figure class="demo" data-demo data-step="0">
+<figure class="demo is-ready" data-demo data-step="5">
   <figcaption class="demo-cap">
-    Syntexia preparing a client acceptance file, in the firm's own interface.
-    Fictional case, no customer data.
+    Syntexia preparing a client acceptance file, in the firm’s own interface. Fictional
+    case, no customer data.
   </figcaption>
 
-  <div class="demo-frame">
-    <header class="demo-head">
-      <div class="demo-id">
-        <span class="demo-ref">NIPC 5<span class="black" role="img" aria-label="Redacted"></span></span>
-        <span class="demo-phase">Aceitação</span>
-      </div>
-      <div class="demo-status">
-        <span class="demo-dot" aria-hidden="true"></span>
-        <span class="demo-status-text" data-status>A ler documentos</span>
-      </div>
-    </header>
+  <div class="win">
+    <ol class="rail" aria-hidden="true">
+      {PHASES.map((p) => (
+        <li class={p.current ? 'is-current' : undefined}>
+          <span>{p.name}</span>
+          <span class="state">
+            {p.state ?? (
+              <svg viewBox="0 0 11 13">
+                <rect x="0.75" y="5.25" width="9.5" height="7"></rect>
+                <path d="M2.75 5.25V3.6a2.75 2.75 0 0 1 5.5 0v1.65"></path>
+              </svg>
+            )}
+          </span>
+        </li>
+      ))}
+    </ol>
 
-    <div class="demo-body">
-      <section class="demo-block">
-        <p class="demo-col">Documentos</p>
-        <ul class="demo-docs">
-          {DOCS.map((d, i) => (
-            <li data-doc={i}>
-              <span class="demo-check" aria-hidden="true"></span>
-              <span>{d}</span>
-            </li>
-          ))}
-          <li class="demo-redacted" data-doc="3">
-            <span class="demo-check" aria-hidden="true"></span>
-            <span>Cartão de identificação</span>
-          </li>
-        </ul>
-      </section>
+    <div class="win-main">
+      <header class="win-head">
+        <div class="win-id">
+          <span class="ref">NIPC 5<span class="redact" role="img" aria-label="Redacted"></span></span>
+          <span class="win-phase">Aceitação</span>
+        </div>
+        <div class="win-status">
+          <span class="agent" aria-hidden="true"></span>
+          <span data-status>Pendente de validação</span>
+        </div>
+      </header>
 
-      <section class="demo-block">
-        <p class="demo-col">Conclusões</p>
-        <dl class="demo-fields">
-          {FIELDS.map((f) => (
-            <div class="demo-field" data-field={f.at}>
-              <dt>{f.label}</dt>
-              <dd>{f.value}</dd>
-            </div>
-          ))}
-        </dl>
-      </section>
+      <div class="win-body">
+        <div class="win-col">
+          <p class="win-col-h">Documentos</p>
+          <ul class="docs">
+            {DOCS.map((d) => (
+              <li class="is-done" data-doc>
+                <span class="box" aria-hidden="true">
+                  <svg viewBox="0 0 16 16"><path d="M3 8.6l3.2 3.1L13 4.6"></path></svg>
+                </span>
+                <span>{d}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div class="win-col">
+          <p class="win-col-h">Conclusões</p>
+          <dl class="fields">
+            {FIELDS.map((f) => (
+              <div class="demo-field is-shown" data-field={f.at}>
+                <dt>{f.label}</dt>
+                <dd><span class="val">{f.value}</span></dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+      </div>
+
+      <footer class="win-foot">
+        <p class="hand">The agent prepares. The auditor validates.</p>
+        <span class="validate" aria-hidden="true">Concluir fase de Aceitação</span>
+      </footer>
     </div>
-
-    <footer class="demo-foot">
-      <p class="demo-hand">The agent prepares. The auditor validates.</p>
-      <span class="demo-btn" data-validate aria-hidden="true">Concluir fase de Aceitação</span>
-    </footer>
   </div>
 </figure>
 
 <script>
-  document.querySelectorAll<HTMLElement>('[data-demo]').forEach((root) => {
-    const status = root.querySelector<HTMLElement>('[data-status]');
+  // L'agent avance une étape toutes les 1,5 s tant que la démonstration est à
+  // l'écran, s'arrête sur « Pendente de validação », marque une pause, puis
+  // recommence. En mouvement réduit, rien ne bouge : le dossier reste terminé.
+  const LABELS = [
+    'A ler documentos',
+    'A avaliar BCFT (Anexo 4b)',
+    'A executar pesquisas',
+    'A verificar independência',
+    'Pendente de validação',
+  ];
+  const HOLD = [900, 1500, 1500, 1500, 1500, 5200];
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  document.querySelectorAll<HTMLElement>('[data-demo]').forEach((demo) => {
+    const status = demo.querySelector<HTMLElement>('[data-status]');
+    const docs = Array.from(demo.querySelectorAll<HTMLElement>('[data-doc]'));
+    const fields = Array.from(demo.querySelectorAll<HTMLElement>('[data-field]'));
     if (!status) return;
 
-    const LABELS = [
-      'A ler documentos',
-      'A avaliar BCFT (Anexo 4b)',
-      'A executar pesquisas',
-      'A verificar independência',
-      'Pendente de validação',
-    ];
-
-    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
-
-    // En mouvement réduit, on affiche directement le dossier terminé : le
-    // visiteur voit le même résultat, sans que rien ne bouge.
-    if (reduced.matches) {
-      root.dataset.step = '5';
-      status.textContent = LABELS[4];
-      return;
-    }
-
-    let step = 0;
+    let step = 5;
     let timer = 0;
+    let running = false;
 
-    const tick = () => {
-      step = (step + 1) % 7;
-      root.dataset.step = String(step);
-      // Les étapes 1 à 5 portent un libellé, 6 est la pause finale et 0 le
-      // retour à l'état vide.
-      if (step >= 1 && step <= 5) status.textContent = LABELS[step - 1];
-      else if (step === 0) status.textContent = LABELS[0];
+    const render = (s: number) => {
+      const done = s === 0 ? 0 : s === 1 ? 1 : s === 2 ? 2 : docs.length;
+      docs.forEach((d, i) => d.classList.toggle('is-done', i < done));
+      fields.forEach((f) => f.classList.toggle('is-shown', s >= Number(f.dataset.field)));
+      status.textContent = s === 0 ? LABELS[0] : LABELS[s - 1];
+      demo.classList.toggle('is-ready', s >= 5);
+      demo.dataset.step = String(s);
     };
 
-    const start = () => { if (!timer) timer = window.setInterval(tick, 1500); };
-    const stop = () => { if (timer) { clearInterval(timer); timer = 0; } };
+    const next = () => {
+      step = step >= 5 ? 0 : step + 1;
+      render(step);
+      timer = window.setTimeout(next, HOLD[step]);
+    };
 
-    if ('IntersectionObserver' in window) {
-      const io = new IntersectionObserver(
-        (entries) => { for (const e of entries) (e.isIntersecting ? start : stop)(); },
-        { threshold: 0.25 }
-      );
-      io.observe(root);
-    } else {
-      start();
+    const start = () => {
+      if (running || reduced.matches) return;
+      running = true;
+      demo.dataset.run = 'on';
+      step = 5;
+      next();
+    };
+
+    const stop = () => {
+      running = false;
+      demo.dataset.run = 'off';
+      window.clearTimeout(timer);
+    };
+
+    if ('IntersectionObserver' in window && !reduced.matches) {
+      new IntersectionObserver(
+        (entries) => {
+          for (const e of entries) {
+            if (e.isIntersecting) start();
+            else stop();
+          }
+        },
+        { threshold: 0.35 }
+      ).observe(demo);
     }
 
     reduced.addEventListener('change', (e) => {
       if (!e.matches) return;
       stop();
-      root.dataset.step = '5';
-      status.textContent = LABELS[4];
+      render(5);
     });
   });
 </script>
 
 <style>
-  .demo { margin: 0; }
-
-  .demo-cap {
-    font-size: var(--t-small);
-    line-height: var(--lh-small);
-    color: var(--mute-2);
-    margin-bottom: var(--s-4);
+  .demo {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--gap);
+    row-gap: 20px;
+    align-items: start;
   }
 
-  .demo-frame {
-    border: 1px solid var(--line);
-    background: var(--bg-2);
+  .demo-cap {
+    grid-column: 1 / span 3;
+    font-size: var(--t-small);
+    line-height: var(--lh-small);
+    color: var(--meta);
+    max-width: 28ch;
+    padding-top: 2px;
+  }
+
+  /* La fenêtre reproduite. C'est un objet posé sur le bureau : elle porte la
+     seule ombre et le seul cadre arrondi de l'accueil hors des points. */
+  .win {
+    grid-column: 4 / -1;
+    display: grid;
+    grid-template-columns: minmax(150px, 208px) minmax(0, 1fr);
+    background: var(--white);
+    color: var(--black);
+    border: 1px solid var(--frame);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: var(--shadow-win);
+  }
+
+  /* ---------- Rail des phases ---------- */
+
+  .rail {
+    background: var(--paper-2);
+    border-right: 1px solid var(--frame);
+    padding: 14px 0;
+  }
+
+  .rail li {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 13px 20px;
+    font-size: 14px;
+    color: var(--stone);
+  }
+
+  .rail .state {
+    display: inline-flex;
+    align-items: center;
+    font-size: 13px;
+  }
+
+  .rail .is-current {
+    color: var(--black);
+    font-weight: 600;
+    background: var(--white);
+  }
+
+  .rail .is-current .state {
+    font-weight: 400;
+    color: var(--stone);
+  }
+
+  .rail svg {
+    width: 11px;
+    height: 13px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.4;
   }
 
   /* ---------- En-tête ---------- */
 
-  .demo-head {
+  .win-main {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  .win-head {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
-    gap: var(--s-3) var(--s-5);
-    padding: var(--s-4) var(--s-5);
-    border-bottom: 1px solid var(--line);
-    background: var(--surface);
+    gap: 12px 24px;
+    padding: 18px 26px;
+    border-bottom: 1px solid var(--frame);
   }
 
-  .demo-id { display: flex; align-items: baseline; gap: var(--s-4); }
-
-  .demo-ref {
-    font-family: var(--font-mono);
-    font-size: var(--t-small);
-    color: var(--mute);
+  .win-id {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 18px;
   }
 
-  .demo-phase { font-size: 14.5px; font-weight: 500; color: var(--ink); }
-
-  .demo-status { display: flex; align-items: center; gap: 9px; }
-
-  .demo-status-text {
-    font-size: var(--t-small);
-    color: var(--mute);
+  .ref {
+    font-size: 13px;
+    color: var(--stone);
     font-variant-numeric: tabular-nums;
   }
 
-  /* Le point d'activité. Il ne pulse pas : il respire, une fois par cycle,
-     et s'arrête quand l'agent rend la main. */
-  .demo-dot {
-    width: 6px;
-    height: 6px;
-    background: var(--accent);
-    flex: none;
-    animation: demoBreathe 1.5s ease-in-out infinite;
+  .redact {
+    display: inline-block;
+    width: 92px;
+    height: 10px;
+    background: var(--black);
+    vertical-align: -1px;
   }
 
-  .demo[data-step='5'] .demo-dot,
-  .demo[data-step='6'] .demo-dot { animation: none; opacity: 0.35; }
-
-  @keyframes demoBreathe {
-    0%, 100% { opacity: 0.28; }
-    50% { opacity: 1; }
+  .win-phase {
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
   }
 
-  /* ---------- Corps. Une grille, jamais un tableau. ---------- */
-
-  .demo-body {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  }
-
-  .demo-block { padding: var(--s-5); }
-  .demo-block + .demo-block { border-left: 1px solid var(--line); }
-
-  /* En-tête de colonne d une interface reproduite, pas une section de la
-     page. En faire un titre cassait la hiérarchie : h1 puis h4. */
-  .demo-col {
-    font-size: var(--t-small);
-    font-weight: 500;
-    color: var(--mute);
-    margin-bottom: var(--s-4);
-  }
-
-  .demo-docs { list-style: none; display: flex; flex-direction: column; gap: var(--s-3); }
-
-  .demo-docs li {
+  .win-status {
     display: flex;
     align-items: center;
-    gap: var(--s-3);
-    font-size: 14.5px;
-    color: var(--mute-2);
-    opacity: 0.4;
-    transition: opacity 0.4s ease, color 0.4s ease;
+    gap: 10px;
+    font-size: 13px;
+    color: var(--stone);
   }
 
-  /* Chaque document s'allume à son tour. Le quatrième, caviardé, arrive avec
-     le troisième : c'est la pièce que nous ne montrons jamais. */
-  .demo[data-step='1'] .demo-docs li[data-doc='0'],
-  .demo[data-step='2'] .demo-docs li[data-doc='0'],
-  .demo[data-step='2'] .demo-docs li[data-doc='1'],
-  .demo[data-step='3'] .demo-docs li,
-  .demo[data-step='4'] .demo-docs li,
-  .demo[data-step='5'] .demo-docs li,
-  .demo[data-step='6'] .demo-docs li {
-    opacity: 1;
-    color: var(--ink-2);
-  }
-
-  .demo-check {
-    width: 12px;
-    height: 12px;
-    border: 1px solid var(--line-strong);
+  /* Le point d'activité de l'agent. Il respire tant qu'il travaille et
+     s'arrête quand il rend la main. */
+  .agent {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--copper);
     flex: none;
-    position: relative;
   }
 
-  /* Le pseudo-élément est défini sans condition : un sélecteur composé se
-     transformait mal sous le CSS à portée d'Astro et la coche n'existait
-     jamais. */
-  .demo-check::after {
-    content: '';
-    position: absolute;
-    inset: 2px;
-    background: var(--accent);
-    opacity: 0;
-    transition: opacity 0.3s ease;
+  .demo[data-run='on']:not(.is-ready) .agent {
+    animation: breathe 1.4s ease-in-out infinite;
   }
 
-  .demo[data-step='1'] .demo-docs li[data-doc='0'] .demo-check::after,
-  .demo[data-step='2'] .demo-docs li[data-doc='0'] .demo-check::after,
-  .demo[data-step='2'] .demo-docs li[data-doc='1'] .demo-check::after,
-  .demo[data-step='3'] .demo-check::after,
-  .demo[data-step='4'] .demo-check::after,
-  .demo[data-step='5'] .demo-check::after,
-  .demo[data-step='6'] .demo-check::after {
-    opacity: 1;
+  @keyframes breathe {
+    0%,
+    100% {
+      opacity: 0.3;
+    }
+    50% {
+      opacity: 1;
+    }
   }
 
-  .black {
-    display: inline-block;
-    width: 104px;
-    height: 10px;
-    background: var(--ink);
-    vertical-align: middle;
+  /* ---------- Corps : une grille, jamais un tableau ---------- */
+
+  .win-body {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.12fr);
+    flex: 1;
+  }
+
+  .win-col {
+    padding: 24px 26px 30px;
+    min-width: 0;
+  }
+
+  .win-col + .win-col {
+    border-left: 1px solid var(--frame);
+  }
+
+  /* En-tête de colonne d'une interface reproduite, pas une section de la
+     page : un titre casserait la hiérarchie (h1 puis h4). */
+  .win-col-h {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--stone);
+    margin-bottom: 18px;
+  }
+
+  .docs {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .docs li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 15px;
+    line-height: 1.35;
+    color: var(--stone);
+    transition: color 0.35s ease;
+  }
+
+  .docs li.is-done {
+    color: var(--black);
+  }
+
+  .box {
+    width: 18px;
+    height: 18px;
+    flex: none;
+    display: grid;
+    place-items: center;
+    border: 1px solid var(--frame);
+    background: var(--white);
+  }
+
+  .box svg {
+    width: 14px;
+    height: 14px;
+    fill: none;
+    stroke: var(--copper);
+    stroke-width: 1.9;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 20;
+    stroke-dashoffset: 20;
+    transition: stroke-dashoffset 0.38s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .docs li.is-done .box svg {
+    stroke-dashoffset: 0;
   }
 
   /* ---------- Conclusions ---------- */
 
-  .demo-fields { display: flex; flex-direction: column; gap: var(--s-4); }
+  .fields {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
 
   .demo-field {
     display: grid;
-    grid-template-columns: 116px minmax(0, 1fr);
-    gap: var(--s-3);
+    grid-template-columns: 100px minmax(0, 1fr);
+    gap: 12px;
     align-items: baseline;
+  }
+
+  .demo-field dt {
+    font-size: 13px;
+    color: var(--stone);
+  }
+
+  .demo-field dd {
+    position: relative;
+    margin: 0;
+    font-size: 15px;
+    line-height: 1.4;
+  }
+
+  .val {
+    display: block;
+    transition:
+      opacity 0.4s ease,
+      transform 0.45s cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+
+  .demo-field:not(.is-shown) .val {
     opacity: 0;
-    transform: translateY(6px);
-    transition: opacity 0.45s ease, transform 0.45s cubic-bezier(0.22, 0.61, 0.36, 1);
+    transform: translateY(5px);
   }
 
-  .demo[data-step='2'] .demo-field[data-field='2'],
-  .demo[data-step='3'] .demo-field[data-field='2'],
-  .demo[data-step='3'] .demo-field[data-field='3'],
-  .demo[data-step='4'] .demo-field,
-  .demo[data-step='5'] .demo-field,
-  .demo[data-step='6'] .demo-field {
-    opacity: 1;
-    transform: none;
+  /* Tant que la valeur n'est pas calculée, une réglette grise tient sa
+     place, comme dans le produit. */
+  .demo-field dd::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.42em;
+    width: min(100%, 132px);
+    height: 8px;
+    background: var(--desk);
+    transition: opacity 0.3s ease;
   }
 
-  .demo-field dt { font-size: var(--t-small); color: var(--mute); }
-  .demo-field dd { margin: 0; font-size: 14.5px; color: var(--ink); }
+  .demo-field.is-shown dd::before {
+    opacity: 0;
+  }
 
-  /* ---------- Pied. C'est ici que l'agent rend la main. ---------- */
+  /* ---------- Pied : l'agent rend la main ---------- */
 
-  .demo-foot {
+  .win-foot {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
-    gap: var(--s-4);
-    padding: var(--s-4) var(--s-5);
-    border-top: 1px solid var(--line);
+    gap: 14px 24px;
+    padding: 16px 26px;
+    border-top: 1px solid var(--frame);
   }
 
-  .demo-hand { font-size: var(--t-small); color: var(--mute-2); margin: 0; }
+  .hand {
+    font-size: 13px;
+    color: var(--stone);
+  }
 
-  /* Le bouton n'est pas cliquable : c'est une reproduction, pas un formulaire.
-     Il s'active visuellement quand l'agent a fini son travail. */
-  .demo-btn {
+  /* Pas cliquable : c'est une reproduction, pas un formulaire. Il passe au
+     noir quand la décision revient à l'auditeur. */
+  .validate {
     font-size: 14px;
-    font-weight: 500;
-    padding: 9px 16px;
-    border: 1px solid var(--line);
-    color: var(--mute-2);
-    transition: background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease;
+    font-weight: 560;
+    padding: 11px 18px;
+    border: 1px solid var(--frame);
+    color: var(--stone);
+    background: var(--white);
+    transition:
+      background-color 0.35s ease,
+      color 0.35s ease,
+      border-color 0.35s ease;
   }
 
-  .demo[data-step='5'] .demo-btn,
-  .demo[data-step='6'] .demo-btn {
-    background: var(--accent);
-    border-color: var(--accent);
-    color: var(--accent-ink);
+  .demo.is-ready .validate {
+    background: var(--black);
+    border-color: var(--black);
+    color: var(--white);
   }
 
-  @media (max-width: 720px) {
-    .demo-body { grid-template-columns: 1fr; }
-    .demo-block + .demo-block { border-left: 0; border-top: 1px solid var(--line); }
-    .demo-field { grid-template-columns: 1fr; gap: 2px; }
+  /* ---------- Adaptation ---------- */
+
+  @media (max-width: 1180px) {
+    .demo-cap,
+    .win {
+      grid-column: 1 / -1;
+    }
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    .demo-dot { animation: none; }
-    .demo-docs li,
-    .demo-field,
-    .demo-btn,
-    .demo-check::after { transition: none; }
+  @media (max-width: 900px) {
+    .win {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .rail {
+      display: none;
+    }
+  }
+
+  @media (max-width: 760px) {
+    .win-body {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .win-col + .win-col {
+      border-left: 0;
+      border-top: 1px solid var(--frame);
+    }
+    .win-head,
+    .win-col,
+    .win-foot {
+      padding-inline: 18px;
+    }
+    .demo-field {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 2px;
+    }
   }
 </style>

@@ -1,15 +1,33 @@
 ---
-// Matrice 5x5 formant un S, point central en accent.
+// Matrice 5 x 5 formant un S, cœur en cuivre.
 // Motif repris à l'identique de l'ancien src/sections.jsx (BRAND_PATTERN).
-// Son animation brandSignalEmerge est le seul mouvement du site.
-const PATTERN = [
-  1, 1, 1, 1, 0,
-  1, 0, 0, 0, 0,
-  1, 1, 2, 1, 1,
-  0, 0, 0, 0, 1,
-  1, 1, 1, 1, 0,
-];
+//
+// size « sm » : barre de navigation et pied de page.
+// size « xl » : section About de l'accueil. Avec draw, le S s'y pose point
+// par point dans l'ordre du tracé, puis le cœur arrive en dernier. Le script
+// qui déclenche ce tracé est dans la page, et ne masque jamais un mark déjà
+// visible au chargement.
+interface Props {
+  size?: 'sm' | 'xl';
+  draw?: boolean;
+  class?: string;
+}
+const { size = 'sm', draw = false, class: cls = '' } = Astro.props;
+
+const PATTERN = [1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 1, 1, 2, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0];
+
+// Ordre du tracé : la barre du haut de droite à gauche, la descente, la barre
+// du milieu, la descente, la barre du bas de droite à gauche. Le cœur, 12,
+// vient en dernier.
+const ORDER: Record<number, number> = {
+  3: 0, 2: 1, 1: 2, 0: 3, 5: 4, 10: 5, 11: 6, 13: 7, 14: 8, 19: 9, 23: 10, 22: 11, 21: 12, 20: 13, 12: 14,
+};
 ---
-<span class="brand-mark" aria-hidden="true">
-  {PATTERN.map((v) => <i class={v === 1 ? 'on' : v === 2 ? 'acc' : ''}></i>)}
+<span class={`mark mark-${size} ${cls}`.trim()} data-mark={draw ? 'draw' : undefined} aria-hidden="true">
+  {PATTERN.map((v, i) => (
+    <i
+      class={v === 1 ? 'on' : v === 2 ? 'core' : undefined}
+      style={draw && ORDER[i] !== undefined ? `--o:${ORDER[i]}` : undefined}
+    ></i>
+  ))}
 </span>

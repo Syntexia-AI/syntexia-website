@@ -140,12 +140,27 @@ export const hardRules: string[] = [
  *  « 2 500 utilisateurs » est repris tel qu'il figure sur le profil public,
  *  qui dit « 2,500+ paying users on the initial prototype ». Le texte interne
  *  d'origine parlait de « 2 500 praticiens », ce que la source ne dit pas :
- *  ce sont des utilisateurs, pas nécessairement tous des praticiens. */
+ *  ce sont des utilisateurs, pas nécessairement tous des praticiens.
+ *
+ *  Portraits. Un portrait n'est rendu que s'il a été fourni par la personne
+ *  elle-même. Sinon photo vaut null et rien n'est rendu à sa place : ni
+ *  silhouette, ni initiales, ni image d'attente.
+ *  Fichiers dans public/team/, nommés <base>-560.webp, <base>-1120.webp et
+ *  <base>-1120.jpg, recadrés en 4:5, sans métadonnées. Pour ajouter un
+ *  portrait : déposer les trois fichiers, puis renseigner photo ci-dessous. */
+export interface Portrait {
+  /** Chemin public sans suffixe, par exemple '/team/baptiste-bouault'. */
+  base: string;
+  alt: string;
+  source: string;
+}
+
 export const team: {
   name: string;
   role: string;
   bio: string[];
   linkedin: string | null;
+  photo: Portrait | null;
 }[] = [
   {
     name: 'Karim Vissangy',
@@ -155,6 +170,8 @@ export const team: {
       'He leads Syntexia between London and Lisbon, from the strategy conversation with a leadership team through to the product that ends up running in their systems.',
     ],
     linkedin: 'https://www.linkedin.com/in/karim-vissangy-17aa893a/',
+    // En attente de la photo de Karim, demandée le 2026-10-01.
+    photo: null,
   },
   {
     name: 'Baptiste Bouault',
@@ -164,6 +181,11 @@ export const team: {
       'He owns the technical side of Syntexia end to end. Every build starts with a refusal list: the things the model is not allowed to do. Deterministic engines handle the numbers, the model only writes around figures already calculated and locked, and nothing reaches a user without clearing an automated check. Each system is tested on both failure modes, giving a wrong answer and refusing a question it should have answered.',
     ],
     linkedin: 'https://www.linkedin.com/in/baptiste-bouault/',
+    photo: {
+      base: '/team/baptiste-bouault',
+      alt: 'Portrait of Baptiste Bouault',
+      source: 'photo fournie par Baptiste le 2026-10-01',
+    },
   },
 ];
 

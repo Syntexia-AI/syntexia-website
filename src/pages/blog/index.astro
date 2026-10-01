@@ -46,7 +46,8 @@ const fmt = (d: Date) => d.toLocaleDateString('en-GB', { month: 'long', year: 'n
   .row-body { display: block; }
   .row-title { display: block; font-size: var(--t-h3); font-weight: 600; line-height: var(--lh-h3); letter-spacing: -0.01em; }
   .row-desc { display: block; margin-top: var(--s-3); color: var(--ink-2); max-width: 62ch; }
-  .row:hover .row-title { color: var(--accent); }
+  .row-title { text-decoration: underline; text-decoration-color: transparent; text-decoration-thickness: 1px; text-underline-offset: 0.2em; }
+  .row:hover .row-title { text-decoration-color: currentColor; }
   @media (max-width: 640px) {
     .row { grid-template-columns: 1fr; gap: var(--s-2); }
   }

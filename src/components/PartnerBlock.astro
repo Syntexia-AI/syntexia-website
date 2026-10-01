@@ -8,9 +8,8 @@ import { partnerNetwork, partnerNetworkUrl } from '../facts';
 //   1. Aucun logo Anthropic. Nous n'avons pas d'autorisation d'usage de leur
 //      marque. Citer le nom du programme en toutes lettres est légitime,
 //      reproduire leur identité visuelle ne l'est pas.
-//   2. Aucun niveau de partenariat affiché. L'ancien site écrivait « Frontier
-//      model partner », que rien ne soutient. Karim a confirmé l'inverse : le
-//      tier actuel est en dessous de celui qui figure à l'annuaire public.
+//   2. Aucun niveau de partenariat inventé. Le niveau affiché vient de
+//      facts.ts, qui en porte la source.
 //   3. Aucun lien, tant que partnerNetworkUrl est vide. Le jour où une
 //      annonce publique existe, le titre devient cliquable tout seul.
 //
@@ -18,11 +17,11 @@ import { partnerNetwork, partnerNetworkUrl } from '../facts';
 ---
 
 {partnerNetwork && (
-  <section class="partner-band">
-    <div class="shell partner-grid">
-      <div class="partner-name" data-anim>
+  <section class="band partner" aria-labelledby="partner-title">
+    <div class="wrap grid partner-grid">
+      <div class="partner-name">
         <p class="partner-kicker">{partnerNetwork.value.tier} in the</p>
-        <h2>
+        <h2 id="partner-title">
           {partnerNetworkUrl ? (
             <a href={partnerNetworkUrl.value} rel="noopener">{partnerNetwork.value.programme}</a>
           ) : (
@@ -31,7 +30,7 @@ import { partnerNetwork, partnerNetworkUrl } from '../facts';
         </h2>
       </div>
 
-      <div class="partner-text" data-anim>
+      <div class="partner-text">
         <p>
           We build with Claude, the model family we believe sets the standard for the kind
           of careful, high-stakes work our customers operate in.
@@ -45,45 +44,56 @@ import { partnerNetwork, partnerNetworkUrl } from '../facts';
 )}
 
 <style>
-  .partner-band {
-    padding: var(--s-9) 0;
-    background: var(--surface);
-    border-top: 1px solid var(--line);
-    border-bottom: 1px solid var(--line);
+  .partner-grid {
+    align-items: end;
+    row-gap: 32px;
   }
 
-  .partner-grid {
-    display: grid;
-    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
-    gap: var(--s-9);
-    align-items: start;
+  .partner-name {
+    grid-column: 1 / span 7;
   }
 
   .partner-kicker {
     font-size: var(--t-small);
     line-height: var(--lh-small);
-    color: var(--mute);
-    margin-bottom: var(--s-3);
+    color: var(--meta);
+    margin-bottom: 14px;
   }
 
-  /* Le nom du programme est traité comme un titre de section, pas comme une
-     mention de bas de page. C'est tout l'objet de ce bloc. */
   .partner-name h2 {
-    font-size: var(--t-h2);
-    line-height: var(--lh-h2);
-    letter-spacing: -0.02em;
-    max-width: 14ch;
+    font-size: clamp(32px, 4.3vw, 64px);
+    line-height: 1;
+    letter-spacing: -0.035em;
+    max-width: 13ch;
   }
 
-  .partner-name h2 a { color: inherit; text-decoration-color: var(--line); }
-  .partner-name h2 a:hover { color: var(--accent); }
+  .partner-name h2 a {
+    text-decoration: none;
+  }
 
-  .partner-text { display: flex; flex-direction: column; gap: var(--s-5); }
-  .partner-text p { font-size: 17px; line-height: 1.6; }
-  .partner-note { color: var(--mute); font-size: var(--t-small); line-height: var(--lh-small); }
+  .partner-text {
+    grid-column: 8 / span 5;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .partner-text p {
+    font-size: 19px;
+    line-height: 1.5;
+    color: var(--fg);
+    max-width: 42ch;
+  }
+
+  .partner-text .partner-note {
+    font-size: 15px;
+    color: var(--meta);
+  }
 
   @media (max-width: 900px) {
-    .partner-grid { grid-template-columns: 1fr; gap: var(--s-6); }
-    .partner-name h2 { max-width: none; }
+    .partner-name,
+    .partner-text {
+      grid-column: 1 / -1;
+    }
   }
 </style>

@@ -1,58 +1,83 @@
 ---
 import { contactEmail, phone, linkedinCompany, location } from '../facts';
 
-// Remplace le formulaire. L'ancien site donnait ses coordonnées directement,
-// sans champ à remplir : on revient à cela.
+// Les coordonnées, données directement, sans formulaire.
 //
-// Chaque ligne n'est rendue que si le fait existe. Le LinkedIn société
-// n'apparaît que le jour où son URL est renseignée dans facts.ts : pas de
-// lien mort, pas de pictogramme qui ne mène nulle part.
+// Chaque ligne n'est rendue que si le fait existe dans facts.ts : pas de lien
+// mort, pas de pictogramme qui ne mène nulle part. L'adresse électronique est
+// mise en avant, c'est le premier geste attendu.
 const items = [
-  { label: 'Email', value: contactEmail.value, href: `mailto:${contactEmail.value}` },
+  { label: 'Email', value: contactEmail.value, href: `mailto:${contactEmail.value}`, lead: true },
   phone && { label: 'Phone', value: phone.value.display, href: `tel:${phone.value.dial}` },
   linkedinCompany && { label: 'LinkedIn', value: 'Syntexia.AI', href: linkedinCompany.value },
   location && { label: 'Where', value: location.value, href: null },
-].filter(Boolean) as { label: string; value: string; href: string | null }[];
+].filter(Boolean) as { label: string; value: string; href: string | null; lead?: boolean }[];
 ---
 
 <ul class="contact-list">
   {items.map((it) => (
-    <li>
-      <span class="contact-label">{it.label}</span>
-      {it.href
-        ? <a href={it.href} rel={it.href.startsWith('http') ? 'noopener' : undefined}>{it.value}</a>
-        : <span class="contact-value">{it.value}</span>}
+    <li class={it.lead ? 'is-lead' : undefined}>
+      <span class="c-label">{it.label}</span>
+      {it.href ? (
+        <a class="c-value" href={it.href} rel={it.href.startsWith('http') ? 'noopener' : undefined}>{it.value}</a>
+      ) : (
+        <span class="c-value">{it.value}</span>
+      )}
     </li>
   ))}
 </ul>
 
 <style>
   .contact-list {
-    list-style: none;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: var(--s-6) var(--s-8);
-    border-top: 1px solid var(--line);
-    padding-top: var(--s-6);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 36px var(--gap);
   }
 
-  .contact-list li { display: flex; flex-direction: column; gap: var(--s-2); }
+  .contact-list li {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 0;
+    padding-top: 16px;
+    border-top: 1px solid var(--rule);
+  }
 
-  .contact-label {
+  .contact-list .is-lead {
+    grid-column: 1 / -1;
+  }
+
+  .c-label {
     font-size: var(--t-small);
-    line-height: var(--lh-small);
-    color: var(--mute);
+    color: var(--meta);
   }
 
-  .contact-list a,
-  .contact-value {
-    font-size: 19px;
+  .c-value {
+    font-size: 20px;
     line-height: 1.35;
-    color: var(--ink);
-    text-decoration: none;
-    letter-spacing: -0.01em;
+    letter-spacing: -0.012em;
+    color: var(--fg);
+    overflow-wrap: anywhere;
   }
 
-  .contact-list a { border-bottom: 1px solid var(--line); padding-bottom: 2px; width: fit-content; }
-  .contact-list a:hover { border-bottom-color: var(--accent); color: var(--accent); }
+  a.c-value {
+    text-decoration-color: var(--soot-2);
+  }
+
+  a.c-value:hover {
+    text-decoration-color: var(--dot);
+  }
+
+  .is-lead .c-value {
+    font-size: clamp(30px, 3.6vw, 54px);
+    line-height: 1.05;
+    letter-spacing: -0.032em;
+    font-weight: var(--w-title);
+  }
+
+  @media (max-width: 760px) {
+    .contact-list {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
 </style>

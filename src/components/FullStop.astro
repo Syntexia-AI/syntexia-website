@@ -1,0 +1,11 @@
+---
+// Le point final cuivre des grands titres.
+//
+// Il remplace visuellement le point du titre par le cœur du mark : le
+// dernier mot et le point sont liés par un espace insécable de fait (nowrap),
+// pour que le point ne parte jamais seul à la ligne. Le vrai point reste dans
+// le texte, masqué, pour la lecture d'écran, l'indexation et le copier-coller.
+//
+// Usage : <h2>Built for the work that cannot be <FullStop>wrong</FullStop></h2>
+---
+<span class="nw"><slot /><span class="sr-only">.</span><i class="dot" aria-hidden="true"></i></span>

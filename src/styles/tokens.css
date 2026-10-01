@@ -1,47 +1,46 @@
 /* tokens.css
-   Source unique des variables. Aucun autre fichier ne redéfinit un token.
-   Palette reprise à l identique de [data-palette="copper"][data-mode="dark"] de
-   l ancien styles.css, avec trois corrections imposées par la mesure de
-   contraste, pas par le goût. Voir docs/CONTRAST.md :
-     --mute-2 : #5A554B puis #6F6A5F donnaient 2.6:1 et 3.68:1. Retenu #7F796C,
-                qui donne 4.57:1. La valeur #6F6A5F de la directive ne tenait
-                pas la promesse de 4.5:1 qui la justifiait.
-     --mute   : #837C6F donnait 4.37:1 sur --surface. Retenu #867E71, 4.51:1.
-     --line-strong : nouveau. Les bordures de champ sont un composant
-                d interface, seuil 3:1. --line seul donne 1.32:1. */
+   Source unique des variables. Direction « le point au cœur », octobre 2026,
+   décrite dans docs/DA-2026-10.md.
 
-/* Polices auto-hébergées. Servies depuis notre origine, jamais depuis Google.
-   Les woff2 sont copiés dans public/fonts/ pour que le chemin soit stable et
-   preloadable, et pour que font-src 'self' suffise. */
+   Trois surfaces :
+     papier (blanc)  la page, Syntexia qui parle ;
+     bureau (gris)   ce qui appartient au client, son interface et ses pièces ;
+     noir            ce que fait l'intelligence, et l'invitation à parler.
+   Un seul accent : le cuivre du cœur du mark. Il ne marque que ce que fait
+   l'intelligence (point final des titres, coches de l'agent, verbe actif).
+   Ce qui revient à une personne s'écrit en noir.
+
+   Contrastes mesurés dans docs/CONTRAST.md, recalculables avec
+   node scripts/contrast.mjs. */
+
+/* Polices auto-hébergées, servies depuis notre origine : font-src 'self'
+   suffit et la page /security peut continuer à l'affirmer.
+   Schibsted Grotesk, Bakken & Bæck et Henrik Kongsvoll pour Schibsted,
+   licence SIL OFL 1.1 (public/fonts/schibsted-grotesk-OFL.txt). Fichiers
+   variables 400 à 900, découpés comme Google Fonts : latin couvre tout le
+   portugais, latin-ext le reste. */
 
 @font-face {
-  font-family: 'Archivo';
+  font-family: 'Schibsted Grotesk';
   font-style: normal;
-  font-weight: 400;
+  font-weight: 400 900;
   font-display: swap;
-  src: url('/fonts/archivo-400.woff2') format('woff2');
+  src: url('/fonts/schibsted-grotesk-latin-ext-wght-normal.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308,
+    U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113,
+    U+2C60-2C7F, U+A720-A7FF;
 }
 @font-face {
-  font-family: 'Archivo';
+  font-family: 'Schibsted Grotesk';
   font-style: normal;
-  font-weight: 500;
+  font-weight: 400 900;
   font-display: swap;
-  src: url('/fonts/archivo-500.woff2') format('woff2');
+  src: url('/fonts/schibsted-grotesk-latin-wght-normal.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304,
+    U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
-@font-face {
-  font-family: 'Archivo';
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-  src: url('/fonts/archivo-600.woff2') format('woff2');
-}
-@font-face {
-  font-family: 'Archivo';
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
-  src: url('/fonts/archivo-700.woff2') format('woff2');
-}
+
+/* La mono ne sert que dans un document reproduit. */
 @font-face {
   font-family: 'Courier Prime';
   font-style: normal;
@@ -58,38 +57,52 @@
 }
 
 :root {
-  /* Couleur */
-  --bg: #0B0A08;
-  --bg-2: #15120E;
-  --surface: #201C16;
-  --line: #2A2622;
-  --line-strong: #655C52;
-  --line-soft: #1E1B17;
-  --ink: #F4F0E6;
-  --ink-2: #C9C3B5;
-  --mute: #8B8376;
-  --mute-2: #7F796C;
-  --accent: #EDA968;
-  --accent: oklch(0.79 0.12 65);
-  --accent-ink: #0B0A08;
-  --selection: oklch(0.42 0.08 65);
+  color-scheme: light;
 
-  /* Familles. La mono ne sert que dans un document reproduit. */
-  --font-ui: 'Archivo', system-ui, -apple-system, sans-serif;
-  --font-mono: 'Courier Prime', ui-monospace, monospace;
+  /* Palette */
+  --white: #ffffff; /* papier : la page et les documents */
+  --desk: #eeedea; /* bureau : ce qui appartient au client */
+  --black: #000000; /* encre */
+  --graphite: #3d3b37; /* texte secondaire sur papier */
+  --stone: #6a6761; /* légendes et métadonnées, papier et bureau */
+  --hairline: #d9d7d2; /* filets sur papier */
+  --pebble: #dad7d1; /* points discrets du mark, sur papier */
+  --frame: #d3d0ca; /* bords de l'interface reproduite */
+  --paper-2: #f7f6f4; /* rail latéral de l'interface reproduite */
+  --typewriter: #1e1d1b; /* encre des documents reproduits */
+  --copper: #b36a2a; /* cœur du mark, sur papier et bureau */
+  --copper-lit: #e39b5e; /* le même cuivre, sur noir */
+  --ash: #c9c6c0; /* texte secondaire sur noir */
+  --ash-2: #8f8b84; /* légendes sur noir */
+  --soot: #2b2a28; /* filets sur noir */
+  --soot-2: #66635e; /* verbes au repos sur noir */
 
-  /* Échelle. Cinq crans. Toute autre taille est un défaut. */
-  --t-display: clamp(40px, 5.2vw, 64px);
-  --lh-display: 1.05;
-  --ls-display: -0.022em;
-  --t-h2: clamp(28px, 3.4vw, 38px);
-  --lh-h2: 1.1;
-  --t-h3: 24px;
-  --lh-h3: 1.25;
-  --t-body: 16px;
+  /* Ombres. Réservées aux objets reproduits : la fenêtre d'interface et le
+     papier. Rien d'autre sur le site ne porte d'ombre. */
+  --shadow-win: 0 1px 0 rgb(0 0 0 / 0.03), 0 56px 90px -56px rgb(38 28 18 / 0.45);
+  --shadow-sheet: 0 1px 1px rgb(0 0 0 / 0.07), 0 22px 36px -22px rgb(38 28 18 / 0.4);
+  --shadow-lift: 0 2px 2px rgb(0 0 0 / 0.06), 0 34px 52px -26px rgb(38 28 18 / 0.48);
+
+  /* Familles */
+  --font-ui: 'Schibsted Grotesk', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --font-mono: 'Courier Prime', 'Courier New', Courier, monospace;
+
+  /* Échelle. Le display ne sert qu'aux deux grands titres de l'accueil. */
+  --t-display: clamp(46px, 9.6vw, 146px);
+  --lh-display: 0.9;
+  --ls-display: -0.045em;
+  --t-title: clamp(40px, 6.2vw, 92px);
+  --t-h2: clamp(36px, 5.6vw, 84px);
+  --lh-h2: 0.96;
+  --t-h2-page: clamp(28px, 3.6vw, 52px);
+  --t-h3: clamp(24px, 2.4vw, 34px);
+  --lh-h3: 1.12;
+  --t-lead: clamp(19px, 1.55vw, 23px);
+  --t-body: 17px;
   --lh-body: 1.6;
-  --t-small: 13px;
+  --t-small: 14px;
   --lh-small: 1.5;
+  --w-title: 560;
 
   /* Espacement */
   --s-1: 4px;
@@ -103,38 +116,67 @@
   --s-9: 96px;
   --s-10: 128px;
 
-  /* Mesure */
-  --shell: 1180px;
+  /* Grille */
+  --gutter: clamp(16px, 3.3vw, 48px);
+  --gap: clamp(16px, 1.7vw, 24px);
+  --max: 1600px;
+  --section: clamp(80px, 9vw, 136px);
   --measure: 68ch;
+  --shell: var(--max);
 }
 
 /* ------------------------------------------------------------------ */
-/* Inversion                                                           */
-/*                                                                     */
-/* Direction Aplat, bloc .d3 de design/syntexia-home-4da.html : « les  */
-/* deux mêmes couleurs, inversées ». Le crème passe au fond, le noir    */
-/* chaud à la typo. Aucune teinte nouvelle n'entre dans la palette :    */
-/* tout vient de --ink et --bg, plus des intermédiaires calculés dans   */
-/* la même famille.                                                     */
-/*                                                                     */
-/* En redéfinissant les tokens dans la portée, tous les composants      */
-/* enfants s'adaptent sans une ligne de code en plus.                   */
+/* Surfaces                                                            */
 /* ------------------------------------------------------------------ */
 
-.invert {
-  --bg: #F4F0E6;
-  --bg-2: #EBE6D9;
-  --surface: #E2DCCC;
-  --line: #C6BFAE;
-  --line-soft: #DAD4C4;
-  --ink: #0B0A08;
-  --ink-2: #2E2A24;
-  --mute: #5F5A50;
-  --mute-2: #6B6459;
-  --accent: #7A4A16;
-  --accent-ink: #F4F0E6;
-  --selection: #D8CEB8;
+:root {
+  --bg: var(--white);
+  --fg: var(--black);
+  --fg-2: var(--graphite);
+  --meta: var(--stone);
+  --rule: var(--hairline);
+  --dot: var(--copper);
+  --quiet: var(--pebble);
+}
 
+.on-desk {
+  --bg: var(--desk);
   background: var(--bg);
-  color: var(--ink);
+}
+
+/* .invert est l'ancien nom de la surface inversée. Elle passe du crème au
+   noir, pour toutes les pages qui l'emploient encore. */
+.on-black,
+.invert {
+  --bg: var(--black);
+  --fg: var(--white);
+  --fg-2: var(--ash);
+  --meta: var(--ash-2);
+  --rule: var(--soot);
+  --dot: var(--copper-lit);
+  --quiet: var(--soot);
+  color-scheme: dark;
+  background: var(--bg);
+  color: var(--fg);
+}
+
+/* Anciens noms, conservés pour les pages pas encore redessinées. Ils sont
+   recalculés sur chaque surface : une variable qui en cite une autre se
+   résout là où elle est déclarée, pas là où elle est lue. */
+:root,
+.on-desk,
+.on-black,
+.invert {
+  --bg-2: var(--desk);
+  --surface: var(--paper-2);
+  --line: var(--rule);
+  --line-soft: var(--rule);
+  --line-strong: var(--meta);
+  --ink: var(--fg);
+  --ink-2: var(--fg-2);
+  --mute: var(--meta);
+  --mute-2: var(--meta);
+  --accent: var(--dot);
+  --accent-ink: var(--bg);
+  --selection: var(--desk);
 }

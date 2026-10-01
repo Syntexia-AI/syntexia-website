@@ -1,21 +1,27 @@
 ---
+import BrandMark from './BrandMark.astro';
 import { legalEntity, companiesHouseUrl, linkedinCompany, contactEmail, securityIsLinked } from '../facts';
 ---
-<footer class="footer">
-  <div class="shell footer-inner">
-    <small>
-      {legalEntity ? (
-        <a href={companiesHouseUrl} rel="noopener">{legalEntity.value}</a>
-      ) : (
-        '© 2026 Syntexia.AI'
-      )}
-    </small>
+<footer class="footer on-black">
+  <div class="shell">
+    <div class="footer-inner">
+      <div class="footer-legal">
+        <BrandMark />
+        <small>
+          {legalEntity ? (
+            <a href={companiesHouseUrl} rel="noopener">{legalEntity.value}</a>
+          ) : (
+            '© 2026 Syntexia.AI'
+          )}
+        </small>
+      </div>
 
-    <div class="footer-links">
-      {linkedinCompany && <a href={linkedinCompany.value} rel="noopener">LinkedIn</a>}
-      {securityIsLinked && <a href="/security">Security</a>}
-      <a href="/legal">Legal</a>
-      <a href={`mailto:${contactEmail.value}`}>Contact</a>
+      <div class="footer-links">
+        {linkedinCompany && <a href={linkedinCompany.value} rel="noopener">LinkedIn</a>}
+        {securityIsLinked && <a href="/security">Security</a>}
+        <a href="/legal">Legal</a>
+        <a href={`mailto:${contactEmail.value}`}>Contact</a>
+      </div>
     </div>
   </div>
 </footer>
