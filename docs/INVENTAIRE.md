@@ -195,7 +195,7 @@ Trois observations que la directive ne porte pas :
 
 **CONFIRMÉ.** `.vercelignore` exclut `_internal/`, `_scripts/`, `avatars/`, `screenshots/`, `DEPLOY.md` du déploiement. `.gitignore` ne les exclut pas. Ils sont donc absents du site et présents sur GitHub.
 
-`DEPLOY.md` documente `GODADDY_API_KEY` et `GODADDY_API_SECRET` (l.194, 204, 222, 234), le sous-domaine client `tcaintelligence.syntexia.ai` (l.214, 293, 302), la configuration Google Workspace (l.300-301, 305) et la résiliation Wix à venir (l.304). Il marque `avatars/` comme `# Personal assets (NEVER ship)` (l.103-104).
+`DEPLOY.md` documente `GODADDY_API_KEY` et `GODADDY_API_SECRET` (l.194, 204, 222, 234), un sous-domaine client (l.214, 293, 302), la configuration Google Workspace (l.300-301, 305) et la résiliation Wix à venir (l.304). Il marque `avatars/` comme `# Personal assets (NEVER ship)` (l.103-104).
 
 **Aucun secret en dur.** Balayage du repo entier sur les motifs `sk_`, `re_`, `ghp_`, `AIza`, `xox[baprs]-` et blocs de clé privée PEM : zéro résultat. `DEPLOY.md` ne cite que des **noms** de variables, jamais leurs valeurs.
 

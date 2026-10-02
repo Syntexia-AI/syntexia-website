@@ -8,7 +8,8 @@ import Pillars from '../components/Pillars.astro';
 import BrandMark from '../components/BrandMark.astro';
 import FullStop from '../components/FullStop.astro';
 import { getCollection } from 'astro:content';
-import { sectors, partnerNetworkUrl, location, cases } from '../facts';
+import { sectors, location, cases, securityIsLinked } from '../facts';
+import { monthYear } from '../lib/format';
 import '../styles/home.css';
 
 // Direction artistique d'octobre 2026, « le point au cœur » : voir
@@ -49,7 +50,6 @@ const offers = [
 const posts = (await getCollection('posts')).sort(
   (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
 );
-const fmt = (d: Date) => d.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
 ---
 
 <Base
@@ -61,11 +61,11 @@ const fmt = (d: Date) => d.toLocaleDateString('en-GB', { month: 'long', year: 'n
     <div class="wrap">
       <p class="sr-only">{eyebrow}</p>
       <h1 class="hero-title" id="hero-title"><span class="l">Intelligence that</span> <span class="l">lives in your</span> <span class="l nw">ecosystem<span class="sr-only">.</span><span class="hero-point" aria-hidden="true" data-callout={eyebrow}><i class="dot"></i></span></span></h1>
-      <p class="legend" aria-hidden="true"><i class="dot"></i>{eyebrow}</p>
+      <p class="hero-legend" aria-hidden="true"><i class="dot"></i>{eyebrow}</p>
 
       <div class="grid hero-foot">
-        <p class="lead">{sub}</p>
-        <div class="actions">
+        <p class="hero-lead">{sub}</p>
+        <div class="hero-actions">
           <a class="btn btn-primary" href="#contact">Book a call</a>
           <a class="text-link" href="#what">See what it does</a>
         </div>
@@ -90,7 +90,9 @@ const fmt = (d: Date) => d.toLocaleDateString('en-GB', { month: 'long', year: 'n
         <div class="case-text">
           <p>{cases.invoices.flow}</p>
           <p>It works in almost any industry that buys from suppliers.</p>
-          <p><a class="text-link" href="/security">What we can put in a contract</a></p>
+          {securityIsLinked && (
+            <p><a class="text-link" href="/security">What we can put in a contract</a></p>
+          )}
         </div>
       </div>
       <InvoiceRun />
@@ -131,19 +133,6 @@ const fmt = (d: Date) => d.toLocaleDateString('en-GB', { month: 'long', year: 'n
       </ul>
     </div>
   </section>
-
-  {partnerNetworkUrl && (
-    <section class="band partner-announce">
-      <div class="wrap">
-        <h2 class="h2">Anthropic Claude Partner Network</h2>
-        <p>
-          Syntexia is a member of the network.
-          <a href={partnerNetworkUrl.value} rel="noopener">Read the announcement</a>.
-        </p>
-      </div>
-    </section>
-  )}
-
   <div class="wrap" aria-hidden="true"><hr class="divider" /></div>
 
   <section class="band" id="about" aria-labelledby="about-title">
@@ -182,7 +171,7 @@ const fmt = (d: Date) => d.toLocaleDateString('en-GB', { month: 'long', year: 'n
         {posts.map((p) => (
           <li>
             <a class="post" href={`/posts/${p.id}`}>
-              <span class="post-date tabular">{fmt(p.data.date)}</span>
+              <span class="post-date tabular">{monthYear(p.data.date)}</span>
               <span class="post-title">{p.data.title}</span>
               <span class="post-desc">{p.data.description}</span>
             </a>
@@ -208,29 +197,3 @@ const fmt = (d: Date) => d.toLocaleDateString('en-GB', { month: 'long', year: 'n
     </div>
   </section>
 </Base>
-
-<script>
-  // Le grand mark de la section About se pose point par point quand il entre
-  // à l'écran. On ne masque jamais un mark déjà visible au chargement, et
-  // rien ne bouge en mouvement réduit.
-  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
-
-  document.querySelectorAll<HTMLElement>('[data-mark="draw"]').forEach((mark) => {
-    if (reduced.matches || !('IntersectionObserver' in window)) return;
-    const r = mark.getBoundingClientRect();
-    if (r.top < window.innerHeight && r.bottom > 0) return;
-
-    mark.classList.add('is-pending');
-    const io = new IntersectionObserver(
-      (entries) => {
-        for (const e of entries) {
-          if (!e.isIntersecting) continue;
-          requestAnimationFrame(() => mark.classList.remove('is-pending'));
-          io.disconnect();
-        }
-      },
-      { threshold: 0.4 }
-    );
-    io.observe(mark);
-  });
-</script>

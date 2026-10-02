@@ -14,7 +14,8 @@ import { pillarMetrics } from '../facts';
 //   2. Les métriques ne sont rendues que si elles sont sourcées dans
 //      facts.ts. Le wording est validé, pas les chiffres.
 //
-// L'auto-avance s'arrête dès que le visiteur prend la main, et ne repart pas.
+// L'auto-avance fait un seul tour, et s'arrête dès que le visiteur prend la
+// main (clic, clavier, focus d'un lecteur d'écran). Elle ne repart pas.
 
 const PILLARS = [
   {
@@ -53,30 +54,20 @@ const PILLARS = [
 ---
 
 <div class="grid tabs" data-pillars>
-  <div class="tablist" role="tablist" aria-label="What it does">
+  <!-- Sans JavaScript, les verbes ne sont qu'un titre visuel : la liste est
+       masquée aux technologies d'assistance, qui lisent les quatre panneaux.
+       Le script pose les rôles d'onglets quand il les rend utilisables. -->
+  <div class="tablist" aria-hidden="true" data-tablist>
     {PILLARS.map((p, i) => (
-      <button
-        type="button"
-        role="tab"
-        class="tab"
-        id={`tab-${p.key}`}
-        aria-controls={`panel-${p.key}`}
-        aria-selected={i === 0 ? 'true' : 'false'}
-        tabindex={i === 0 ? 0 : -1}
-        data-tab={i}
-      >{p.verb}<i class="dot" aria-hidden="true"></i><span class="progress" aria-hidden="true"></span></button>
+      <button type="button" class="tab" id={`tab-${p.key}`} tabindex="-1" data-tab={i} data-key={p.key}>
+        {p.verb}<i class="dot" aria-hidden="true"></i><span class="progress" aria-hidden="true"></span>
+      </button>
     ))}
   </div>
 
   <div class="panels">
     {PILLARS.map((p, i) => (
-      <section
-        role="tabpanel"
-        class="panel"
-        id={`panel-${p.key}`}
-        aria-labelledby={`tab-${p.key}`}
-        data-panel={i}
-      >
+      <section class="panel" id={`panel-${p.key}`} data-panel={i}>
         <p class="panel-kicker">{p.label}</p>
         <h3>{p.title}</h3>
         <p class="panel-body">{p.body}</p>
@@ -97,19 +88,37 @@ const PILLARS = [
 
 <script>
   document.querySelectorAll<HTMLElement>('[data-pillars]').forEach((root) => {
+    const list = root.querySelector<HTMLElement>('[data-tablist]');
     const tabs = Array.from(root.querySelectorAll<HTMLButtonElement>('[data-tab]'));
     const panels = Array.from(root.querySelectorAll<HTMLElement>('[data-panel]'));
-    if (!tabs.length) return;
+    if (!list || !tabs.length || tabs.length !== panels.length) return;
 
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const narrow = window.matchMedia('(max-width: 900px)');
 
     // Les panneaux sont tous rendus visibles par le HTML. C'est le script, et
-    // lui seul, qui les replie en onglets. Sans JavaScript, le visiteur lit
-    // les quatre piliers à la suite : il perd l'interaction, jamais le contenu.
+    // lui seul, qui les replie en onglets accessibles.
+    list.removeAttribute('aria-hidden');
+    list.setAttribute('role', 'tablist');
+    list.setAttribute('aria-label', 'What it does');
+    const orient = () => list.setAttribute('aria-orientation', narrow.matches ? 'horizontal' : 'vertical');
+    orient();
+    narrow.addEventListener('change', orient);
+
+    tabs.forEach((tab, i) => {
+      tab.setAttribute('role', 'tab');
+      tab.setAttribute('aria-controls', panels[i].id);
+    });
+    panels.forEach((panel, i) => {
+      panel.setAttribute('role', 'tabpanel');
+      panel.setAttribute('aria-labelledby', tabs[i].id);
+      panel.tabIndex = 0;
+    });
     root.dataset.ready = 'on';
 
     let current = 0;
     let timer = 0;
+    let advances = 0;
     let userTook = false;
 
     const show = (next: number) => {
@@ -137,19 +146,29 @@ const PILLARS = [
       root.dataset.auto = 'off';
     };
 
+    // L'avance automatique fait un seul tour, puis s'arrête sur le premier
+    // verbe. Elle ne démarre qu'à l'écran et jamais en mouvement réduit.
     const startAuto = () => {
-      if (timer || userTook || reduced.matches) return;
+      if (timer || userTook || reduced.matches || advances >= tabs.length) return;
       root.dataset.auto = 'on';
       show(current);
-      timer = window.setInterval(() => show(current + 1), 7000);
+      timer = window.setInterval(() => {
+        advances += 1;
+        show(current + 1);
+        if (advances >= tabs.length) stopAuto();
+      }, 7000);
     };
 
-    // L'auto-avance s'arrête définitivement au premier geste du visiteur.
-    // Un carrousel qui bouge pendant qu'on lit est une nuisance.
+    // Elle s'arrête définitivement dès que le visiteur prend la main, à la
+    // souris, au clavier ou avec un lecteur d'écran qui pose le focus.
     const takeOver = () => {
       userTook = true;
       stopAuto();
     };
+
+    root.addEventListener('focusin', takeOver);
+    root.addEventListener('pointerenter', () => stopAuto());
+    root.addEventListener('pointerleave', () => startAuto());
 
     tabs.forEach((tab, i) => {
       tab.addEventListener('click', () => {
@@ -173,7 +192,6 @@ const PILLARS = [
 
     show(0);
 
-    // On ne démarre que si le bloc est à l'écran, et jamais en mouvement réduit.
     if (!reduced.matches && 'IntersectionObserver' in window) {
       new IntersectionObserver(
         (entries) => {
@@ -185,6 +203,10 @@ const PILLARS = [
         { threshold: 0.4 }
       ).observe(root);
     }
+
+    reduced.addEventListener('change', (e) => {
+      if (e.matches) takeOver();
+    });
   });
 </script>
 

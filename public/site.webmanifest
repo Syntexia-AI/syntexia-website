@@ -3,7 +3,7 @@
   "short_name": "Syntexia",
   "theme_color": "#FFFFFF",
   "background_color": "#FFFFFF",
-  "display": "standalone",
+  "display": "browser",
   "start_url": "/",
   "icons": [
     {

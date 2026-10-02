@@ -16,6 +16,8 @@ import { cases } from '../facts';
 // Noms, code et numéro de ticket sont fictifs, et le disent.
 //
 // Sans JavaScript, ou en mouvement réduit, l'appel s'affiche en entier.
+// Les répliques de la ligne et celles de l'appelant sont distinguées par le
+// nom, pas seulement par la couleur.
 
 const LINES = [
   { t: '00:00', who: 'line', text: 'IT help desk, good morning. How can I help?' },
@@ -84,8 +86,8 @@ const BARS = [3, 6, 10, 7, 12, 16, 9, 5, 11, 15, 8, 4, 7, 13, 10, 6, 3, 8, 12, 7
       ))}
     </ol>
 
-    <div class="panel-foot">
-      <button class="replay" type="button" data-replay hidden>Replay the call</button>
+    <div class="panel-foot" data-foot hidden>
+      <button class="replay" type="button" data-control>Replay the call</button>
     </div>
   </div>
 
@@ -110,40 +112,56 @@ const BARS = [3, 6, 10, 7, 12, 16, 9, 5, 11, 15, 8, 4, 7, 13, 10, 6, 3, 8, 12, 7
 <script>
   // L'appel se déroule une fois, quand il entre à l'écran. Chaque réplique
   // apparaît après un temps proportionnel à sa longueur, l'horloge suit, les
-  // actions se cochent au moment où la ligne les annonce. À la fin, un bouton
-  // permet de rejouer l'appel.
+  // actions se cochent au moment où la ligne les annonce.
+  //
+  // Un seul bouton, qui garde le focus : pendant l'appel il affiche tout de
+  // suite l'appel entier, ensuite il le rejoue. Sans JavaScript, en mouvement
+  // réduit, ou si l'appel est déjà visible au chargement, tout est affiché
+  // d'emblée.
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
 
   document.querySelectorAll<HTMLElement>('[data-call]').forEach((root) => {
     const lines = Array.from(root.querySelectorAll<HTMLElement>('[data-line]'));
     const acts = Array.from(root.querySelectorAll<HTMLElement>('[data-act]'));
     const clock = root.querySelector<HTMLElement>('[data-clock]');
-    const replay = root.querySelector<HTMLButtonElement>('[data-replay]');
-    if (!lines.length || !clock || !replay) return;
+    const foot = root.querySelector<HTMLElement>('[data-foot]');
+    const control = root.querySelector<HTMLButtonElement>('[data-control]');
+    if (!lines.length || !clock || !foot || !control) return;
     if (reduced.matches || !('IntersectionObserver' in window)) return;
 
     const END = clock.textContent || '';
     let timers: number[] = [];
+    let playing = false;
 
     const clear = () => {
       timers.forEach((t) => window.clearTimeout(t));
       timers = [];
     };
 
-    const reset = () => {
+    // Montre l'appel entier, dans son état final.
+    const finish = () => {
       clear();
+      playing = false;
+      root.dataset.play = '';
+      root.dataset.speaking = '';
+      lines.forEach((l) => l.classList.add('is-said'));
+      acts.forEach((a) => a.classList.add('is-done'));
+      clock.textContent = END;
+      control.textContent = 'Replay the call';
+    };
+
+    const play = () => {
+      clear();
+      playing = true;
       root.dataset.play = 'on';
       root.dataset.speaking = '';
       lines.forEach((l) => l.classList.remove('is-said'));
       acts.forEach((a) => a.classList.remove('is-done'));
       clock.textContent = '00:00';
-      replay.hidden = true;
-    };
+      control.textContent = 'Show the whole call';
 
-    const play = () => {
-      reset();
       let at = 300;
-      lines.forEach((line, i) => {
+      for (const line of lines) {
         timers.push(
           window.setTimeout(() => {
             line.classList.add('is-said');
@@ -157,49 +175,34 @@ const BARS = [3, 6, 10, 7, 12, 16, 9, 5, 11, 15, 8, 4, 7, 13, 10, 6, 3, 8, 12, 7
         );
         const len = (line.querySelector('.line-text')?.textContent || '').length;
         at += Math.min(2600, 700 + len * 18);
-        if (i === lines.length - 1) {
-          timers.push(
-            window.setTimeout(() => {
-              root.dataset.speaking = '';
-              clock.textContent = END;
-              replay.hidden = false;
-            }, at)
-          );
-        }
-      });
+      }
+      timers.push(window.setTimeout(finish, at));
     };
 
-    replay.addEventListener('click', play);
+    foot.hidden = false;
+    control.addEventListener('click', () => (playing ? finish() : play()));
+
+    reduced.addEventListener('change', (e) => {
+      if (!e.matches) return;
+      finish();
+      foot.hidden = true;
+    });
+
+    // Déjà visible au chargement : rien ne disparaît, le bouton rejoue.
+    const r = root.getBoundingClientRect();
+    if (r.top < window.innerHeight && r.bottom > 0) return;
 
     const io = new IntersectionObserver(
       (entries) => {
         for (const e of entries) {
           if (!e.isIntersecting) continue;
-          play();
           io.disconnect();
+          play();
         }
       },
       { threshold: 0.35 }
     );
-
-    // On ne cache rien de ce qui est déjà visible au chargement : l'appel
-    // reste affiché en entier, et le bouton permet de le rejouer.
-    const r = root.getBoundingClientRect();
-    if (r.top < window.innerHeight && r.bottom > 0) {
-      replay.hidden = false;
-      return;
-    }
     io.observe(root);
-
-    reduced.addEventListener('change', (e) => {
-      if (!e.matches) return;
-      clear();
-      io.disconnect();
-      root.dataset.play = '';
-      lines.forEach((l) => l.classList.add('is-said'));
-      acts.forEach((a) => a.classList.add('is-done'));
-      clock.textContent = END;
-    });
   });
 </script>
 
@@ -354,10 +357,6 @@ const BARS = [3, 6, 10, 7, 12, 16, 9, 5, 11, 15, 8, 4, 7, 13, 10, 6, 3, 8, 12, 7
 
   .panel-foot {
     padding: 0 26px 18px;
-  }
-
-  .panel-foot:has(.replay[hidden]) {
-    display: none;
   }
 
   .replay {

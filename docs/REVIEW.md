@@ -36,9 +36,9 @@ C'est la section à lire. Chaque ligne se restaure en renseignant **une valeur d
 |---|---|---|---|
 | `sections.jsx:534-535` | stat `5` `Industries live in production` | compte non sourcé | renseigner `sectors` et le compte revient de lui-même s'il est voulu |
 | `about.html:110` | `Live in five industries.` | compte non sourcé | idem |
-| maquette `.d2` | bloc `totals` : `000` calls, `0 000` documents, `0` people | trois nombres non sourcés | `dayTotals = { value: { calls: '…', documents: '…', people: '…' }, source: '…' }` dans `src/facts.ts` |
-| maquette `.d2` | segment `across five companies` du titre | nombre non sourcé | `deploymentCount = { value: 5, source: '…' }` |
-| directive P4 | segment `across our live deployments` du titre | statut de déploiement non sourcé, relevé par le vérificateur de claims | idem, le titre complet revient avec le nombre |
+| maquette `.d2` | bloc `totals` : `000` calls, `0 000` documents, `0` people | trois nombres non sourcés | sans objet depuis la DA d'octobre 2026 : le bloc n'existe plus, `dayTotals` est retiré de `src/facts.ts` |
+| maquette `.d2` | segment `across five companies` du titre | nombre non sourcé | sans objet depuis la DA d'octobre 2026 : le titre a changé, `deploymentCount` est retiré de `src/facts.ts` |
+| directive P4 | segment `across our live deployments` du titre | statut de déploiement non sourcé, relevé par le vérificateur de claims | sans objet, idem |
 | `sections.jsx:280-318` | les 12 métriques des piliers, dont `~70 %`, `60 %`, `~80 %`, `3 → 1`, `Days → hrs` | aucune source | rendre la source dans `docs/FACTS-SITE.md`, puis rétablir le bloc |
 | `sections.jsx:393-397` | les 5 KPI de secteurs, dont `−60%`, `~70%`, `Hours saved`, `Live` | aucune source | idem |
 | `sections.jsx:190-201` | `LiveLog` en entier, dix messages horodatés sous l'en-tête `inside customer environment · anonymized` | données fabriquées présentées comme réelles | ne pas restaurer en l'état |

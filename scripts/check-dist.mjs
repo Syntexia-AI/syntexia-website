@@ -8,8 +8,12 @@
 //   3. aucun script, feuille de style, police ou image chargé d'un autre
 //      domaine (font-src, img-src et style-src sont limités à 'self') ;
 //   4. aucun lien interne ni fichier local manquant (href, src, srcset) ;
-//   5. aucun identifiant en double, aucune image sans attribut alt ;
-//   6. chaque bloc JSON-LD est du JSON valide.
+//   5. aucun identifiant en double, aucune image sans attribut alt, aucune
+//      référence (aria-labelledby, aria-describedby, aria-controls, for) vers
+//      un identifiant absent ;
+//   6. chaque bloc JSON-LD est du JSON valide ;
+//   7. le plan du site couvre exactement les pages indexables, et chacune de
+//      ses adresses existe.
 //
 // Sort en code 1 au premier problème trouvé, après les avoir tous listés.
 
@@ -48,8 +52,18 @@ async function resolves(urlPath) {
     : (await exists(join(base, 'index.html'))) || (await exists(`${base}.html`));
 }
 
+const SITE = 'https://www.syntexia.ai';
+
 const problems = [];
 const report = (file, msg) => problems.push(`${relative(DIST, file)}: ${msg}`);
+
+// Adresse publique d'une page construite : dist/about/index.html -> /about.
+const pathOf = (file) => {
+  const rel = relative(DIST, file).replace(/\\/g, '/');
+  if (rel === 'index.html') return '/';
+  return `/${rel.replace(/\/index\.html$/, '').replace(/\.html$/, '')}`;
+};
+const indexable = new Set();
 
 const files = await walk(DIST);
 if (!files.length) {
@@ -118,6 +132,40 @@ for (const file of files) {
   }
   for (const m of html.matchAll(/<img\b[^>]*>/gi)) {
     if (!/\balt\s*=/.test(m[0])) report(file, `image sans alt : ${m[0].slice(0, 80)}`);
+  }
+  for (const m of html.matchAll(/\s(aria-labelledby|aria-describedby|aria-controls|for)\s*=\s*["']([^"']+)["']/gi)) {
+    for (const ref of m[2].split(/\s+/)) {
+      if (!idSet.has(ref)) report(file, `${m[1]} vers un id absent : ${ref}`);
+    }
+  }
+
+  if (!/<meta\s+name=["']robots["']\s+content=["'][^"']*noindex/i.test(html)) indexable.add(pathOf(file));
+}
+
+// 7. Plan du site.
+let sitemap = '';
+try {
+  sitemap = await readFile(join(DIST, 'sitemap.xml'), 'utf8');
+} catch {
+  problems.push('sitemap.xml absent de dist/');
+}
+if (sitemap) {
+  const listed = new Set();
+  for (const m of sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)) {
+    const loc = m[1];
+    if (!loc.startsWith(SITE)) {
+      problems.push(`sitemap.xml : adresse hors du site : ${loc}`);
+      continue;
+    }
+    const path = loc.slice(SITE.length) || '/';
+    listed.add(path);
+    if (!(await resolves(path))) problems.push(`sitemap.xml : page introuvable : ${path}`);
+  }
+  for (const path of indexable) {
+    if (!listed.has(path)) problems.push(`sitemap.xml : page indexable absente : ${path}`);
+  }
+  for (const path of listed) {
+    if (!indexable.has(path)) problems.push(`sitemap.xml : page non indexable listée : ${path}`);
   }
 }
 

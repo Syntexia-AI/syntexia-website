@@ -1,5 +1,6 @@
 ---
 import { cases } from '../facts';
+import { INVOICE, INVOICE_LINES, INVOICE_ORDER } from '../data/documents';
 
 // Automatisation des factures fournisseurs, le visuel principal de l'accueil.
 // Cas décrit par Karim le 2026-10-02, anonymisé : voir cases.invoices dans
@@ -15,11 +16,14 @@ import { cases } from '../facts';
 // la décision de la personne est en noir (le bouton s'allume quand c'est à
 // elle).
 //
-// Tout est fictif : pièce, montants, codes, numéros. Le fournisseur et son
-// NIF sont caviardés. Aucun nom de logiciel, aucun lieu.
+// Tout est fictif : pièce, montants, codes, numéros (src/data/documents.ts).
+// Le fournisseur et son NIF sont caviardés. Aucun nom de logiciel, aucun lieu.
 //
-// Sans JavaScript, ou en mouvement réduit, la démonstration s'affiche à son
-// état final : écriture prête, une ligne signalée, en attente de validation.
+// Mouvement : une seule passe, quand la démonstration entre à l'écran, puis
+// l'état final reste affiché. Un bouton permet de sauter à la fin pendant la
+// passe, et de la rejouer ensuite. Sans JavaScript, en mouvement réduit, ou si
+// la démonstration est déjà visible au chargement, l'état final s'affiche
+// d'emblée : écriture prête, une ligne signalée, en attente de validation.
 
 const INBOX = [
   { ref: 'FT 2026/0148', format: 'PDF', current: true },
@@ -28,30 +32,29 @@ const INBOX = [
   { ref: 'INV-88412', format: 'E-invoice' },
 ];
 
-const LINES = [
-  { label: 'Bacalhau demolhado 5 kg', amount: '184,50' },
-  { label: 'Azeite virgem extra 5 L', amount: '96,20', flag: true },
-  { label: 'Batata nova 25 kg', amount: '41,75' },
-];
+// La ligne signalée : le prix facturé ne correspond pas à la commande.
+const FLAGGED = 'Azeite virgem extra 5 L';
+const LINES = INVOICE_LINES.map((l) => ({ ...l, flag: l.label === FLAGGED }));
 
 const CHECKS = [
   { label: 'Supplier', value: 'Matched to code F-0217', at: 1 },
-  { label: 'Order', value: 'PO 4471, 3 of 3 lines found', at: 2 },
+  { label: 'Order', value: `PO ${INVOICE_ORDER}, 3 of 3 lines found`, at: 2 },
   { label: 'Prices', value: '1 line differs from the order', at: 3 },
   { label: 'ERP', value: 'Entry prepared, posted once validated', at: 4 },
 ];
 
 const FINAL = 4;
+const paperLabel = `Illustrative supplier invoice ${INVOICE.heading}, total ${INVOICE.total?.value}. The amount of ${FLAGGED} is circled.`;
 ---
 
 <figure class="inv" data-inv data-step={FINAL}>
-  <div class="paper" aria-label="Illustrative supplier invoice">
-    <p class="paper-head">FATURA FT 2026/0148</p>
+  <div class="paper" role="img" aria-label={paperLabel} lang="pt-PT">
+    <p class="paper-head">{INVOICE.heading}</p>
     <table>
       <tbody>
-        <tr><td>Fornecedor</td><td class="n"><span class="redact" role="img" aria-label="Redacted"></span></td></tr>
-        <tr><td>NIF</td><td class="n"><span class="redact" role="img" aria-label="Redacted"></span></td></tr>
-        <tr><td>Encomenda</td><td class="n">4471</td></tr>
+        <tr><td>Fornecedor</td><td class="n"><span class="redact"></span></td></tr>
+        <tr><td>NIF</td><td class="n"><span class="redact"></span></td></tr>
+        <tr><td>Encomenda</td><td class="n">{INVOICE_ORDER}</td></tr>
       </tbody>
     </table>
     <div class="paper-rule"></div>
@@ -63,13 +66,13 @@ const FINAL = 4;
             <td class="n">
               {l.flag ? (
                 <span class="circled">
-                  {l.amount}
-                  <svg class="circle" viewBox="0 0 100 44" preserveAspectRatio="none" aria-hidden="true">
+                  {l.value}
+                  <svg class="circle" viewBox="0 0 100 44" preserveAspectRatio="none">
                     <path d="M8 24C9 10 34 4 56 5c22 1 39 7 38 19-1 12-24 16-47 15C24 38 7 34 8 22" pathLength="100"></path>
                   </svg>
                 </span>
               ) : (
-                l.amount
+                l.value
               )}
             </td>
           </tr>
@@ -79,7 +82,7 @@ const FINAL = 4;
     <div class="paper-rule"></div>
     <table>
       <tbody>
-        <tr><td>Total</td><td class="n">322,45</td></tr>
+        <tr><td>{INVOICE.total?.label}</td><td class="n">{INVOICE.total?.value}</td></tr>
       </tbody>
     </table>
   </div>
@@ -100,7 +103,7 @@ const FINAL = 4;
     <div class="win-main">
       <header class="win-head">
         <div class="win-id">
-          <span class="win-ref">FT 2026/0148</span>
+          <span class="win-ref">{INVOICE.heading.replace('FATURA ', '')}</span>
           <span class="win-supplier">Supplier <span class="redact" role="img" aria-label="Redacted"></span></span>
         </div>
         <div class="win-status">
@@ -115,8 +118,8 @@ const FINAL = 4;
           <ul class="lines">
             {LINES.map((l) => (
               <li class={l.flag ? 'line is-flag' : 'line'}>
-                <span class="line-label">{l.label}</span>
-                <span class="line-amount">{l.amount}</span>
+                <span class="line-label" lang="pt-PT">{l.label}</span>
+                <span class="line-amount">{l.value}</span>
                 <span class="line-mark" aria-hidden="true">
                   {l.flag ? (
                     <svg class="mark-flag" viewBox="0 0 16 16">
@@ -133,7 +136,7 @@ const FINAL = 4;
             ))}
             <li class="line line-total">
               <span class="line-label">Total</span>
-              <span class="line-amount">322,45</span>
+              <span class="line-amount">{INVOICE.total?.value}</span>
               <span class="line-mark"></span>
             </li>
           </ul>
@@ -152,14 +155,14 @@ const FINAL = 4;
         </div>
       </div>
 
-      <div class="flag-note" data-flag>
+      <div class="flag-note">
         <p class="flag-h">
           <svg class="mark-flag" viewBox="0 0 16 16" aria-hidden="true">
             <circle cx="8" cy="8" r="6.6"></circle>
             <path d="M8 4.6v4.4"></path>
             <path d="M8 11.3v.1"></path>
           </svg>
-          Flagged: Azeite virgem extra 5 L
+          <span>Flagged: <span lang="pt-PT">{FLAGGED}</span></span>
         </p>
         <p class="flag-why">Invoiced at 96,20. The order says 92,40, a 4,1&nbsp;% difference.</p>
       </div>
@@ -172,14 +175,12 @@ const FINAL = 4;
   </div>
 
   <figcaption class="inv-cap">
-    {cases.invoices.client}. Fictional invoice, no customer data.
+    <span>{cases.invoices.client}. Fictional invoice, no customer data.</span>
+    <button class="replay" type="button" data-control hidden>Replay the check</button>
   </figcaption>
 </figure>
 
 <script>
-  // Une passe complète : lecture, fournisseur, commande, prix, puis attente de
-  // validation. La boucle ne tourne que lorsque la démonstration est à
-  // l'écran. En mouvement réduit, rien ne bouge : l'état final reste affiché.
   const LABELS = [
     'Reading the invoice',
     'Matching the supplier',
@@ -187,16 +188,17 @@ const FINAL = 4;
     'Checking prices',
     'Waiting for validation',
   ];
-  const HOLD = [1000, 1400, 1400, 1700, 5600];
+  const HOLD = [1000, 1400, 1400, 1700];
   const FINAL = LABELS.length - 1;
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
 
   document.querySelectorAll<HTMLElement>('[data-inv]').forEach((root) => {
     const status = root.querySelector<HTMLElement>('[data-status]');
+    const control = root.querySelector<HTMLButtonElement>('[data-control]');
     const checks = Array.from(root.querySelectorAll<HTMLElement>('[data-check]'));
-    if (!status) return;
+    if (!status || !control) return;
+    if (reduced.matches || !('IntersectionObserver' in window)) return;
 
-    let step = FINAL;
     let timer = 0;
     let running = false;
 
@@ -206,48 +208,65 @@ const FINAL = 4;
       checks.forEach((c) => c.classList.toggle('is-shown', s >= Number(c.dataset.check)));
     };
 
-    const next = () => {
-      step = step >= FINAL ? 0 : step + 1;
-      render(step);
-      timer = window.setTimeout(next, HOLD[step]);
-    };
-
-    const start = () => {
-      if (running || reduced.matches) return;
-      running = true;
-      root.dataset.run = 'on';
-      step = FINAL;
-      next();
-    };
-
-    const stop = () => {
+    // Arrêt à tout moment : on montre toujours l'état final, jamais une étape
+    // à moitié faite.
+    const finish = () => {
+      window.clearTimeout(timer);
       running = false;
       root.dataset.run = 'off';
-      window.clearTimeout(timer);
+      render(FINAL);
+      control.textContent = 'Replay the check';
     };
 
-    if ('IntersectionObserver' in window && !reduced.matches) {
-      new IntersectionObserver(
-        (entries) => {
-          for (const e of entries) {
-            if (e.isIntersecting) start();
-            else stop();
-          }
-        },
-        { threshold: 0.35 }
-      ).observe(root);
-    }
+    const play = () => {
+      window.clearTimeout(timer);
+      running = true;
+      root.dataset.run = 'on';
+      control.textContent = 'Show the result';
+      let step = 0;
+      render(step);
+      const next = () => {
+        step += 1;
+        if (step >= FINAL) return finish();
+        render(step);
+        timer = window.setTimeout(next, HOLD[step]);
+      };
+      timer = window.setTimeout(next, HOLD[0]);
+    };
+
+    control.hidden = false;
+    control.addEventListener('click', () => (running ? finish() : play()));
 
     reduced.addEventListener('change', (e) => {
       if (!e.matches) return;
-      stop();
-      render(FINAL);
+      finish();
+      control.hidden = true;
     });
+
+    // Déjà visible au chargement : l'état final reste, le bouton permet de
+    // rejouer. Sinon, la passe démarre à l'entrée dans l'écran.
+    const r = root.getBoundingClientRect();
+    if (r.top < window.innerHeight && r.bottom > 0) return;
+
+    let played = false;
+    new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting && !played) {
+            played = true;
+            play();
+          } else if (!e.isIntersecting && running) {
+            finish();
+          }
+        }
+      },
+      { threshold: 0.35 }
+    ).observe(root);
   });
 </script>
 
 <style>
-  /* Le papier est posé devant l'écran, à cheval sur son bord gauche. */
+  /* Le papier est posé devant l'écran, sous la boîte de réception. */
   .inv {
     display: grid;
     grid-template-columns: repeat(12, minmax(0, 1fr));
@@ -322,19 +341,17 @@ const FINAL = 4;
   .circle {
     position: absolute;
     left: -14px;
-    right: -12px;
     top: -9px;
-    bottom: -9px;
     width: calc(100% + 26px);
     height: calc(100% + 18px);
+    max-width: none;
+    overflow: visible;
     fill: none;
     stroke: var(--copper);
     stroke-width: 1.6;
     stroke-linecap: round;
     stroke-dasharray: 100;
     stroke-dashoffset: 0;
-    max-width: none;
-    overflow: visible;
     transition: stroke-dashoffset 0.7s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
@@ -358,8 +375,7 @@ const FINAL = 4;
     box-shadow: var(--shadow-win);
   }
 
-  /* La boîte de réception : un format par pièce, c'est tout le propos. Le
-     rail démarre après le papier qui le recouvre en partie. */
+  /* La boîte de réception : un format par pièce, c'est tout le propos. */
   .rail {
     background: var(--paper-2);
     border-right: 1px solid var(--frame);
@@ -450,7 +466,7 @@ const FINAL = 4;
     background: var(--copper);
   }
 
-  .inv[data-run='on']:not([data-step='4']) .pulse {
+  .inv[data-run='on'] .pulse {
     animation: breathe 1.4s ease-in-out infinite;
   }
 
@@ -542,7 +558,10 @@ const FINAL = 4;
   }
 
   .mark-flag {
-    transition: opacity 0.3s ease, transform 0.35s cubic-bezier(0.2, 0.9, 0.25, 1.3);
+    flex: none;
+    transition:
+      opacity 0.3s ease,
+      transform 0.35s cubic-bezier(0.2, 0.9, 0.25, 1.3);
   }
 
   .inv[data-step='0'] .mark-tick,
@@ -618,7 +637,9 @@ const FINAL = 4;
     margin: 0 26px 22px;
     padding: 14px 16px;
     border: 1px solid var(--copper);
-    transition: opacity 0.4s ease, transform 0.45s cubic-bezier(0.2, 0.7, 0.2, 1);
+    transition:
+      opacity 0.4s ease,
+      transform 0.45s cubic-bezier(0.2, 0.7, 0.2, 1);
   }
 
   .inv[data-step='0'] .flag-note,
@@ -681,11 +702,16 @@ const FINAL = 4;
     color: var(--white);
   }
 
-  /* La légende se lit en premier, en haut à gauche, au-dessus du papier. */
+  /* ---------- Légende et commande ---------- */
+
   .inv-cap {
     grid-column: 1 / span 3;
     grid-row: 1;
     align-self: start;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
     padding-top: 2px;
     font-size: var(--t-small);
     line-height: var(--lh-small);
@@ -693,33 +719,38 @@ const FINAL = 4;
     max-width: 26ch;
   }
 
-  /* ---------- Adaptation ---------- */
-
-  @media (max-width: 1180px) {
-    .paper {
-      grid-column: 1 / span 5;
-      margin-top: 96px;
-    }
-    .win {
-      grid-column: 5 / -1;
-      grid-template-columns: minmax(0, 1fr);
-    }
-    .rail {
-      display: none;
-    }
-    .inv-cap {
-      grid-column: 1 / span 4;
-    }
+  .replay {
+    appearance: none;
+    background: none;
+    border: 0;
+    padding: 4px 0;
+    font-family: var(--font-ui);
+    font-size: 15px;
+    font-weight: 560;
+    color: var(--fg);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.3em;
+    cursor: pointer;
   }
 
-  @media (max-width: 900px) {
+  .replay:hover {
+    text-decoration-color: var(--dot);
+  }
+
+  /* ---------- Adaptation ----------
+     Sous 1180 px, plus de chevauchement : la légende, le papier, puis l'écran
+     pleine largeur, que le papier ne touche que par son bord. */
+
+  @media (max-width: 1180px) {
+    .inv-cap,
     .paper,
-    .win,
-    .inv-cap {
+    .win {
       grid-column: 1 / -1;
     }
     .inv-cap {
       grid-row: 1;
+      max-width: 44ch;
     }
     .paper {
       grid-row: 2;
@@ -730,7 +761,16 @@ const FINAL = 4;
     }
     .win {
       grid-row: 3;
-      margin-top: -36px;
+      margin-top: -12px;
+    }
+  }
+
+  @media (max-width: 900px) {
+    .win {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .rail {
+      display: none;
     }
   }
 

@@ -3,6 +3,12 @@
 Établi le 2026-09-02. À exécuter par un humain. Les commandes de réécriture et
 de poussée ne sont jamais lancées par l'agent.
 
+> **Mise à jour du 2026-10-02.** Le dépôt est **public** : l'API GitHub répond
+> `visibility: public`. Le constat ci-dessous (« privé aujourd'hui ») n'est donc
+> plus exact, et l'historique est lisible par tout le monde. Les noms de clients
+> ont été retirés des fichiers actuels le même jour ; ils restent dans
+> l'historique, comme les coordonnées décrites ici.
+
 ---
 
 ## Le constat, vérifié

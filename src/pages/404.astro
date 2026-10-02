@@ -1,11 +1,11 @@
 ---
 import Base from '../layouts/Base.astro';
 ---
-<Base title="Page not found" description="That page does not exist." path="/404">
+<Base title="Page not found" description="That page does not exist." path="/404" noindex>
   <section class="section first">
     <div class="shell">
       <h1>That page does not exist.</h1>
-      <p class="lead">It may have been removed, or the address may be wrong.</p>
+      <p class="intro">It may have been removed, or the address may be wrong.</p>
       <p class="acts"><a class="btn btn-primary" href="/">Go to the home page</a></p>
     </div>
   </section>
@@ -13,6 +13,6 @@ import Base from '../layouts/Base.astro';
 
 <style>
   .first { border-top: 0; }
-  .lead { margin-top: var(--s-5); }
+  .intro { margin-top: var(--s-5); }
   .acts { margin-top: var(--s-6); }
 </style>

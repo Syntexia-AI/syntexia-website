@@ -88,8 +88,8 @@ export const phone: SourcedFact<{ display: string; dial: string }> = {
 /* Partenariat                                                         */
 /* ------------------------------------------------------------------ */
 
-/** URL publique d'annonce du partenariat Anthropic. Sans elle, les huit
-    mentions du réseau partenaire sortent du rendu.
+/** URL publique d'annonce du partenariat Anthropic. Sans elle, la mention
+    du partenariat (voir partnerNetwork plus bas) est rendue sans lien.
 
     Recherche menée le 2026-08-31. Le programme existe bien sous ce nom
     (anthropic.com/news/claude-partner-network), mais l'annuaire officiel des
@@ -196,21 +196,8 @@ export const team: {
 ];
 
 /* ------------------------------------------------------------------ */
-/* Déploiements et secteurs                                            */
+/* Secteurs                                                            */
 /* ------------------------------------------------------------------ */
-
-/** Nombre de déploiements en production. Alimentait « across five companies »
-    et la mention d'illustration de la home. */
-export const deploymentCount: SourcedFact<number> | null = NONE;
-
-/** Totaux de la journée type. Les trois sont requis ensemble : si l'un
-    manque, le bloc entier disparaît. Pas de « 000 », pas de zéro de
-    remplissage. */
-export const dayTotals: SourcedFact<{
-  calls: string;
-  documents: string;
-  people: string;
-}> | null = NONE;
 
 /** Les secteurs pour lesquels nous construisons.
  *
@@ -298,9 +285,10 @@ export const cases = {
 /* Page security                                                       */
 /* ------------------------------------------------------------------ */
 
-/** Les quatre réponses contractuelles. Chacune n'est rendue que si sourcée.
-    La page /security n'est liée depuis la navigation et le pied de page
-    qu'à partir de trois entrées sourcées. */
+/** Ce que la page /security peut mettre dans un contrat. Une entrée n'est
+    écrite ici qu'avec sa source. La page n'est liée depuis la navigation,
+    l'accueil et le pied de page qu'à partir de SECURITY_LINK_THRESHOLD
+    entrées. */
 export const contractAnswers: { title: string; body: string; source: string }[] = [
   // Les trois premières viennent de l'architecture réelle des plateformes,
   // lue dans les dépôts le 2026-08-31. Voir docs/FACTS-PRODUIT.md. Ce sont des
@@ -315,13 +303,13 @@ export const contractAnswers: { title: string; body: string; source: string }[] 
     body:
       'Syntexia prepares the work, and a person decides. Anything uncertain is flagged with its reason and waits for someone to validate it. In audit, nothing is written back into your audit software by us, and no conclusion is reached without a person signing it.',
     source:
-      'architecture des plateformes, README kreston-intelligence, 2026-08-31 ; principe de validation confirmé par Karim, 2026-10-02',
+      "architecture des plateformes, README d'une des plateformes d'audit, 2026-08-31 ; principe de validation confirmé par Karim, 2026-10-02",
   },
   {
     title: 'Who else touches your data',
     body:
-      'Nobody. Each firm gets its own deployment, with its own rules and its own templates. We reuse the architecture between clients. We never reuse the data.',
-    source: 'architecture des plateformes, README ctng-intelligence, 2026-08-31',
+      'Nobody. Each organisation gets its own deployment, with its own rules and its own templates. We reuse the architecture between clients. We never reuse the data.',
+    source: "architecture des plateformes, README de la seconde plateforme d'audit, 2026-08-31",
   },
   {
     title: 'Where your files live',
@@ -359,8 +347,7 @@ export const pillarMetrics: Record<string, { value: string; label: string }[]> =
   // shows: [],
 };
 
-/** Nombre d'entrées sourcées requis pour lier /security depuis la navigation
-    et le pied de page. */
-export const SECURITY_LINK_THRESHOLD = 3;
+/** Nombre d'entrées sourcées requis pour lier /security. */
+const SECURITY_LINK_THRESHOLD = 3;
 
 export const securityIsLinked = contractAnswers.length >= SECURITY_LINK_THRESHOLD;

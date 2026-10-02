@@ -3,20 +3,20 @@
 // contenu et non de la décoration. Données entièrement fictives.
 //
 // Chaque ligne lue et rapprochée de sa source porte une coche cuivre, la
-// marque de l'agent. Les lignes caviardées n'en portent pas : ce que nous ne
-// montrons pas, nous ne prétendons pas l'avoir montré.
+// marque de ce que fait Syntexia. Les lignes caviardées n'en portent pas : ce
+// que nous ne montrons pas, nous ne prétendons pas l'avoir montré.
+//
+// Les pièces sont en portugais : lang="pt-PT" pour que les lecteurs d'écran
+// les prononcent correctement.
 //
 // tick : numéro d'ordre de la première coche, pour que la page puisse les
 // tracer l'une après l'autre (variable --k).
-interface Row {
-  label: string;
-  value: string;
-  redacted?: boolean;
-}
+import type { DocumentRow } from '../data/documents';
+
 interface Props {
   heading: string;
-  rows: Row[];
-  total?: Row;
+  rows: DocumentRow[];
+  total?: DocumentRow;
   tick?: number;
   class?: string;
 }
@@ -25,14 +25,14 @@ const { heading, rows, total, tick = 0, class: cls = '' } = Astro.props;
 let k = tick;
 const next = () => k++;
 ---
-<div class={`sheet ${cls}`.trim()}>
+<div class={`sheet ${cls}`.trim()} lang="pt-PT">
   <p class="sheet-head">{heading}</p>
   <table>
     <tbody>
       {rows.map((r) => (
         <tr>
           <td>{r.label}</td>
-          <td class="n">{r.redacted ? <span class="black" role="img" aria-label="Redacted"></span> : r.value}</td>
+          <td class="n">{r.redacted ? <span class="black" role="img" aria-label="Redacted" lang="en"></span> : r.value}</td>
           <td class="t">
             {!r.redacted && (
               <svg class="tick" style={`--k:${next()}`} viewBox="0 0 16 16" aria-hidden="true">

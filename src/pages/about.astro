@@ -1,6 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
-import { partnerNetworkUrl, partnerNetwork, location, sectors } from '../facts';
+import { partnerNetworkUrl, location, sectors } from '../facts';
 
 // Copy repris de about.html, nettoyé.
 // Ce qui a été retiré et pourquoi est dans docs/REVIEW.md, section « Retiré »,
@@ -67,7 +67,7 @@ import { partnerNetworkUrl, partnerNetwork, location, sectors } from '../facts';
     </div>
   </section>
 
-  <section class="section invert">
+  <section class="section on-black">
     <div class="shell">
       <h2>Where</h2>
       <div class="prose">
@@ -109,14 +109,13 @@ import { partnerNetworkUrl, partnerNetwork, location, sectors } from '../facts';
 <style>
   .first { border-top: 0; }
   .prose { margin-top: var(--s-6); display: flex; flex-direction: column; gap: var(--s-5); }
-  .where { font-size: 19px; color: var(--ink); font-weight: 500; }
-  .partner { font-size: var(--t-small); color: var(--mute); }
+  .where { font-size: 19px; color: var(--fg); font-weight: 500; }
   .sectors {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: var(--s-7);
     margin-top: var(--s-6);
   }
-  .sector { border-top: 1px solid var(--line); padding-top: var(--s-5); }
+  .sector { border-top: 1px solid var(--rule); padding-top: var(--s-5); }
   .sector p { margin-top: var(--s-3); }
 </style>

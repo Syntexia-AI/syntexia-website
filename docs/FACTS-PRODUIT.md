@@ -6,10 +6,11 @@ l'organisation `Syntexia-AI`, et non en supposant.
 **Source** : les README et la structure des dépôts produits. C'est une source de
 type 1 au sens de `FACTS-SITE.md` (le code lui-même).
 
-**Ce document contient des noms de clients. Il ne sort pas de `docs/`.**
-Aucun de ces noms ne va sur le site sans accord écrit du client concerné : ce sont
-des cabinets d'audit et des sociétés portugaises, la confidentialité est structurelle
-à leur métier.
+**Ce dépôt est public : ce document ne nomme aucun client.** Anonymisé le
+2026-10-02. Les dépôts et les clients sont désignés par une lettre ; la
+correspondance reste dans l'organisation, hors de ce dépôt. Aucun nom de client ne
+va sur le site sans accord écrit du client concerné : ce sont des cabinets d'audit et
+des sociétés portugaises, la confidentialité est structurelle à leur métier.
 
 ---
 
@@ -21,11 +22,11 @@ C'est le cœur. Trois dépôts, dont deux documentés en détail.
 
 | dépôt | pour qui | quoi |
 |---|---|---|
-| `kreston-intelligence` | Kreston Iberaudit Portugal (pilote) | couche d'automatisation au dessus de **CaseWare Working Papers Desktop** |
-| `ctng-intelligence` | Carlos Teixeira, Noé Gomes & Associados, SROC, Porto | plateforme orientée acceptation, au dessus de **CaseWare Cloud** |
-| `tca-engine` | TCA | moteur, sous-domaine `tcaintelligence.syntexia.ai` |
+| plateforme d'audit A | un cabinet d'audit portugais (pilote) | couche d'automatisation au dessus de **CaseWare Working Papers Desktop** |
+| plateforme d'audit B | un second cabinet d'audit portugais (SROC) | plateforme orientée acceptation, au dessus de **CaseWare Cloud** |
+| moteur d'audit C | un troisième client audit | moteur, sur un sous-domaine dédié |
 
-**La phrase de positionnement existe déjà, elle est dans le README de Kreston :**
+**La phrase de positionnement existe déjà, elle est dans le README de la plateforme A :**
 
 > « The agent pre-fills, the auditor validates. No CaseWare write-back. »
 
@@ -48,24 +49,24 @@ Quatre dépôts, même moteur, un locataire de premier rang par client.
 
 | dépôt | pour qui | quoi |
 |---|---|---|
-| `teresa-bot` | Trace | réceptionniste PT/EN |
-| `amelia-bot` | Palácio do Correio Velho (maison de ventes, Lisbonne) | réceptionniste PT/EN |
-| `Rita` | Palácio do Correio Velho | spécification, pilote prévu septembre 2026 |
-| `magda-bot` | EXS (studio) | réceptionniste, avec réservation |
+| réceptionniste A | une société cliente | réceptionniste PT/EN |
+| réceptionniste B | une maison de ventes aux enchères | réceptionniste PT/EN |
+| spécification C | la même maison de ventes | spécification, pilote prévu septembre 2026 |
+| réceptionniste D | un studio de sport | réceptionniste, avec réservation |
 
 Pile technique commune : FastAPI, Telnyx, Soniox pour la transcription, Azure pour la
 synthèse, Anthropic pour la conversation, Supabase pour les données.
 
 Ce qu'elles font : répondre, transférer vers une personne, enregistrer un rappel,
-prendre un message, raccrocher. Chez Amelia les transferts sont derrière un
+prendre un message, raccrocher. Chez B les transferts sont derrière un
 interrupteur, **et sa posture de lancement est fermée** : elle promet un rappel
 immédiat plutôt que de composer un numéro.
 
 ### Ligne C, adjacente. Plateforme de gestion
 
-`magda-platform` (remplace progressivement OVG chez EXS, multi-tenant, a vocation à
-servir d'autres cabinets) et `Magda-student-app` (application membre, cliente de
-l'API de la plateforme).
+Une plateforme de gestion (remplace progressivement l'outil en place chez le studio
+de sport, multi-tenant, a vocation à servir d'autres clients) et une application
+membre, cliente de l'API de la plateforme.
 
 ---
 
@@ -96,9 +97,9 @@ Il n'y a pas cinq secteurs. Il y a quatre constantes, et toutes sont vérifiable
 le code sans nommer un seul client.
 
 1. **Le Portugal.** Tout est en portugais européen. Les normes implémentées sont
-   portugaises. Les clients sont à Lisbonne et à Porto.
+   portugaises. Les clients sont au Portugal.
 2. **L'agent prépare, l'humain décide.** C'est écrit noir sur blanc dans le README de
-   Kreston, et c'est la posture de lancement d'Amelia. Ce n'est pas un slogan, c'est
+   la plateforme A, et c'est la posture de lancement de la réceptionniste B. Ce n'est pas un slogan, c'est
    une contrainte d'architecture.
 3. **Un locataire par client, jamais de donnée partagée.** « Architecture replicated
    from the proven blueprint, architecture only, never data. » Chaque cabinet a sa
@@ -129,7 +130,7 @@ ligne cliente. Cette recommandation est retirée du benchmark.
 
 ## 5. Ce qui reste à trancher, et qui n'appartient qu'à toi
 
-- **Peut-on nommer un client ?** Kreston et CTNG sont des cabinets d'audit. Un logo
+- **Peut-on nommer un client ?** A et B sont des cabinets d'audit. Un logo
   ou une étude de cas nommée change complètement la crédibilité du site. Cela demande
   leur accord écrit.
 - **Peut-on citer CaseWare ?** L'intégration est un fait technique et un argument

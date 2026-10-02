@@ -23,6 +23,12 @@
   padding: 0;
 }
 
+/* L'attribut hidden l'emporte toujours, même sur un composant qui fixe son
+   propre display : les scripts s'en servent pour montrer et cacher. */
+[hidden] {
+  display: none !important;
+}
+
 html {
   -webkit-text-size-adjust: 100%;
   scroll-behavior: smooth;
@@ -105,8 +111,7 @@ p {
   max-width: var(--measure);
 }
 
-small,
-.t-small {
+small {
   font-size: var(--t-small);
   line-height: var(--lh-small);
 }
@@ -122,7 +127,6 @@ h5 em {
   font-weight: inherit;
 }
 
-.num,
 .tabular {
   font-variant-numeric: tabular-nums;
 }
@@ -209,16 +213,6 @@ a:hover {
 
 .btn-primary:hover {
   background: var(--fg-2);
-}
-
-.btn-secondary {
-  color: var(--fg);
-  border-color: var(--fg);
-}
-
-.btn-secondary:hover {
-  background: var(--fg);
-  color: var(--bg);
 }
 
 /* ---------- Focus. Visible partout, sans exception. ---------- */

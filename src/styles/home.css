@@ -1,8 +1,10 @@
 /* home.css
-   Mise en page de l'accueil. Les composants portent leurs propres styles
-   (ProductDemo, AuditFlow, Pillars, DocumentStack, ContactBlock) ; ce
-   fichier ne règle que la page : l'accroche, les titres de section et les
-   grilles qui les accueillent. Direction décrite dans docs/DA-2026-10.md. */
+   Mise en page de l'accueil, importée par src/pages/index.astro seulement.
+   Les composants portent leurs propres styles (InvoiceRun, CallTranscript,
+   Pillars, PartnerBlock, ContactBlock) ; ce fichier règle la page :
+   l'accroche, les titres de section et les grilles qui les accueillent.
+   Les classes de l'accroche sont préfixées hero- pour ne jamais croiser une
+   classe d'un composant. Direction décrite dans docs/DA-2026-10.md. */
 
 /* ---------- Titres de section ---------- */
 
@@ -84,7 +86,7 @@
   color: var(--fg);
 }
 
-.legend {
+.hero-legend {
   display: none;
 }
 
@@ -129,7 +131,7 @@
   row-gap: 34px;
 }
 
-.lead {
+.hero-lead {
   grid-column: 7 / span 5;
   grid-row: 1;
   font-size: var(--t-lead);
@@ -139,7 +141,7 @@
   max-width: 36ch;
 }
 
-.actions {
+.hero-actions {
   grid-column: 7 / span 5;
   grid-row: 2;
   align-self: start;
@@ -303,11 +305,6 @@
   font-weight: 560;
 }
 
-/* Bloc partenaire, rendu seulement quand une annonce publique existe. */
-.partner-announce p {
-  margin-top: var(--s-5);
-}
-
 /* ---------- Insights ---------- */
 
 .insights-head {
@@ -409,8 +406,8 @@
 /* ---------- Écrans plus étroits ---------- */
 
 @media (max-width: 1180px) {
-  .lead,
-  .actions {
+  .hero-lead,
+  .hero-actions {
     grid-column: 6 / -1;
   }
   .post-title {
@@ -422,15 +419,15 @@
 }
 
 @media (max-width: 900px) {
-  .lead,
-  .actions,
+  .hero-lead,
+  .hero-actions,
   .offers {
     grid-column: 1 / span 10;
   }
-  .lead {
+  .hero-lead {
     grid-row: 1;
   }
-  .actions {
+  .hero-actions {
     grid-row: 2;
   }
   .offers {
@@ -451,8 +448,8 @@
 }
 
 @media (max-width: 760px) {
-  .lead,
-  .actions,
+  .hero-lead,
+  .hero-actions,
   .offers,
   .about-title,
   .post-date,
@@ -468,7 +465,7 @@
   .hero-point::after {
     display: none;
   }
-  .legend {
+  .hero-legend {
     display: flex;
     align-items: center;
     gap: 10px;
@@ -477,7 +474,7 @@
     font-weight: 560;
     color: var(--fg);
   }
-  .legend .dot {
+  .hero-legend .dot {
     width: 9px;
     height: 9px;
     margin: 0;
