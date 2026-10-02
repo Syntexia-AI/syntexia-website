@@ -1,11 +1,11 @@
 ---
 import Base from '../../layouts/Base.astro';
 import { getCollection } from 'astro:content';
+import { monthYear } from '../../lib/format';
 
 const posts = (await getCollection('posts')).sort(
   (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
 );
-const fmt = (d: Date) => d.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
 ---
 
 <Base
@@ -19,7 +19,7 @@ const fmt = (d: Date) => d.toLocaleDateString('en-GB', { month: 'long', year: 'n
       <div class="list">
         {posts.map((p) => (
           <a class="row" href={`/posts/${p.id}`}>
-            <span class="row-date tabular">{fmt(p.data.date)}</span>
+            <span class="row-date tabular">{monthYear(p.data.date)}</span>
             <div class="row-body">
               <h2 class="row-title">{p.data.title}</h2>
               <span class="row-desc">{p.data.description}</span>
@@ -33,19 +33,19 @@ const fmt = (d: Date) => d.toLocaleDateString('en-GB', { month: 'long', year: 'n
 
 <style>
   .first { border-top: 0; }
-  .list { margin-top: var(--s-7); border-top: 1px solid var(--line); }
+  .list { margin-top: var(--s-7); border-top: 1px solid var(--rule); }
   .row {
     display: grid;
     grid-template-columns: 160px 1fr;
     gap: var(--s-5);
     padding: var(--s-6) 0;
-    border-bottom: 1px solid var(--line-soft);
+    border-bottom: 1px solid var(--rule);
     text-decoration: none;
   }
-  .row-date { font-size: var(--t-small); color: var(--mute); }
+  .row-date { font-size: var(--t-small); color: var(--meta); }
   .row-body { display: block; }
   .row-title { display: block; font-size: var(--t-h3); font-weight: 600; line-height: var(--lh-h3); letter-spacing: -0.01em; }
-  .row-desc { display: block; margin-top: var(--s-3); color: var(--ink-2); max-width: 62ch; }
+  .row-desc { display: block; margin-top: var(--s-3); color: var(--fg-2); max-width: 62ch; }
   .row-title { text-decoration: underline; text-decoration-color: transparent; text-decoration-thickness: 1px; text-underline-offset: 0.2em; }
   .row:hover .row-title { text-decoration-color: currentColor; }
   @media (max-width: 640px) {

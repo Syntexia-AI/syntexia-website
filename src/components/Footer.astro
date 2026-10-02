@@ -7,13 +7,7 @@ import { legalEntity, companiesHouseUrl, linkedinCompany, contactEmail, security
     <div class="footer-inner">
       <div class="footer-legal">
         <BrandMark />
-        <small>
-          {legalEntity ? (
-            <a href={companiesHouseUrl} rel="noopener">{legalEntity.value}</a>
-          ) : (
-            '© 2026 Syntexia.AI'
-          )}
-        </small>
+        <small><a href={companiesHouseUrl} rel="noopener">{legalEntity.value}</a></small>
       </div>
 
       <div class="footer-links">

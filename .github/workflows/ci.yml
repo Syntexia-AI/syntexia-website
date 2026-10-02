@@ -1,0 +1,80 @@
+# Contrôle automatique : à chaque push et à chaque pull request, le site est
+# installé depuis le lockfile, construit avec Astro, puis vérifié.
+# Un échec affiche la fin du journal en annotation sur le commit.
+
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+# bash explicite : GitHub active alors pipefail, sans quoi un échec avant
+# « | tee » passerait pour un succès.
+defaults:
+  run:
+    shell: bash
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build and checks
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install
+        run: npm ci 2>&1 | tee install.log
+
+      - name: Build
+        run: npm run build 2>&1 | tee build.log
+
+      - name: Check the built pages (CSP, links, ids, alt, JSON-LD)
+        run: npm run check:dist 2>&1 | tee check-dist.log
+
+      - name: Validate HTML
+        run: npm run check:html 2>&1 | tee check-html.log
+
+      - name: Check colour contrast
+        run: npm run check:contrast 2>&1 | tee check-contrast.log
+
+      - name: Report the failure
+        if: failure()
+        run: |
+          for f in install.log build.log check-dist.log check-html.log check-contrast.log; do
+            [ -s "$f" ] || continue
+            body=$(tail -n 60 "$f" | sed -e 's/%/%25/g' -e 's/\r/%0D/g' | sed ':a;N;$!ba;s/\n/%0A/g')
+            echo "::error title=${f}::${body}"
+          done
+
+  audit:
+    name: Dependency audit
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Audit all dependencies
+        run: npm audit --audit-level=low 2>&1 | tee audit.log
+
+      - name: Report the failure
+        if: failure()
+        run: |
+          body=$(tail -n 60 audit.log | sed -e 's/%/%25/g' -e 's/\r/%0D/g' | sed ':a;N;$!ba;s/\n/%0A/g')
+          echo "::error title=npm audit::${body}"

@@ -1,0 +1,798 @@
+---
+import { cases } from '../facts';
+import { INVOICE, INVOICE_LINES, INVOICE_ORDER } from '../data/documents';
+
+// Automatisation des factures fournisseurs, le visuel principal de l'accueil.
+// Cas décrit par Karim le 2026-10-02, anonymisé : voir cases.invoices dans
+// facts.ts et ses règles d'anonymat (ce dépôt est public).
+//
+// Ce que la démonstration raconte, et rien de plus :
+//   la facture arrive (n'importe quel format), elle est lue, rapprochée du
+//   code fournisseur et de la commande, l'écriture ERP est préparée ; ce qui
+//   est incertain est signalé avec sa raison, et une personne valide.
+//
+// Code couleur de la direction (docs/DA-2026-10.md) : ce que fait Syntexia est
+// en cuivre (point d'activité, coches, cercle sur le papier, signalement),
+// la décision de la personne est en noir (le bouton s'allume quand c'est à
+// elle).
+//
+// Tout est fictif : pièce, montants, codes, numéros (src/data/documents.ts).
+// Le fournisseur et son NIF sont caviardés. Aucun nom de logiciel, aucun lieu.
+//
+// Mouvement : une seule passe, quand la démonstration entre à l'écran, puis
+// l'état final reste affiché. Un bouton permet de sauter à la fin pendant la
+// passe, et de la rejouer ensuite. Sans JavaScript, en mouvement réduit, ou si
+// la démonstration est déjà visible au chargement, l'état final s'affiche
+// d'emblée : écriture prête, une ligne signalée, en attente de validation.
+
+const INBOX = [
+  { ref: 'FT 2026/0148', format: 'PDF', current: true },
+  { ref: 'FT 2026/0151', format: 'Scan' },
+  { ref: 'GR 3307', format: 'Photo' },
+  { ref: 'INV-88412', format: 'E-invoice' },
+];
+
+// La ligne signalée : le prix facturé ne correspond pas à la commande.
+const FLAGGED = 'Azeite virgem extra 5 L';
+const LINES = INVOICE_LINES.map((l) => ({ ...l, flag: l.label === FLAGGED }));
+
+const CHECKS = [
+  { label: 'Supplier', value: 'Matched to code F-0217', at: 1 },
+  { label: 'Order', value: `PO ${INVOICE_ORDER}, 3 of 3 lines found`, at: 2 },
+  { label: 'Prices', value: '1 line differs from the order', at: 3 },
+  { label: 'ERP', value: 'Entry prepared, posted once validated', at: 4 },
+];
+
+const FINAL = 4;
+const paperLabel = `Illustrative supplier invoice ${INVOICE.heading}, total ${INVOICE.total?.value}. The amount of ${FLAGGED} is circled.`;
+---
+
+<figure class="inv" data-inv data-step={FINAL}>
+  <div class="paper" role="img" aria-label={paperLabel} lang="pt-PT">
+    <p class="paper-head">{INVOICE.heading}</p>
+    <table>
+      <tbody>
+        <tr><td>Fornecedor</td><td class="n"><span class="redact"></span></td></tr>
+        <tr><td>NIF</td><td class="n"><span class="redact"></span></td></tr>
+        <tr><td>Encomenda</td><td class="n">{INVOICE_ORDER}</td></tr>
+      </tbody>
+    </table>
+    <div class="paper-rule"></div>
+    <table>
+      <tbody>
+        {LINES.map((l) => (
+          <tr>
+            <td>{l.label}</td>
+            <td class="n">
+              {l.flag ? (
+                <span class="circled">
+                  {l.value}
+                  <svg class="circle" viewBox="0 0 100 44" preserveAspectRatio="none">
+                    <path d="M8 24C9 10 34 4 56 5c22 1 39 7 38 19-1 12-24 16-47 15C24 38 7 34 8 22" pathLength="100"></path>
+                  </svg>
+                </span>
+              ) : (
+                l.value
+              )}
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+    <div class="paper-rule"></div>
+    <table>
+      <tbody>
+        <tr><td>{INVOICE.total?.label}</td><td class="n">{INVOICE.total?.value}</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="win">
+    <div class="rail" aria-hidden="true">
+      <p class="rail-h">Inbox</p>
+      <ul>
+        {INBOX.map((d) => (
+          <li class={d.current ? 'is-current' : undefined}>
+            <span class="rail-ref">{d.ref}</span>
+            <span class="rail-format">{d.format}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+
+    <div class="win-main">
+      <header class="win-head">
+        <div class="win-id">
+          <span class="win-ref">{INVOICE.heading.replace('FATURA ', '')}</span>
+          <span class="win-supplier">Supplier <span class="redact" role="img" aria-label="Redacted"></span></span>
+        </div>
+        <div class="win-status">
+          <span class="pulse" aria-hidden="true"></span>
+          <span data-status>Waiting for validation</span>
+        </div>
+      </header>
+
+      <div class="win-body">
+        <div class="win-col">
+          <p class="col-h">Invoice lines</p>
+          <ul class="lines">
+            {LINES.map((l) => (
+              <li class={l.flag ? 'line is-flag' : 'line'}>
+                <span class="line-label" lang="pt-PT">{l.label}</span>
+                <span class="line-amount">{l.value}</span>
+                <span class="line-mark" aria-hidden="true">
+                  {l.flag ? (
+                    <svg class="mark-flag" viewBox="0 0 16 16">
+                      <circle cx="8" cy="8" r="6.6"></circle>
+                      <path d="M8 4.6v4.4"></path>
+                      <path d="M8 11.3v.1"></path>
+                    </svg>
+                  ) : (
+                    <svg class="mark-tick" viewBox="0 0 16 16"><path d="M3 8.6l3.2 3.1L13 4.6"></path></svg>
+                  )}
+                </span>
+                {l.flag && <span class="sr-only">Flagged</span>}
+              </li>
+            ))}
+            <li class="line line-total">
+              <span class="line-label">Total</span>
+              <span class="line-amount">{INVOICE.total?.value}</span>
+              <span class="line-mark"></span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="win-col">
+          <p class="col-h">Checks</p>
+          <dl class="checks">
+            {CHECKS.map((c) => (
+              <div class="check is-shown" data-check={c.at}>
+                <dt>{c.label}</dt>
+                <dd><span class="val">{c.value}</span></dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+      </div>
+
+      <div class="flag-note">
+        <p class="flag-h">
+          <svg class="mark-flag" viewBox="0 0 16 16" aria-hidden="true">
+            <circle cx="8" cy="8" r="6.6"></circle>
+            <path d="M8 4.6v4.4"></path>
+            <path d="M8 11.3v.1"></path>
+          </svg>
+          <span>Flagged: <span lang="pt-PT">{FLAGGED}</span></span>
+        </p>
+        <p class="flag-why">Invoiced at 96,20. The order says 92,40, a 4,1&nbsp;% difference.</p>
+      </div>
+
+      <footer class="win-foot">
+        <p class="hand">Syntexia prepares. A person validates.</p>
+        <span class="validate" aria-hidden="true">Validate and post</span>
+      </footer>
+    </div>
+  </div>
+
+  <figcaption class="inv-cap">
+    <span>{cases.invoices.client}. Fictional invoice, no customer data.</span>
+    <button class="replay" type="button" data-control hidden>Replay the check</button>
+  </figcaption>
+</figure>
+
+<script>
+  const LABELS = [
+    'Reading the invoice',
+    'Matching the supplier',
+    'Checking against the order',
+    'Checking prices',
+    'Waiting for validation',
+  ];
+  const HOLD = [1000, 1400, 1400, 1700];
+  const FINAL = LABELS.length - 1;
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  document.querySelectorAll<HTMLElement>('[data-inv]').forEach((root) => {
+    const status = root.querySelector<HTMLElement>('[data-status]');
+    const control = root.querySelector<HTMLButtonElement>('[data-control]');
+    const checks = Array.from(root.querySelectorAll<HTMLElement>('[data-check]'));
+    if (!status || !control) return;
+    if (reduced.matches || !('IntersectionObserver' in window)) return;
+
+    let timer = 0;
+    let running = false;
+
+    const render = (s: number) => {
+      root.dataset.step = String(s);
+      status.textContent = LABELS[s];
+      checks.forEach((c) => c.classList.toggle('is-shown', s >= Number(c.dataset.check)));
+    };
+
+    // Arrêt à tout moment : on montre toujours l'état final, jamais une étape
+    // à moitié faite.
+    const finish = () => {
+      window.clearTimeout(timer);
+      running = false;
+      root.dataset.run = 'off';
+      render(FINAL);
+      control.textContent = 'Replay the check';
+    };
+
+    const play = () => {
+      window.clearTimeout(timer);
+      running = true;
+      root.dataset.run = 'on';
+      control.textContent = 'Show the result';
+      let step = 0;
+      render(step);
+      const next = () => {
+        step += 1;
+        if (step >= FINAL) return finish();
+        render(step);
+        timer = window.setTimeout(next, HOLD[step]);
+      };
+      timer = window.setTimeout(next, HOLD[0]);
+    };
+
+    control.hidden = false;
+    control.addEventListener('click', () => (running ? finish() : play()));
+
+    reduced.addEventListener('change', (e) => {
+      if (!e.matches) return;
+      finish();
+      control.hidden = true;
+    });
+
+    // Déjà visible au chargement : l'état final reste, le bouton permet de
+    // rejouer. Sinon, la passe démarre à l'entrée dans l'écran.
+    const r = root.getBoundingClientRect();
+    if (r.top < window.innerHeight && r.bottom > 0) return;
+
+    let played = false;
+    new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting && !played) {
+            played = true;
+            play();
+          } else if (!e.isIntersecting && running) {
+            finish();
+          }
+        }
+      },
+      { threshold: 0.35 }
+    ).observe(root);
+  });
+</script>
+
+<style>
+  /* Le papier est posé devant l'écran, sous la boîte de réception. */
+  .inv {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--gap);
+    row-gap: 28px;
+    align-items: start;
+  }
+
+  /* ---------- La facture papier ---------- */
+
+  /* Le papier se pose sous les pièces de la boîte de réception, pour ne
+     jamais les masquer, et déborde sous l'écran comme une feuille posée. */
+  .paper {
+    grid-column: 1 / span 4;
+    grid-row: 1;
+    position: relative;
+    z-index: 2;
+    margin-top: 324px;
+    background: var(--white);
+    color: var(--typewriter);
+    font-family: var(--font-mono);
+    font-size: 14.5px;
+    line-height: 1.5;
+    padding: 26px 28px 30px;
+    box-shadow: var(--shadow-sheet);
+    transform: rotate(-2deg);
+  }
+
+  .paper-head {
+    font-weight: 700;
+    color: var(--black);
+    letter-spacing: 0.02em;
+    margin-bottom: 16px;
+    max-width: none;
+  }
+
+  .paper table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .paper td {
+    padding: 3px 0;
+    vertical-align: baseline;
+  }
+
+  .paper td.n {
+    text-align: right;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .paper-rule {
+    border-top: 1px solid var(--typewriter);
+    margin: 10px 0 6px;
+  }
+
+  .redact {
+    display: inline-block;
+    width: 84px;
+    height: 11px;
+    background: var(--black);
+    vertical-align: middle;
+  }
+
+  /* Le cercle à la main autour du montant signalé, comme un comptable. */
+  .circled {
+    position: relative;
+    display: inline-block;
+  }
+
+  .circle {
+    position: absolute;
+    left: -14px;
+    top: -9px;
+    width: calc(100% + 26px);
+    height: calc(100% + 18px);
+    max-width: none;
+    overflow: visible;
+    fill: none;
+    stroke: var(--copper);
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    stroke-dasharray: 100;
+    stroke-dashoffset: 0;
+    transition: stroke-dashoffset 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .inv:not([data-step='3']):not([data-step='4']) .circle {
+    stroke-dashoffset: 100;
+    transition-duration: 0.2s;
+  }
+
+  /* ---------- L'écran ---------- */
+
+  .win {
+    grid-column: 4 / -1;
+    grid-row: 1;
+    display: grid;
+    grid-template-columns: minmax(130px, 170px) minmax(0, 1fr);
+    background: var(--white);
+    color: var(--black);
+    border: 1px solid var(--frame);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: var(--shadow-win);
+  }
+
+  /* La boîte de réception : un format par pièce, c'est tout le propos. */
+  .rail {
+    background: var(--paper-2);
+    border-right: 1px solid var(--frame);
+    padding: 18px 0 14px;
+  }
+
+  .rail-h {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--stone);
+    padding: 0 18px 10px;
+  }
+
+  .rail li {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 10px 18px;
+    font-size: 13px;
+    color: var(--stone);
+  }
+
+  .rail .is-current {
+    background: var(--white);
+    color: var(--black);
+  }
+
+  .rail-ref {
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .win-main {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  .win-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px 24px;
+    padding: 18px 26px;
+    border-bottom: 1px solid var(--frame);
+  }
+
+  .win-id {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 18px;
+  }
+
+  .win-ref {
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .win-supplier {
+    font-size: 13px;
+    color: var(--stone);
+  }
+
+  .win-supplier .redact {
+    width: 72px;
+    height: 9px;
+    margin-left: 6px;
+    vertical-align: -1px;
+  }
+
+  .win-status {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    color: var(--stone);
+  }
+
+  .pulse {
+    width: 8px;
+    height: 8px;
+    flex: none;
+    border-radius: 50%;
+    background: var(--copper);
+  }
+
+  .inv[data-run='on'] .pulse {
+    animation: breathe 1.4s ease-in-out infinite;
+  }
+
+  @keyframes breathe {
+    0%,
+    100% {
+      opacity: 0.3;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+
+  .win-body {
+    display: grid;
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+    flex: 1;
+  }
+
+  .win-col {
+    padding: 22px 26px 26px;
+    min-width: 0;
+  }
+
+  .win-col + .win-col {
+    border-left: 1px solid var(--frame);
+  }
+
+  .col-h {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--stone);
+    margin-bottom: 16px;
+  }
+
+  /* ---------- Lignes lues ---------- */
+
+  .lines {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .line {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto 18px;
+    gap: 12px;
+    align-items: center;
+    font-size: 15px;
+    line-height: 1.35;
+    color: var(--black);
+    transition: color 0.35s ease;
+  }
+
+  .inv[data-step='0'] .line {
+    color: var(--stone);
+  }
+
+  .line-amount {
+    font-variant-numeric: tabular-nums;
+  }
+
+  .line-total {
+    padding-top: 12px;
+    border-top: 1px solid var(--frame);
+    font-weight: 600;
+  }
+
+  .line-mark {
+    display: grid;
+    place-items: center;
+  }
+
+  .mark-tick,
+  .mark-flag {
+    width: 16px;
+    height: 16px;
+    fill: none;
+    stroke: var(--copper);
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .mark-tick {
+    stroke-dasharray: 20;
+    stroke-dashoffset: 0;
+    transition: stroke-dashoffset 0.38s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .mark-flag {
+    flex: none;
+    transition:
+      opacity 0.3s ease,
+      transform 0.35s cubic-bezier(0.2, 0.9, 0.25, 1.3);
+  }
+
+  .inv[data-step='0'] .mark-tick,
+  .inv[data-step='1'] .mark-tick {
+    stroke-dashoffset: 20;
+  }
+
+  .inv[data-step='0'] .line .mark-flag,
+  .inv[data-step='1'] .line .mark-flag,
+  .inv[data-step='2'] .line .mark-flag {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+
+  /* ---------- Contrôles ---------- */
+
+  .checks {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .check {
+    display: grid;
+    grid-template-columns: 72px minmax(0, 1fr);
+    gap: 12px;
+    align-items: baseline;
+  }
+
+  .check dt {
+    font-size: 13px;
+    color: var(--stone);
+  }
+
+  .check dd {
+    position: relative;
+    margin: 0;
+    font-size: 15px;
+    line-height: 1.4;
+  }
+
+  .val {
+    display: block;
+    transition:
+      opacity 0.4s ease,
+      transform 0.45s cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+
+  .check:not(.is-shown) .val {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+
+  /* Tant que le contrôle n'est pas fait, une réglette tient sa place. */
+  .check dd::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.42em;
+    width: min(100%, 132px);
+    height: 8px;
+    background: var(--desk);
+    transition: opacity 0.3s ease;
+  }
+
+  .check.is-shown dd::before {
+    opacity: 0;
+  }
+
+  /* ---------- Le signalement, avec sa raison ---------- */
+
+  .flag-note {
+    margin: 0 26px 22px;
+    padding: 14px 16px;
+    border: 1px solid var(--copper);
+    transition:
+      opacity 0.4s ease,
+      transform 0.45s cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+
+  .inv[data-step='0'] .flag-note,
+  .inv[data-step='1'] .flag-note,
+  .inv[data-step='2'] .flag-note {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  .flag-h {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--black);
+  }
+
+  .flag-why {
+    margin-top: 4px;
+    padding-left: 26px;
+    font-size: 14px;
+    color: var(--graphite);
+  }
+
+  /* ---------- Pied : la décision revient à une personne ---------- */
+
+  .win-foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px 24px;
+    padding: 16px 26px;
+    border-top: 1px solid var(--frame);
+  }
+
+  .hand {
+    font-size: 13px;
+    color: var(--stone);
+  }
+
+  /* Pas cliquable : une reproduction, pas un formulaire. */
+  .validate {
+    font-size: 14px;
+    font-weight: 560;
+    padding: 11px 18px;
+    border: 1px solid var(--frame);
+    color: var(--stone);
+    background: var(--white);
+    transition:
+      background-color 0.35s ease,
+      color 0.35s ease,
+      border-color 0.35s ease;
+  }
+
+  .inv[data-step='4'] .validate {
+    background: var(--black);
+    border-color: var(--black);
+    color: var(--white);
+  }
+
+  /* ---------- Légende et commande ---------- */
+
+  .inv-cap {
+    grid-column: 1 / span 3;
+    grid-row: 1;
+    align-self: start;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    padding-top: 2px;
+    font-size: var(--t-small);
+    line-height: var(--lh-small);
+    color: var(--meta);
+    max-width: 26ch;
+  }
+
+  .replay {
+    appearance: none;
+    background: none;
+    border: 0;
+    padding: 4px 0;
+    font-family: var(--font-ui);
+    font-size: 15px;
+    font-weight: 560;
+    color: var(--fg);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.3em;
+    cursor: pointer;
+  }
+
+  .replay:hover {
+    text-decoration-color: var(--dot);
+  }
+
+  /* ---------- Adaptation ----------
+     Sous 1180 px, plus de chevauchement : la légende, le papier, puis l'écran
+     pleine largeur, que le papier ne touche que par son bord. */
+
+  @media (max-width: 1180px) {
+    .inv-cap,
+    .paper,
+    .win {
+      grid-column: 1 / -1;
+    }
+    .inv-cap {
+      grid-row: 1;
+      max-width: 44ch;
+    }
+    .paper {
+      grid-row: 2;
+      justify-self: start;
+      width: min(100%, 440px);
+      margin-top: 0;
+      transform: rotate(-1.2deg);
+    }
+    .win {
+      grid-row: 3;
+      margin-top: -12px;
+    }
+  }
+
+  @media (max-width: 900px) {
+    .win {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .rail {
+      display: none;
+    }
+  }
+
+  @media (max-width: 760px) {
+    .win-body {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .win-col + .win-col {
+      border-left: 0;
+      border-top: 1px solid var(--frame);
+    }
+    .win-head,
+    .win-col,
+    .win-foot {
+      padding-inline: 18px;
+    }
+    .flag-note {
+      margin-inline: 18px;
+    }
+    .paper {
+      font-size: 13.5px;
+      padding: 22px 20px 24px;
+    }
+  }
+</style>

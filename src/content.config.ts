@@ -1,8 +1,10 @@
-import { defineCollection, z } from 'astro:content';
+import { defineCollection } from 'astro:content';
 import { glob } from 'astro/loaders';
+import { z } from 'astro/zod';
 
-// Les deux articles existants. L'arborescence est prête pour pt et fr,
-// aucune traduction n'est fournie.
+// Les articles du blog, un fichier markdown par article dans
+// src/content/posts. L'identifiant d'un article est le nom de son fichier,
+// et devient son adresse : /posts/<nom>.
 const posts = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/posts' }),
   schema: z.object({

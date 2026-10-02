@@ -35,12 +35,12 @@ The independence thresholds move too, depending on whether the entity is a publi
 
 A product that ships one opinion of how audit acceptance works will be wrong at the second client. So we do not ship the rules. We ship the machinery, and the rules come from the firm: their questionnaire, their thresholds, their templates, their approval matrix. The architecture is reused between clients. Nothing else is.
 
-## Where the agent actually helps
+## Where Syntexia actually helps
 
 Once the order is respected, the useful work is obvious and narrow.
 
 Reading the permanent record and the ownership structure. Pre-filling the questionnaire from what those documents say. Flagging the entry that pushes a threshold. Assembling the annex in the firm's own format, ready to be reviewed.
 
-The agent prepares the file. The partner validates it. Nothing is concluded without a person signing it, and nothing is written back into the firm's audit software by us.
+Syntexia prepares the file. The partner validates it. Nothing is concluded without a person signing it, and nothing is written back into the firm's audit software by us.
 
 That division is not a limitation we accepted reluctantly. It is the only version of this that survives a review.

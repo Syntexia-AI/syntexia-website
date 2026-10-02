@@ -4,17 +4,23 @@ import '../styles/base.css';
 import Masthead from '../components/Masthead.astro';
 import Footer from '../components/Footer.astro';
 import { linkedinCompany } from '../facts';
+import { serializeJsonLd } from '../lib/jsonld';
 
 interface Props {
   title: string;
   description: string;
   path: string;
   ogType?: string;
+  /** Pages à ne pas indexer, comme la 404 : ni canonical, ni og:url. */
+  noindex?: boolean;
 }
 
-const { title, description, path, ogType = 'website' } = Astro.props;
+const { title, description, path, ogType = 'website', noindex = false } = Astro.props;
 const site = 'https://www.syntexia.ai';
 const canonical = `${site}${path}`;
+
+// Le nom de la marque figure dans chaque titre, une seule fois.
+const fullTitle = title.includes('Syntexia') ? title : `${title} | Syntexia`;
 
 // JSON-LD Organization. Champs vérifiés uniquement : le nom et le domaine
 // sont établis par le site lui-même, le logo est servi par nous. Aucune
@@ -28,11 +34,6 @@ const orgLd: Record<string, unknown> = {
   logo: `${site}/syntexia-mark-dark.svg`,
 };
 if (linkedinCompany) orgLd.sameAs = [linkedinCompany.value];
-
-// Échappe les caractères qui pourraient fermer la balise script. JSON.stringify
-// ne le fait pas. Nos valeurs sont contrôlées, ceci protège les suivantes.
-const safeJsonLd = (o: unknown) =>
-  JSON.stringify(o).replace(/</g, '\u003c').replace(/>/g, '\u003e');
 ---
 
 <!doctype html>
@@ -41,9 +42,9 @@ const safeJsonLd = (o: unknown) =>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>{title}</title>
+    <title>{fullTitle}</title>
     <meta name="description" content={description} />
-    <link rel="canonical" href={canonical} />
+    {noindex ? <meta name="robots" content="noindex" /> : <link rel="canonical" href={canonical} />}
 
     <link
       rel="preload"
@@ -61,8 +62,8 @@ const safeJsonLd = (o: unknown) =>
 
     <meta property="og:type" content={ogType} />
     <meta property="og:site_name" content="Syntexia" />
-    <meta property="og:url" content={canonical} />
-    <meta property="og:title" content={title} />
+    {!noindex && <meta property="og:url" content={canonical} />}
+    <meta property="og:title" content={fullTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:image" content={`${site}/og-image.png`} />
     <meta property="og:image:type" content="image/png" />
@@ -70,11 +71,11 @@ const safeJsonLd = (o: unknown) =>
     <meta property="og:image:height" content="630" />
 
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content={title} />
+    <meta name="twitter:title" content={fullTitle} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={`${site}/og-image.png`} />
 
-    <script type="application/ld+json" set:html={safeJsonLd(orgLd)} />
+    <script type="application/ld+json" is:inline set:html={serializeJsonLd(orgLd)}></script>
 
     {/* Analytics, disabled. While this stays commented out the site loads no
         third-party script, and /security can say so truthfully. Account and

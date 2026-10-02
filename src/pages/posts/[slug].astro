@@ -1,6 +1,8 @@
 ---
 import Base from '../../layouts/Base.astro';
 import { getCollection, render } from 'astro:content';
+import { serializeJsonLd } from '../../lib/jsonld';
+import { monthYear, isoDate } from '../../lib/format';
 
 export async function getStaticPaths() {
   const posts = await getCollection('posts');
@@ -10,13 +12,14 @@ export async function getStaticPaths() {
 const { post } = Astro.props;
 const { Content } = await render(post);
 
-const iso = post.data.date.toISOString().slice(0, 10);
-const human = post.data.date.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+const site = 'https://www.syntexia.ai';
+const iso = isoDate(post.data.date);
+const human = monthYear(post.data.date);
 
-// Même durcissement que dans le layout : JSON.stringify ne neutralise pas
-// une séquence de fermeture de balise script.
-const safeJsonLd = (o: unknown) =>
-  JSON.stringify(o).replace(/</g, '\u003c').replace(/>/g, '\u003e');
+// Un article signé par la société est attribué à une organisation, pas à une
+// personne.
+const byCompany = post.data.author.startsWith('Syntexia');
+const publisher = { '@type': 'Organization', name: 'Syntexia.AI', url: site };
 
 const articleLd = {
   '@context': 'https://schema.org',
@@ -24,7 +27,10 @@ const articleLd = {
   headline: post.data.title,
   description: post.data.description,
   datePublished: iso,
-  author: { '@type': 'Person', name: post.data.author },
+  image: `${site}/og-image.png`,
+  mainEntityOfPage: `${site}/posts/${post.id}`,
+  author: byCompany ? publisher : { '@type': 'Person', name: post.data.author },
+  publisher,
 };
 ---
 
@@ -42,24 +48,28 @@ const articleLd = {
       <p class="back"><a href="/blog">All insights</a></p>
     </div>
   </article>
-  <script type="application/ld+json" set:html={safeJsonLd(articleLd)} />
+  <script type="application/ld+json" is:inline set:html={serializeJsonLd(articleLd)}></script>
 </Base>
 
 <style>
   .first { border-top: 0; }
-  .meta { display: flex; gap: var(--s-5); font-size: var(--t-small); color: var(--mute); margin-bottom: var(--s-5); }
+  .meta { display: flex; gap: var(--s-5); font-size: var(--t-small); color: var(--meta); margin-bottom: var(--s-5); }
   .prose { margin-top: var(--s-7); max-width: var(--measure); }
   .prose :global(p) { margin-bottom: var(--s-5); }
   .prose :global(h2) { margin: var(--s-8) 0 var(--s-4); }
   .prose :global(h3) { margin: var(--s-7) 0 var(--s-3); }
-  .prose :global(ul), .prose :global(ol) { margin: 0 0 var(--s-5) var(--s-5); color: var(--ink-2); }
-  .prose :global(li) { margin-bottom: var(--s-2); }
+  /* base.css retire les puces de toutes les listes ; un article les rend. */
+  .prose :global(ul),
+  .prose :global(ol) { margin: 0 0 var(--s-5); padding-left: 1.25em; color: var(--fg-2); }
+  .prose :global(ul) { list-style: disc; }
+  .prose :global(ol) { list-style: decimal; }
+  .prose :global(li) { margin-bottom: var(--s-2); padding-left: 0.25em; }
   .prose :global(blockquote) {
-    border-left: 2px solid var(--line);
+    border-left: 2px solid var(--rule);
     padding-left: var(--s-5);
     margin: var(--s-6) 0;
   }
   .prose :global(em) { font-style: italic; }
-  .prose :global(a) { color: var(--ink); }
+  .prose :global(a) { color: var(--fg); }
   .back { margin-top: var(--s-8); }
 </style>

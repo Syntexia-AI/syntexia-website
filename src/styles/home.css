@@ -1,8 +1,10 @@
 /* home.css
-   Mise en page de l'accueil. Les composants portent leurs propres styles
-   (ProductDemo, AuditFlow, Pillars, DocumentStack, ContactBlock) ; ce
-   fichier ne règle que la page : l'accroche, les titres de section et les
-   grilles qui les accueillent. Direction décrite dans docs/DA-2026-10.md. */
+   Mise en page de l'accueil, importée par src/pages/index.astro seulement.
+   Les composants portent leurs propres styles (InvoiceRun, CallTranscript,
+   Pillars, PartnerBlock, ContactBlock) ; ce fichier règle la page :
+   l'accroche, les titres de section et les grilles qui les accueillent.
+   Les classes de l'accroche sont préfixées hero- pour ne jamais croiser une
+   classe d'un composant. Direction décrite dans docs/DA-2026-10.md. */
 
 /* ---------- Titres de section ---------- */
 
@@ -84,7 +86,7 @@
   color: var(--fg);
 }
 
-.legend {
+.hero-legend {
   display: none;
 }
 
@@ -129,8 +131,9 @@
   row-gap: 34px;
 }
 
-.lead {
+.hero-lead {
   grid-column: 7 / span 5;
+  grid-row: 1;
   font-size: var(--t-lead);
   line-height: 1.42;
   letter-spacing: -0.006em;
@@ -138,53 +141,102 @@
   max-width: 36ch;
 }
 
-.actions {
+.hero-actions {
   grid-column: 7 / span 5;
+  grid-row: 2;
+  align-self: start;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 16px 34px;
 }
 
-/* ---------- Paperasse ---------- */
+/* ---------- Ce que fait la société, dès le premier écran ----------
+   Deux lignes, chacune renvoie à sa démonstration. Placées sous le titre,
+   à gauche, en face de la promesse et des boutons. */
 
-.paper-grid {
-  row-gap: 40px;
-  align-items: start;
-}
-
-.paper-text {
+.offers {
   grid-column: 1 / span 5;
-  display: flex;
-  flex-direction: column;
-  gap: 22px;
+  grid-row: 1 / span 2;
+  align-self: start;
+  border-top: 1px solid var(--rule);
 }
 
-.paper-text .h2 {
-  font-size: clamp(36px, 4.6vw, 70px);
-  max-width: 12ch;
-  margin-bottom: 14px;
+.offers li {
+  border-bottom: 1px solid var(--rule);
 }
 
-.paper-text p {
-  font-size: 18px;
-  line-height: 1.6;
-  color: var(--fg-2);
-  max-width: 40ch;
+.offers a {
+  display: grid;
+  gap: 6px;
+  padding-block: 16px 18px;
+  text-decoration: none;
 }
 
-.paper-text .paper-note {
+.offer-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 20px;
+  font-weight: var(--w-title);
+  letter-spacing: -0.015em;
   color: var(--fg);
 }
 
-.paper-pile,
-.paper-legend {
-  grid-column: 6 / -1;
+/* Le point cuivre : ce sont deux choses que fait l'intelligence. */
+.offer-name::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--dot);
 }
 
-.paper-legend {
-  font-size: var(--t-small);
-  color: var(--meta);
+.offer-desc {
+  padding-left: 18px;
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--fg-2);
+  max-width: 44ch;
+}
+
+.offers a:hover .offer-name {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.25em;
+}
+
+/* ---------- Les deux cas : factures, puis voix ---------- */
+
+.case-intro {
+  row-gap: 28px;
+  align-items: end;
+  margin-bottom: clamp(48px, 6vw, 88px);
+}
+
+.case-intro .h2 {
+  grid-column: 1 / span 7;
+  font-size: clamp(36px, 5vw, 76px);
+  max-width: 13ch;
+}
+
+.case-text {
+  grid-column: 8 / span 5;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.case-text p {
+  font-size: 18px;
+  line-height: 1.6;
+  color: var(--fg-2);
+  max-width: 44ch;
+}
+
+.case-text p:first-child {
+  color: var(--fg);
 }
 
 /* ---------- Secteurs ---------- */
@@ -251,11 +303,6 @@
 .about-body .about-where {
   color: var(--fg);
   font-weight: 560;
-}
-
-/* Bloc partenaire, rendu seulement quand une annonce publique existe. */
-.partner-announce p {
-  margin-top: var(--s-5);
 }
 
 /* ---------- Insights ---------- */
@@ -359,16 +406,9 @@
 /* ---------- Écrans plus étroits ---------- */
 
 @media (max-width: 1180px) {
-  .lead,
-  .actions {
+  .hero-lead,
+  .hero-actions {
     grid-column: 6 / -1;
-  }
-  .paper-text {
-    grid-column: 1 / span 9;
-  }
-  .paper-pile,
-  .paper-legend {
-    grid-column: 1 / -1;
   }
   .post-title {
     grid-column: 3 / span 6;
@@ -379,9 +419,23 @@
 }
 
 @media (max-width: 900px) {
-  .lead,
-  .actions {
+  .hero-lead,
+  .hero-actions,
+  .offers {
     grid-column: 1 / span 10;
+  }
+  .hero-lead {
+    grid-row: 1;
+  }
+  .hero-actions {
+    grid-row: 2;
+  }
+  .offers {
+    grid-row: 3;
+  }
+  .case-intro .h2,
+  .case-text {
+    grid-column: 1 / -1;
   }
   .sector-index h3,
   .sector-index p,
@@ -394,11 +448,9 @@
 }
 
 @media (max-width: 760px) {
-  .lead,
-  .actions,
-  .paper-text,
-  .paper-pile,
-  .paper-legend,
+  .hero-lead,
+  .hero-actions,
+  .offers,
   .about-title,
   .post-date,
   .post-title,
@@ -413,7 +465,7 @@
   .hero-point::after {
     display: none;
   }
-  .legend {
+  .hero-legend {
     display: flex;
     align-items: center;
     gap: 10px;
@@ -422,7 +474,7 @@
     font-weight: 560;
     color: var(--fg);
   }
-  .legend .dot {
+  .hero-legend .dot {
     width: 9px;
     height: 9px;
     margin: 0;

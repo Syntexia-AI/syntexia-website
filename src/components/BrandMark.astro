@@ -4,9 +4,9 @@
 //
 // size « sm » : barre de navigation et pied de page.
 // size « xl » : section About de l'accueil. Avec draw, le S s'y pose point
-// par point dans l'ordre du tracé, puis le cœur arrive en dernier. Le script
-// qui déclenche ce tracé est dans la page, et ne masque jamais un mark déjà
-// visible au chargement.
+// par point dans l'ordre du tracé, puis le cœur arrive en dernier, quand le
+// mark entre à l'écran. Sans JavaScript, en mouvement réduit, ou si le mark
+// est déjà visible au chargement, il s'affiche complet d'emblée.
 interface Props {
   size?: 'sm' | 'xl';
   draw?: boolean;
@@ -31,3 +31,26 @@ const ORDER: Record<number, number> = {
     ></i>
   ))}
 </span>
+
+<script>
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  document.querySelectorAll<HTMLElement>('[data-mark="draw"]').forEach((mark) => {
+    if (reduced.matches || !('IntersectionObserver' in window)) return;
+    const r = mark.getBoundingClientRect();
+    if (r.top < window.innerHeight && r.bottom > 0) return;
+
+    mark.classList.add('is-pending');
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (!e.isIntersecting) continue;
+          requestAnimationFrame(() => mark.classList.remove('is-pending'));
+          io.disconnect();
+        }
+      },
+      { threshold: 0.4 }
+    );
+    io.observe(mark);
+  });
+</script>

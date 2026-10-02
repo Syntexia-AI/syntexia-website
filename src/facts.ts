@@ -51,14 +51,20 @@ export const linkedinCompany: SourcedFact<string> = {
   source: 'vérifié par requête directe le 2026-09-01, HTTP 200',
 };
 
-/** Implantation. Tranché par Karim le 2026-09-01 : « Working in Portugal is
+/** Implantation. Révisé par Karim le 2026-10-02 : la société veut être vue
+    comme européenne, pas seulement portugaise (Malte peut suivre, puis le
+    Royaume-Uni). Formulation retenue, la sienne : « A UK company working with
+    organisations across Europe ». La décision précédente suit, pour mémoire.
+
+    Tranché par Karim le 2026-09-01 : « Working in Portugal is
     a strength in our market, no reason to hide it. » La société est
     immatriculée au Royaume-Uni, le travail se fait au Portugal. Les deux sont
     vrais et se disent séparément, ce qui lève la contradiction de l'ancien
     site entre « Londres » et « Londres et Lisbonne ». */
 export const location: SourcedFact<string> = {
-  value: 'Registered in the UK. The work happens in Portugal.',
-  source: 'décision Karim, 2026-09-01, plus Companies House pour la partie UK',
+  value: 'A UK company working with organisations across Europe.',
+  source:
+    'décision Karim, 2026-10-02 (« The work happens in Portugal » jugé trop limitant), plus Companies House pour la partie UK',
 };
 
 /** Adresse de contact fonctionnelle. Publiée sur les six pages du site
@@ -82,8 +88,8 @@ export const phone: SourcedFact<{ display: string; dial: string }> = {
 /* Partenariat                                                         */
 /* ------------------------------------------------------------------ */
 
-/** URL publique d'annonce du partenariat Anthropic. Sans elle, les huit
-    mentions du réseau partenaire sortent du rendu.
+/** URL publique d'annonce du partenariat Anthropic. Sans elle, la mention
+    du partenariat (voir partnerNetwork plus bas) est rendue sans lien.
 
     Recherche menée le 2026-08-31. Le programme existe bien sous ce nom
     (anthropic.com/news/claude-partner-network), mais l'annuaire officiel des
@@ -190,21 +196,8 @@ export const team: {
 ];
 
 /* ------------------------------------------------------------------ */
-/* Déploiements et secteurs                                            */
+/* Secteurs                                                            */
 /* ------------------------------------------------------------------ */
-
-/** Nombre de déploiements en production. Alimentait « across five companies »
-    et la mention d'illustration de la home. */
-export const deploymentCount: SourcedFact<number> | null = NONE;
-
-/** Totaux de la journée type. Les trois sont requis ensemble : si l'un
-    manque, le bloc entier disparaît. Pas de « 000 », pas de zéro de
-    remplissage. */
-export const dayTotals: SourcedFact<{
-  calls: string;
-  documents: string;
-  people: string;
-}> | null = NONE;
 
 /** Les secteurs pour lesquels nous construisons.
  *
@@ -224,15 +217,27 @@ export const dayTotals: SourcedFact<{
  *  Ces secteurs sont donc rendus comme ce qu'ils sont : les marchés pour
  *  lesquels le produit est construit. Ni statut, ni chiffre, ni « live ». Le
  *  titre de la section doit rester au futur ou au général, jamais au présent
- *  de constatation. Voir docs/FACTS-PRODUIT.md. */
+ *  de constatation. Voir docs/FACTS-PRODUIT.md.
+ *
+ *  Ordre revu le 2026-10-02, à la demande de Karim : l'audit reste un secteur
+ *  parmi d'autres, pas la pièce centrale. Viennent d'abord les secteurs des
+ *  deux cas montrés sur l'accueil (factures, help desk). */
 export const sectors: { name: string; blurb: string }[] = [
   {
-    name: 'Audit and assurance',
-    blurb: 'Evidence-grade workpapers, client acceptance and anti-money-laundering checks. Methodical at machine speed.',
+    name: 'Hospitality',
+    blurb: 'Calls answered at any hour, bookings taken, supplier paperwork read overnight.',
   },
   {
     name: 'Financial services',
     blurb: 'Cross-ledger answers, plain-language reports, decisions on current data.',
+  },
+  {
+    name: 'Retail and luxury',
+    blurb: 'Customer foresight, inventory risk, trends caught before the peak.',
+  },
+  {
+    name: 'Audit and assurance',
+    blurb: 'Evidence-grade workpapers, client acceptance and anti-money-laundering checks. Methodical at machine speed.',
   },
   {
     name: 'Legal services',
@@ -243,38 +248,68 @@ export const sectors: { name: string; blurb: string }[] = [
     name: 'Public sector',
     blurb: 'Triage incoming requests, route them across departments, draft the responses.',
   },
-  {
-    name: 'Retail and luxury',
-    blurb: 'Customer foresight, inventory risk, trends caught before the peak.',
-  },
-  {
-    name: 'Hospitality',
-    blurb: 'Calls answered at any hour, bookings taken, supplier paperwork read overnight.',
-  },
 ];
+
+/* ------------------------------------------------------------------ */
+/* Cas montrés sur l'accueil                                           */
+/* ------------------------------------------------------------------ */
+
+/** Les deux cas de l'accueil, anonymisés. Choisis et décrits par Karim le
+ *  2026-10-02.
+ *
+ *  RÈGLES D'ANONYMAT, à tenir dans le site ET dans ce dépôt, qui est public :
+ *  aucun nom de client, aucun nom de logiciel ou de système tiré de leurs
+ *  documents, aucun lieu, aucun nombre de sites ou d'établissements. Seuls
+ *  les descripteurs ci-dessous sont publiés.
+ *
+ *  Le cas voix est un prototype : aucune formulation ne doit le présenter
+ *  comme déployé (« live », « in production », « every day »…).
+ *
+ *  Dans les deux démonstrations, documents, montants, noms et numéros sont
+ *  fictifs, et le disent. */
+export const cases = {
+  invoices: {
+    client: 'A multi-restaurant hospitality group',
+    flow: 'Supplier invoices arrive in every format, get read, checked against the order and the supplier codes, and posted into the ERP. Anything uncertain is flagged with its reason, and a person validates it.',
+    source: 'Karim, 2026-10-02',
+  },
+  voice: {
+    client: 'An IT help desk at a European bank',
+    flow: 'Staff call, the line answers, confirms who they are, resets the password or unlocks the account, and opens a ticket for anything else.',
+    stage: 'prototype',
+    source: 'Karim, 2026-10-02',
+  },
+} as const;
 
 /* ------------------------------------------------------------------ */
 /* Page security                                                       */
 /* ------------------------------------------------------------------ */
 
-/** Les quatre réponses contractuelles. Chacune n'est rendue que si sourcée.
-    La page /security n'est liée depuis la navigation et le pied de page
-    qu'à partir de trois entrées sourcées. */
+/** Ce que la page /security peut mettre dans un contrat. Une entrée n'est
+    écrite ici qu'avec sa source. La page n'est liée depuis la navigation,
+    l'accueil et le pied de page qu'à partir de SECURITY_LINK_THRESHOLD
+    entrées. */
 export const contractAnswers: { title: string; body: string; source: string }[] = [
   // Les trois premières viennent de l'architecture réelle des plateformes,
   // lue dans les dépôts le 2026-08-31. Voir docs/FACTS-PRODUIT.md. Ce sont des
   // contraintes de conception, pas des intentions commerciales.
   {
     title: 'Who decides',
+    // Réécrit le 2026-10-02 : le mot « agent » est retiré du site (Syntexia est
+    // une couche d'intelligence), et la phrase « nothing is written back »
+    // ne valait que pour l'audit. Les factures, elles, sont passées dans
+    // l'ERP du client : la règle générale est donc le signalement motivé et
+    // la validation par une personne, la règle d'audit est gardée telle quelle.
     body:
-      'The agent prepares the file. The auditor validates it. Nothing is written back into your audit software by us, and no conclusion is reached without a person signing it.',
-    source: 'architecture des plateformes, README kreston-intelligence, 2026-08-31',
+      'Syntexia prepares the work, and a person decides. Anything uncertain is flagged with its reason and waits for someone to validate it. In audit, nothing is written back into your audit software by us, and no conclusion is reached without a person signing it.',
+    source:
+      "architecture des plateformes, README d'une des plateformes d'audit, 2026-08-31 ; principe de validation confirmé par Karim, 2026-10-02",
   },
   {
     title: 'Who else touches your data',
     body:
-      'Nobody. Each firm gets its own deployment, with its own rules and its own templates. We reuse the architecture between clients. We never reuse the data.',
-    source: 'architecture des plateformes, README ctng-intelligence, 2026-08-31',
+      'Nobody. Each organisation gets its own deployment, with its own rules and its own templates. We reuse the architecture between clients. We never reuse the data.',
+    source: "architecture des plateformes, README de la seconde plateforme d'audit, 2026-08-31",
   },
   {
     title: 'Where your files live',
@@ -312,8 +347,7 @@ export const pillarMetrics: Record<string, { value: string; label: string }[]> =
   // shows: [],
 };
 
-/** Nombre d'entrées sourcées requis pour lier /security depuis la navigation
-    et le pied de page. */
-export const SECURITY_LINK_THRESHOLD = 3;
+/** Nombre d'entrées sourcées requis pour lier /security. */
+const SECURITY_LINK_THRESHOLD = 3;
 
 export const securityIsLinked = contractAnswers.length >= SECURITY_LINK_THRESHOLD;

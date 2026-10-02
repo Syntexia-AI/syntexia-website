@@ -1,8 +1,8 @@
 ---
-// La démonstration du produit : l'agent prépare un dossier d'acceptation,
+// Démonstration audit : Syntexia prépare un dossier d'acceptation,
 // étape par étape, puis s'arrête et rend la main à l'auditeur.
 //
-// Code couleur de la direction (docs/DA-2026-10.md) : le travail de l'agent
+// Code couleur de la direction (docs/DA-2026-10.md) : le travail de Syntexia
 // est en cuivre (point d'activité, coches), la décision de la personne est en
 // noir (le bouton « Concluir fase de Aceitação » s'allume quand c'est à elle).
 //
@@ -27,6 +27,11 @@
 // contrepartie est caviardée, comme dans le produit.
 //
 // Sans JavaScript, le dossier s'affiche terminé, en attente de validation.
+//
+// Retirée de l'accueil le 2026-10-02 (l'audit devient un secteur parmi
+// d'autres). Gardée pour une future page sectorielle audit. Avant de la
+// réutiliser : la boucle doit pouvoir être arrêtée (WCAG 2.2.2), comme dans
+// InvoiceRun, qui ne joue qu'un passage et propose de le rejouer.
 
 const DOCS = [
   'Questionário de identificação do cliente',
@@ -55,7 +60,7 @@ const PHASES = [
     case, no customer data.
   </figcaption>
 
-  <div class="win">
+  <div class="win" lang="pt-PT">
     <ol class="rail" aria-hidden="true">
       {PHASES.map((p) => (
         <li class={p.current ? 'is-current' : undefined}>
@@ -79,7 +84,7 @@ const PHASES = [
           <span class="win-phase">Aceitação</span>
         </div>
         <div class="win-status">
-          <span class="agent" aria-hidden="true"></span>
+          <span class="pulse" aria-hidden="true"></span>
           <span data-status>Pendente de validação</span>
         </div>
       </header>
@@ -113,7 +118,7 @@ const PHASES = [
       </div>
 
       <footer class="win-foot">
-        <p class="hand">The agent prepares. The auditor validates.</p>
+        <p class="hand" lang="en">Syntexia prepares. The auditor validates.</p>
         <span class="validate" aria-hidden="true">Concluir fase de Aceitação</span>
       </footer>
     </div>
@@ -121,9 +126,9 @@ const PHASES = [
 </figure>
 
 <script>
-  // L'agent avance une étape toutes les 1,5 s tant que la démonstration est à
-  // l'écran, s'arrête sur « Pendente de validação », marque une pause, puis
-  // recommence. En mouvement réduit, rien ne bouge : le dossier reste terminé.
+  // La préparation avance d'une étape toutes les 1,5 s tant que la
+  // démonstration est à l'écran, s'arrête sur « Pendente de validação »,
+  // marque une pause, puis recommence. En mouvement réduit, rien ne bouge : le dossier reste terminé.
   const LABELS = [
     'A ler documentos',
     'A avaliar BCFT (Anexo 4b)',
@@ -321,9 +326,9 @@ const PHASES = [
     color: var(--stone);
   }
 
-  /* Le point d'activité de l'agent. Il respire tant qu'il travaille et
+  /* Le point d'activité de Syntexia. Il respire tant qu'il travaille et
      s'arrête quand il rend la main. */
-  .agent {
+  .pulse {
     width: 8px;
     height: 8px;
     border-radius: 50%;
@@ -331,7 +336,7 @@ const PHASES = [
     flex: none;
   }
 
-  .demo[data-run='on']:not(.is-ready) .agent {
+  .demo[data-run='on']:not(.is-ready) .pulse {
     animation: breathe 1.4s ease-in-out infinite;
   }
 
@@ -474,7 +479,7 @@ const PHASES = [
     opacity: 0;
   }
 
-  /* ---------- Pied : l'agent rend la main ---------- */
+  /* ---------- Pied : Syntexia rend la main ---------- */
 
   .win-foot {
     display: flex;
