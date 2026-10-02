@@ -48,43 +48,45 @@ const paperLabel = `Illustrative supplier invoice ${INVOICE.heading}, total ${IN
 ---
 
 <figure class="inv" data-inv data-step={FINAL}>
-  <div class="paper" role="img" aria-label={paperLabel} lang="pt-PT">
-    <p class="paper-head">{INVOICE.heading}</p>
-    <table>
-      <tbody>
-        <tr><td>Fornecedor</td><td class="n"><span class="redact"></span></td></tr>
-        <tr><td>NIF</td><td class="n"><span class="redact"></span></td></tr>
-        <tr><td>Encomenda</td><td class="n">{INVOICE_ORDER}</td></tr>
-      </tbody>
-    </table>
-    <div class="paper-rule"></div>
-    <table>
-      <tbody>
-        {LINES.map((l) => (
-          <tr>
-            <td>{l.label}</td>
-            <td class="n">
-              {l.flag ? (
-                <span class="circled">
-                  {l.value}
-                  <svg class="circle" viewBox="0 0 100 44" preserveAspectRatio="none">
-                    <path d="M8 24C9 10 34 4 56 5c22 1 39 7 38 19-1 12-24 16-47 15C24 38 7 34 8 22" pathLength="100"></path>
-                  </svg>
-                </span>
-              ) : (
-                l.value
-              )}
-            </td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-    <div class="paper-rule"></div>
-    <table>
-      <tbody>
-        <tr><td>{INVOICE.total?.label}</td><td class="n">{INVOICE.total?.value}</td></tr>
-      </tbody>
-    </table>
+  <div class="paper" role="img" aria-label={paperLabel}>
+    <div lang="pt-PT">
+      <p class="paper-head">{INVOICE.heading}</p>
+      <table>
+        <tbody>
+          <tr><td>Fornecedor</td><td class="n"><span class="redact"></span></td></tr>
+          <tr><td>NIF</td><td class="n"><span class="redact"></span></td></tr>
+          <tr><td>Encomenda</td><td class="n">{INVOICE_ORDER}</td></tr>
+        </tbody>
+      </table>
+      <div class="paper-rule"></div>
+      <table>
+        <tbody>
+          {LINES.map((l) => (
+            <tr>
+              <td>{l.label}</td>
+              <td class="n">
+                {l.flag ? (
+                  <span class="circled">
+                    {l.value}
+                    <svg class="circle" viewBox="0 0 100 44" preserveAspectRatio="none">
+                      <path d="M8 24C9 10 34 4 56 5c22 1 39 7 38 19-1 12-24 16-47 15C24 38 7 34 8 22" pathLength="100"></path>
+                    </svg>
+                  </span>
+                ) : (
+                  l.value
+                )}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <div class="paper-rule"></div>
+      <table>
+        <tbody>
+          <tr><td>{INVOICE.total?.label}</td><td class="n">{INVOICE.total?.value}</td></tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 
   <div class="win">
@@ -251,6 +253,8 @@ const paperLabel = `Illustrative supplier invoice ${INVOICE.heading}, total ${IN
     let played = false;
     new IntersectionObserver(
       (entries) => {
+        // Mouvement réduit activé en cours de visite : plus aucune passe.
+        if (reduced.matches) return;
         for (const e of entries) {
           if (e.isIntersecting && !played) {
             played = true;
