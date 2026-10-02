@@ -1,0 +1,490 @@
+---
+import { cases } from '../facts';
+
+// Voice AI : un appel au help desk informatique d'une banque européenne.
+// Cas décrit par Karim le 2026-10-02, anonymisé : voir cases.voice dans
+// facts.ts et ses règles d'anonymat (ce dépôt est public).
+//
+// C'est un prototype. Rien ici ne doit dire ou laisser entendre qu'il est
+// déployé : pas de « live », pas de compteur d'appels, pas de « every day ».
+//
+// Ce que montre l'appel, et rien de plus que le déroulé donné par Karim :
+// la ligne répond, confirme l'identité, débloque le compte, ouvre un ticket
+// pour le reste. Le moyen de confirmation (un code envoyé au téléphone
+// enregistré) est une hypothèse de rédaction, à faire valider.
+//
+// Noms, code et numéro de ticket sont fictifs, et le disent.
+//
+// Sans JavaScript, ou en mouvement réduit, l'appel s'affiche en entier.
+
+const LINES = [
+  { t: '00:00', who: 'line', text: 'IT help desk, good morning. How can I help?' },
+  {
+    t: '00:04',
+    who: 'caller',
+    text: 'Hi, I’m locked out of my account. I think I typed the wrong password too many times.',
+  },
+  {
+    t: '00:10',
+    who: 'line',
+    text: 'I can sort that out. First I need to confirm it’s you. I’ve just sent a code to the phone registered on your account. Can you read it to me?',
+  },
+  { t: '00:22', who: 'caller', text: 'Four, eight, two, seven, one, nine.' },
+  {
+    t: '00:27',
+    who: 'line',
+    text: 'Thank you, Marta, that’s confirmed. Your account is unlocked, you can sign in again now.',
+    acts: [0, 1],
+  },
+  {
+    t: '00:35',
+    who: 'caller',
+    text: 'It works. While I have you, my second screen stopped working this morning.',
+  },
+  {
+    t: '00:41',
+    who: 'line',
+    text: 'I’ve opened a ticket for your screen, reference HD-20418. The support team will contact you about it.',
+    acts: [2],
+  },
+  { t: '00:49', who: 'caller', text: 'Perfect, thank you.' },
+];
+
+const ACTIONS = [
+  { t: '00:27', text: 'Identity confirmed' },
+  { t: '00:27', text: 'Account unlocked' },
+  { t: '00:41', text: 'Ticket HD-20418 opened, second screen not working' },
+];
+
+const WHO: Record<string, string> = { line: 'Help desk', caller: 'Marta' };
+
+// La forme d'onde de l'en-tête : des hauteurs fixes, pas de hasard au rendu.
+const BARS = [3, 6, 10, 7, 12, 16, 9, 5, 11, 15, 8, 4, 7, 13, 10, 6, 3, 8, 12, 7, 4, 9, 6, 3];
+---
+
+<figure class="call" data-call>
+  <div class="panel">
+    <header class="panel-head">
+      <div class="panel-id">
+        <span class="panel-name">IT help desk</span>
+        <span class="wave" aria-hidden="true">
+          {BARS.map((h, i) => <i style={`--h:${h}px;--d:${(i % 6) * 90}ms`}></i>)}
+        </span>
+      </div>
+      <span class="clock tabular" data-clock>00:52</span>
+    </header>
+
+    <ol class="lines">
+      {LINES.map((l, i) => (
+        <li class={`line from-${l.who}`} data-line={i} data-t={l.t} data-acts={l.acts ? l.acts.join(',') : undefined}>
+          <span class="line-t tabular">{l.t}</span>
+          <span class="line-who">{WHO[l.who]}</span>
+          <p class="line-text">{l.text}</p>
+        </li>
+      ))}
+    </ol>
+
+    <div class="panel-foot">
+      <button class="replay" type="button" data-replay hidden>Replay the call</button>
+    </div>
+  </div>
+
+  <div class="call-actions">
+    <p class="call-actions-h">What the line did</p>
+    <ul>
+      {ACTIONS.map((a, i) => (
+        <li data-act={i}>
+          <svg class="tick" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.6l3.2 3.1L13 4.6"></path></svg>
+          <span class="act-text">{a.text}</span>
+          <span class="act-t tabular">{a.t}</span>
+        </li>
+      ))}
+    </ul>
+  </div>
+
+  <figcaption class="call-cap">
+    {cases.voice.client}. Fictional call, fictional names.
+  </figcaption>
+</figure>
+
+<script>
+  // L'appel se déroule une fois, quand il entre à l'écran. Chaque réplique
+  // apparaît après un temps proportionnel à sa longueur, l'horloge suit, les
+  // actions se cochent au moment où la ligne les annonce. À la fin, un bouton
+  // permet de rejouer l'appel.
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  document.querySelectorAll<HTMLElement>('[data-call]').forEach((root) => {
+    const lines = Array.from(root.querySelectorAll<HTMLElement>('[data-line]'));
+    const acts = Array.from(root.querySelectorAll<HTMLElement>('[data-act]'));
+    const clock = root.querySelector<HTMLElement>('[data-clock]');
+    const replay = root.querySelector<HTMLButtonElement>('[data-replay]');
+    if (!lines.length || !clock || !replay) return;
+    if (reduced.matches || !('IntersectionObserver' in window)) return;
+
+    const END = clock.textContent || '';
+    let timers: number[] = [];
+
+    const clear = () => {
+      timers.forEach((t) => window.clearTimeout(t));
+      timers = [];
+    };
+
+    const reset = () => {
+      clear();
+      root.dataset.play = 'on';
+      root.dataset.speaking = '';
+      lines.forEach((l) => l.classList.remove('is-said'));
+      acts.forEach((a) => a.classList.remove('is-done'));
+      clock.textContent = '00:00';
+      replay.hidden = true;
+    };
+
+    const play = () => {
+      reset();
+      let at = 300;
+      lines.forEach((line, i) => {
+        timers.push(
+          window.setTimeout(() => {
+            line.classList.add('is-said');
+            root.dataset.speaking = line.classList.contains('from-line') ? 'line' : 'caller';
+            clock.textContent = line.dataset.t || '';
+            (line.dataset.acts || '')
+              .split(',')
+              .filter(Boolean)
+              .forEach((k) => acts[Number(k)]?.classList.add('is-done'));
+          }, at)
+        );
+        const len = (line.querySelector('.line-text')?.textContent || '').length;
+        at += Math.min(2600, 700 + len * 18);
+        if (i === lines.length - 1) {
+          timers.push(
+            window.setTimeout(() => {
+              root.dataset.speaking = '';
+              clock.textContent = END;
+              replay.hidden = false;
+            }, at)
+          );
+        }
+      });
+    };
+
+    replay.addEventListener('click', play);
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (!e.isIntersecting) continue;
+          play();
+          io.disconnect();
+        }
+      },
+      { threshold: 0.35 }
+    );
+
+    // On ne cache rien de ce qui est déjà visible au chargement : l'appel
+    // reste affiché en entier, et le bouton permet de le rejouer.
+    const r = root.getBoundingClientRect();
+    if (r.top < window.innerHeight && r.bottom > 0) {
+      replay.hidden = false;
+      return;
+    }
+    io.observe(root);
+
+    reduced.addEventListener('change', (e) => {
+      if (!e.matches) return;
+      clear();
+      io.disconnect();
+      root.dataset.play = '';
+      lines.forEach((l) => l.classList.add('is-said'));
+      acts.forEach((a) => a.classList.add('is-done'));
+      clock.textContent = END;
+    });
+  });
+</script>
+
+<style>
+  .call {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--gap);
+    row-gap: 24px;
+    align-items: start;
+  }
+
+  /* ---------- Le panneau de l'appel ---------- */
+
+  .panel {
+    grid-column: 1 / span 8;
+    border: 1px solid var(--soot);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .panel-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 18px 26px;
+    border-bottom: 1px solid var(--soot);
+  }
+
+  .panel-id {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    min-width: 0;
+  }
+
+  .panel-name {
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--white);
+  }
+
+  .clock {
+    font-size: 14px;
+    color: var(--ash-2);
+  }
+
+  /* La forme d'onde : cuivre quand la ligne parle, cendre quand c'est
+     l'appelant, immobile sinon. */
+  .wave {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    height: 18px;
+  }
+
+  .wave i {
+    display: block;
+    width: 2px;
+    height: var(--h);
+    border-radius: 1px;
+    background: var(--soot-2);
+    transform-origin: center;
+    transition: background-color 0.3s ease;
+  }
+
+  .call[data-speaking='line'] .wave i {
+    background: var(--copper-lit);
+    animation: talk 0.7s ease-in-out infinite alternate;
+    animation-delay: var(--d);
+  }
+
+  .call[data-speaking='caller'] .wave i {
+    background: var(--ash);
+    animation: talk 0.7s ease-in-out infinite alternate;
+    animation-delay: var(--d);
+  }
+
+  @keyframes talk {
+    from {
+      transform: scaleY(0.35);
+    }
+    to {
+      transform: scaleY(1);
+    }
+  }
+
+  /* ---------- Les répliques ---------- */
+
+  .lines {
+    display: flex;
+    flex-direction: column;
+    padding: 10px 0;
+  }
+
+  .line {
+    display: grid;
+    grid-template-columns: 52px 92px minmax(0, 1fr);
+    gap: 16px;
+    align-items: baseline;
+    padding: 12px 26px;
+    transition:
+      opacity 0.4s ease,
+      transform 0.45s cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+
+  .call[data-play='on'] .line:not(.is-said) {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  .line-t {
+    font-size: 13px;
+    color: var(--ash-2);
+  }
+
+  .line-who {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 560;
+    color: var(--ash-2);
+  }
+
+  /* La ligne, c'est l'intelligence qui parle : son nom porte le point cuivre. */
+  .from-line .line-who {
+    color: var(--white);
+  }
+
+  .from-line .line-who::before {
+    content: '';
+    width: 7px;
+    height: 7px;
+    flex: none;
+    border-radius: 50%;
+    background: var(--copper-lit);
+  }
+
+  .line-text {
+    font-size: 18px;
+    line-height: 1.5;
+    color: var(--ash);
+    max-width: 52ch;
+  }
+
+  .from-line .line-text {
+    color: var(--white);
+  }
+
+  .panel-foot {
+    padding: 0 26px 18px;
+  }
+
+  .panel-foot:has(.replay[hidden]) {
+    display: none;
+  }
+
+  .replay {
+    appearance: none;
+    background: none;
+    border: 0;
+    padding: 6px 0;
+    font-family: var(--font-ui);
+    font-size: 15px;
+    font-weight: 560;
+    color: var(--white);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.3em;
+    cursor: pointer;
+  }
+
+  .replay:hover {
+    text-decoration-color: var(--copper-lit);
+  }
+
+  /* ---------- Ce que la ligne a fait ---------- */
+
+  .call-actions {
+    grid-column: 9 / -1;
+    padding-top: 18px;
+  }
+
+  .call-actions-h {
+    font-size: var(--t-small);
+    color: var(--ash-2);
+    margin-bottom: 14px;
+  }
+
+  .call-actions ul {
+    border-top: 1px solid var(--soot);
+  }
+
+  .call-actions li {
+    display: grid;
+    grid-template-columns: 18px minmax(0, 1fr) auto;
+    gap: 12px;
+    align-items: baseline;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--soot);
+    font-size: 16px;
+    line-height: 1.4;
+    color: var(--white);
+    transition: opacity 0.4s ease;
+  }
+
+  .act-t {
+    font-size: 13px;
+    color: var(--ash-2);
+  }
+
+  .tick {
+    width: 16px;
+    height: 16px;
+    align-self: center;
+    fill: none;
+    stroke: var(--copper-lit);
+    stroke-width: 1.9;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 20;
+    stroke-dashoffset: 0;
+    transition: stroke-dashoffset 0.38s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .call[data-play='on'] .call-actions li:not(.is-done) {
+    opacity: 0.35;
+  }
+
+  .call[data-play='on'] .call-actions li:not(.is-done) .tick {
+    stroke-dashoffset: 20;
+  }
+
+  .call-cap {
+    grid-column: 1 / span 8;
+    font-size: var(--t-small);
+    line-height: var(--lh-small);
+    color: var(--ash-2);
+  }
+
+  /* ---------- Adaptation ---------- */
+
+  @media (max-width: 1180px) {
+    .panel,
+    .call-cap {
+      grid-column: 1 / span 12;
+    }
+    .call-actions {
+      grid-column: 1 / span 12;
+      grid-row: 2;
+      padding-top: 0;
+    }
+    .call-cap {
+      grid-row: 3;
+    }
+  }
+
+  @media (max-width: 760px) {
+    .panel-head,
+    .panel-foot {
+      padding-inline: 18px;
+    }
+    .line {
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 4px 12px;
+      padding: 12px 18px;
+    }
+    .line-who {
+      grid-column: 1;
+      grid-row: 1;
+    }
+    .line-t {
+      grid-column: 2;
+      grid-row: 1;
+      text-align: right;
+    }
+    .line-text {
+      grid-column: 1 / -1;
+      font-size: 17px;
+    }
+    .wave {
+      display: none;
+    }
+  }
+</style>
