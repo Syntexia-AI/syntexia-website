@@ -5,6 +5,65 @@ Paquet de revue de la passe complète. Branche `refonte-2026-09`, 2026-08-31.
 
 ---
 
+## 0 bis. Passe du 2026-10-09, retours de Karim
+
+Sur `focus-automation-voice`, décrite dans `docs/DA-2026-10.md` (section
+« Recentrage du 2026-10-09 ») :
+
+- automatisation montrée comme une chaîne achats et finance en quatre
+  étapes, la démonstration de facture devenue l'étape 3 ;
+- factures en quatre langues (PT, ES, FR, EN), écran en anglais ;
+- Claude Partner Network et Claude Startups cités ensemble sous les boutons
+  de l'accueil, dans la bande partenariat, le pied de page et About ;
+- bas du site rééquilibré : trois derniers articles sur l'accueil, sujet de
+  chaque article affiché, deux articles ajoutés (automatisation, voix), page
+  Security et phrase de recrutement sorties de l'audit.
+
+À trancher avant la mise en ligne :
+
+1. **Le deck de Karim n'a pas été lu.** Le récit des quatre étapes suit son
+   message ; à relire contre le deck.
+2. **Les deux nouveaux articles** (`reading-the-invoice-is-the-easy-part`,
+   `what-a-phone-line-is-not-allowed-to-say`) sont signés « Syntexia » et
+   n'ont pas été relus par Karim. Leurs règles sont des règles de
+   conception, écrites comme telles (« Rules we build to »).
+3. **Troisième fiche équipe** : en attente de l'accord de la personne et de
+   ses éléments ; son nom n'entre dans ce dépôt public qu'après.
+
+Réglé pendant la passe : le nom « Claude Startups » et le statut de membre
+sont ceux de la page du programme (claude.com/programs/startups, consultée
+le 2026-10-09).
+
+## 0. État au 2026-10-02, à lire d'abord
+
+Ce paquet décrit l'état du 2026-08-31. Depuis, sur la branche
+`focus-automation-voice` :
+
+- **Astro 7.3.5**, sans adaptateur Vercel : le site est entièrement statique.
+  Astro 5.18.2 portait 34 alertes connues, dont une critique (exécution de
+  code à distance via l'optimisation d'images AVIF, corrigée seulement à
+  partir d'Astro 7.2.8). Avec Astro 7, `npm audit` et la base d'alertes de
+  GitHub n'en trouvent plus aucune.
+- **Le blocage de la section 1 peut revenir sur ta machine.** Astro 7 charge
+  des binaires natifs (compilateur, moteur Markdown, Vite 8). Si Windows les
+  bloque encore (« An Application Control policy has blocked this file »),
+  ne contourne pas la politique : la construction se fait de toute façon sur
+  GitHub Actions à chaque push et sur les serveurs de Vercel au déploiement.
+  Pour construire en local malgré tout : WSL (Ubuntu), où ces binaires sont
+  ceux de Linux.
+- La CSP est appliquée (plus en Report-Only), le formulaire de contact a été
+  retiré au profit des coordonnées directes, le standard est publié, la page
+  `/security` est liée, le mark en volume (section 9) a été remplacé par le
+  mark en points de la direction d'octobre (`docs/DA-2026-10.md`).
+- Le serveur de la section 8 n'existe plus. Les sections 2, 6 et 7 sont
+  historiques.
+- Décisions encore ouvertes : la formulation de la vérification d'identité
+  dans l'appel, la mention « between London and Lisbon » de la bio de Karim,
+  le portrait de Karim, la connexion de Vercel au dépôt, la visibilité du
+  dépôt (`DEPLOY-CHECKLIST.md`, étape 1).
+
+---
+
 ## 1. Blocages
 
 **Aucun blocage.** Les six portes sont passées. Un incident a demandé trois tentatives et une décision, il est résolu :
@@ -114,9 +173,9 @@ En revanche j'ai retiré les emphases dans les **titres** des articles (cinq `<e
 Captures Playwright, 1440 et 390, `prefers-reduced-motion` activé.
 
 - **Avant**, production actuelle, lecture seule : `docs/shots/before/` (12 captures, 6 routes)
-- **Après**, serveur local : `docs/shots/after/` (16 captures, 8 routes)
+- **Après**, site reconstruit : `docs/shots/after/` (22 captures, 11 routes), refaites le 2026-10-02 dans la direction d'octobre
 
-Correspondances : `home`, `about`, `team`, `blog`, `post-precedent`, `post-quiet-revolution`. Les routes `security` et `404` n'existent pas en production, elles n'ont pas de « avant ».
+Correspondances : `home`, `about`, `team`, `blog`, et pour les articles `post-precedent` / `post-precedent-meets-pace`, `post-quiet-revolution` / `post-the-quiet-revolution-coming-to-audit`. Les routes `security`, `legal`, `404` et les deux articles de septembre n'existent pas en production, elles n'ont pas de « avant ».
 
 La comparaison la plus parlante est `home-1440` : à gauche un hero avec badge, journal d'opérations défilant et bandeau marquee, à droite une journée de travail déclarée comme illustration.
 

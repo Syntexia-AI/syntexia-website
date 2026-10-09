@@ -3,6 +3,7 @@ title: "Precedent meets pace"
 description: "How AI is rewriting the economics of legal work, and why a profession built on precedent has no precedent for this."
 date: 2026-05-23
 author: "Karim Vissangy"
+topic: "Legal"
 ---
 
 The law is the only profession that builds its future entirely out of its past. Every argument leans on precedent, every contract on a clause that worked before, every piece of advice on the accumulated judgement of those who came earlier. It is a discipline engineered to move carefully, and for good reason. *Carelessness in law is not inefficiency; it is malpractice.*
@@ -27,7 +28,7 @@ The most useful way to understand the present moment is to look not at what AI m
 
 It is tempting to stop at the list of features. But the legal profession has specific, non-negotiable concerns, and any honest discussion of AI in law has to meet them directly.
 
-Confidentiality and professional secrecy (*sigilo profissional*) are not optional. A tool that processes privileged client material in an uncontrolled environment is not an efficiency gain; it is a liability. The firms adopting AI responsibly are the ones insisting on **data residency, controlled access, clear audit trails, and infrastructure that keeps client information within defined boundaries** rather than feeding it into open systems. The technology is only as trustworthy as the architecture around it.
+Confidentiality and professional secrecy (<em lang="pt-PT">sigilo profissional</em>) are not optional. A tool that processes privileged client material in an uncontrolled environment is not an efficiency gain; it is a liability. The firms adopting AI responsibly are the ones insisting on **data residency, controlled access, clear audit trails, and infrastructure that keeps client information within defined boundaries** rather than feeding it into open systems. The technology is only as trustworthy as the architecture around it.
 
 Equally, AI in law is not autonomous and should not be sold as such. It produces drafts, comparisons, and candidate answers. A qualified lawyer remains accountable for every output that reaches a client. The firms getting this right treat AI as an exceptionally capable junior, fast, tireless, and well-read, but always supervised.
 

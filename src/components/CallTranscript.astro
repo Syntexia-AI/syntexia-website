@@ -197,7 +197,8 @@ const BARS = [3, 6, 10, 7, 12, 16, 9, 5, 11, 15, 8, 4, 7, 13, 10, 6, 3, 8, 12, 7
         for (const e of entries) {
           if (!e.isIntersecting) continue;
           io.disconnect();
-          play();
+          // Mouvement réduit activé en cours de visite : l'appel reste entier.
+          if (!reduced.matches) play();
         }
       },
       { threshold: 0.35 }

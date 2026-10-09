@@ -15,7 +15,9 @@ import { pillarMetrics } from '../facts';
 //      facts.ts. Le wording est validé, pas les chiffres.
 //
 // L'auto-avance fait un seul tour, et s'arrête dès que le visiteur prend la
-// main (clic, clavier, focus d'un lecteur d'écran). Elle ne repart pas.
+// main (clic, clavier, focus d'un lecteur d'écran). Elle ne repart pas, et ne
+// démarre pas si les piliers sont déjà à l'écran au chargement : on ne
+// change pas un panneau que quelqu'un lit déjà.
 
 const PILLARS = [
   {
@@ -59,7 +61,7 @@ const PILLARS = [
        Le script pose les rôles d'onglets quand il les rend utilisables. -->
   <div class="tablist" aria-hidden="true" data-tablist>
     {PILLARS.map((p, i) => (
-      <button type="button" class="tab" id={`tab-${p.key}`} tabindex="-1" data-tab={i} data-key={p.key}>
+      <button type="button" class="tab" id={`tab-${p.key}`} tabindex="-1" data-tab={i}>
         {p.verb}<i class="dot" aria-hidden="true"></i><span class="progress" aria-hidden="true"></span>
       </button>
     ))}
@@ -94,16 +96,13 @@ const PILLARS = [
     if (!list || !tabs.length || tabs.length !== panels.length) return;
 
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const narrow = window.matchMedia('(max-width: 900px)');
 
     // Les panneaux sont tous rendus visibles par le HTML. C'est le script, et
     // lui seul, qui les replie en onglets accessibles.
     list.removeAttribute('aria-hidden');
     list.setAttribute('role', 'tablist');
     list.setAttribute('aria-label', 'What it does');
-    const orient = () => list.setAttribute('aria-orientation', narrow.matches ? 'horizontal' : 'vertical');
-    orient();
-    narrow.addEventListener('change', orient);
+    list.setAttribute('aria-orientation', 'vertical');
 
     tabs.forEach((tab, i) => {
       tab.setAttribute('role', 'tab');
@@ -192,7 +191,11 @@ const PILLARS = [
 
     show(0);
 
-    if (!reduced.matches && 'IntersectionObserver' in window) {
+    // Déjà à l'écran au chargement : pas d'avance automatique.
+    const r = root.getBoundingClientRect();
+    if (r.top < window.innerHeight && r.bottom > 0) userTook = true;
+
+    if (!reduced.matches && !userTook && 'IntersectionObserver' in window) {
       new IntersectionObserver(
         (entries) => {
           for (const e of entries) {

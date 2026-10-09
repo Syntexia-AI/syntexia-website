@@ -3,11 +3,15 @@
 Établi le 2026-09-02. À exécuter par un humain. Les commandes de réécriture et
 de poussée ne sont jamais lancées par l'agent.
 
-> **Mise à jour du 2026-10-02.** Le dépôt est **public** : l'API GitHub répond
-> `visibility: public`. Le constat ci-dessous (« privé aujourd'hui ») n'est donc
-> plus exact, et l'historique est lisible par tout le monde. Les noms de clients
-> ont été retirés des fichiers actuels le même jour ; ils restent dans
-> l'historique, comme les coordonnées décrites ici.
+> **Mise à jour du 2026-10-02.** Le constat ci-dessous date d'avant la
+> réécriture : l'option B a été exécutée (journal en fin de document) et
+> l'historique ne contient plus les coordonnées personnelles. Mais le dépôt
+> est **public** (l'API GitHub répond `visibility: public`), et l'historique
+> contient encore des noms de clients, dans les documents et le code d'avant
+> le 2026-10-02, et sur les branches `refonte-2026-09` et
+> `hotfix-install-signature`. Ils ont été retirés des fichiers actuels le
+> 2026-10-02. Les suites possibles sont dans `DEPLOY-CHECKLIST.md`, étapes 1
+> et 6.
 
 ---
 

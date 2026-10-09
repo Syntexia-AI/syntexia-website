@@ -3,6 +3,7 @@ title: "The order a firm works in"
 description: "Most AI tools for audit start at the interesting part. The work starts three steps earlier, and that is where it goes wrong."
 date: 2026-07-22
 author: "Syntexia"
+topic: "Audit"
 ---
 
 Ask a software vendor to show you AI for audit and you will be shown the fieldwork. Documents read, balances tied, exceptions raised. It demonstrates well, because it is the part that looks like work.

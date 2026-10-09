@@ -1,31 +1,28 @@
 ---
-// Document reproduit. C'est le seul endroit du site où la mono est du
-// contenu et non de la décoration. Données entièrement fictives.
+// Document reproduit. Avec le papier de la démonstration des factures, c'est
+// le seul endroit du site où la mono est du contenu et non de la décoration.
+// Données entièrement fictives (src/data/documents.ts).
 //
 // Chaque ligne lue et rapprochée de sa source porte une coche cuivre, la
 // marque de ce que fait Syntexia. Les lignes caviardées n'en portent pas : ce
 // que nous ne montrons pas, nous ne prétendons pas l'avoir montré.
 //
-// Les pièces sont en portugais : lang="pt-PT" pour que les lecteurs d'écran
-// les prononcent correctement.
-//
-// tick : numéro d'ordre de la première coche, pour que la page puisse les
-// tracer l'une après l'autre (variable --k).
-import type { DocumentRow } from '../data/documents';
+// Chaque pièce garde sa langue (portugais, espagnol, français, anglais) et
+// la déclare dans lang, pour que les lecteurs d'écran la prononcent
+// correctement.
+import type { SampleDocument } from '../data/documents';
 
 interface Props {
-  heading: string;
-  rows: DocumentRow[];
-  total?: DocumentRow;
-  tick?: number;
+  doc: SampleDocument;
   class?: string;
 }
-const { heading, rows, total, tick = 0, class: cls = '' } = Astro.props;
-
-let k = tick;
-const next = () => k++;
+const { doc, class: cls = '' } = Astro.props;
+const { heading, rows, total, lang } = doc;
+// Une pièce qui porte une ligne signalée n'a pas de coche sur son total : le
+// calcul est juste, mais la pièce n'est pas validée.
+const hasFlag = rows.some((r) => r.flagged);
 ---
-<div class={`sheet ${cls}`.trim()} lang="pt-PT">
+<div class={`sheet ${cls}`.trim()} lang={lang}>
   <p class="sheet-head">{heading}</p>
   <table>
     <tbody>
@@ -34,10 +31,21 @@ const next = () => k++;
           <td>{r.label}</td>
           <td class="n">{r.redacted ? <span class="black" role="img" aria-label="Redacted" lang="en"></span> : r.value}</td>
           <td class="t">
-            {!r.redacted && (
-              <svg class="tick" style={`--k:${next()}`} viewBox="0 0 16 16" aria-hidden="true">
-                <path d="M3 8.6l3.2 3.1L13 4.6"></path>
-              </svg>
+            {r.flagged ? (
+              <>
+                <svg class="tick flag" viewBox="0 0 16 16" aria-hidden="true">
+                  <circle cx="8" cy="8" r="6.6"></circle>
+                  <path d="M8 4.6v4.4"></path>
+                  <path d="M8 11.3v.1"></path>
+                </svg>
+                <span class="sr-only" lang="en">Flagged</span>
+              </>
+            ) : (
+              !r.redacted && (
+                <svg class="tick" viewBox="0 0 16 16" aria-hidden="true">
+                  <path d="M3 8.6l3.2 3.1L13 4.6"></path>
+                </svg>
+              )
             )}
           </td>
         </tr>
@@ -53,9 +61,11 @@ const next = () => k++;
             <td>{total.label}</td>
             <td class="n">{total.value}</td>
             <td class="t">
-              <svg class="tick" style={`--k:${next()}`} viewBox="0 0 16 16" aria-hidden="true">
-                <path d="M3 8.6l3.2 3.1L13 4.6"></path>
-              </svg>
+              {!hasFlag && (
+                <svg class="tick" viewBox="0 0 16 16" aria-hidden="true">
+                  <path d="M3 8.6l3.2 3.1L13 4.6"></path>
+                </svg>
+              )}
             </td>
           </tr>
         </tbody>
@@ -132,8 +142,6 @@ const next = () => k++;
     stroke-width: 1.9;
     stroke-linecap: round;
     stroke-linejoin: round;
-    stroke-dasharray: 20;
-    stroke-dashoffset: 0;
   }
 
   @media (max-width: 760px) {

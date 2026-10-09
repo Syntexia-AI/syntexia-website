@@ -3,9 +3,16 @@ import Base from '../layouts/Base.astro';
 import FullStop from '../components/FullStop.astro';
 import { linkedinCompany, contactEmail, team, hardRules } from '../facts';
 
-// Deux fiches. Noms, fonctions et biographies viennent de facts.ts, qui en
-// porte les sources. Un portrait n'est rendu que s'il a été fourni par la
-// personne : sinon sa colonne reste vide, sans silhouette ni initiales.
+// Une fiche par personne de team, dans facts.ts, qui porte les sources des
+// noms, fonctions et biographies. Une fiche n'est ajoutée qu'avec l'accord
+// écrit de la personne, et son nom n'apparaît dans ce dépôt public qu'après
+// cet accord. Un portrait n'est rendu que
+// s'il a été fourni par la personne : sinon sa colonne reste vide, sans
+// silhouette ni initiales.
+//
+// Recrutement, réécrit le 2026-10-09 pour sortir de l'audit (retours de
+// Karim). Avant : « If you have run audits, answered phones for a living, or
+// built systems that other people depend on, write to us. »
 //
 // Les portraits passent en noir et blanc par CSS, pour que des photos prises
 // dans des lumières différentes tiennent ensemble dans la palette du site.
@@ -97,9 +104,8 @@ const rules = hardRules.map((r) => {
   <section class="band team-more">
     <div class="wrap">
       <p class="hiring">
-        We are hiring for the work we cannot do fast enough. If you have run audits,
-        answered phones for a living, or built systems that other people depend on,
-        write to us.
+        We are hiring for the work we cannot do fast enough. If you have done the work we
+        automate, or you build systems other people depend on, write to us.
       </p>
       <p class="team-links">
         <a class="text-link" href={`mailto:${contactEmail.value}`}>{contactEmail.value}</a>

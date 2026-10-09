@@ -1,0 +1,147 @@
+---
+import { programmes } from '../facts';
+
+// Les programmes Anthropic dont Syntexia fait partie, en texte seul.
+// Demandé par Karim le 2026-10-09 : le partenariat se perdait au milieu de
+// l'accueil. Les deux programmes sont montrés ensemble, à trois endroits :
+// sous les boutons de l'accueil (hero), dans le pied de page (footer), et en
+// registre pleine largeur dans la bande partenariat et sur About (register).
+//
+// Aucun logo Anthropic ni Claude : nous n'avons pas d'autorisation d'usage
+// de leur marque. Les noms et les statuts viennent de facts.ts, qui en porte
+// les sources ; un programme absent de facts.ts disparaît partout à la fois.
+// Un nom devient un lien dès qu'une URL publique est renseignée.
+
+interface Props {
+  variant: 'hero' | 'footer' | 'register';
+}
+const { variant } = Astro.props;
+---
+
+{programmes.length > 0 && variant === 'hero' && (
+  <div class="progs-hero">
+    <p class="progs-label">Anthropic programmes</p>
+    <dl>
+      {programmes.map((p) => (
+        <div>
+          <dt>{p.url ? <a href={p.url} rel="noopener">{p.name}</a> : p.name}</dt>
+          <dd>{p.status}</dd>
+        </div>
+      ))}
+    </dl>
+  </div>
+)}
+
+{programmes.length > 0 && variant === 'footer' && (
+  <ul class="progs-footer" aria-label="Anthropic programmes">
+    {programmes.map((p) => (
+      <li>
+        {p.url ? <a href={p.url} rel="noopener">{p.name}</a> : p.name}, {p.status}
+      </li>
+    ))}
+  </ul>
+)}
+
+{programmes.length > 0 && variant === 'register' && (
+  <dl class="progs-register">
+    {programmes.map((p) => (
+      <div>
+        <dt>{p.url ? <a href={p.url} rel="noopener">{p.name}</a> : p.name}</dt>
+        <dd>{p.status}</dd>
+      </div>
+    ))}
+  </dl>
+)}
+
+<style>
+  /* ---------- Sous les boutons de l'accueil ---------- */
+
+  .progs-hero {
+    padding-top: 16px;
+    border-top: 1px solid var(--rule);
+  }
+
+  .progs-label {
+    font-size: 13px;
+    line-height: 1.4;
+    color: var(--meta);
+  }
+
+  .progs-hero dl {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px clamp(28px, 3vw, 48px);
+    margin-top: 12px;
+  }
+
+  .progs-hero dt {
+    font-size: 16px;
+    font-weight: 560;
+    letter-spacing: -0.01em;
+    color: var(--fg);
+  }
+
+  .progs-hero dd {
+    margin: 2px 0 0;
+    font-size: 14px;
+    color: var(--meta);
+  }
+
+  /* ---------- Pied de page ---------- */
+
+  .progs-footer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 28px;
+    font-size: 13.5px;
+    line-height: 1.5;
+    color: var(--meta);
+    max-width: none;
+  }
+
+  /* ---------- Registre pleine largeur ---------- */
+
+  .progs-register {
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .progs-register div {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px 32px;
+    padding-block: clamp(18px, 2.2vw, 30px);
+    border-top: 1px solid var(--rule);
+  }
+
+  .progs-register dt {
+    font-size: clamp(28px, 3.6vw, 54px);
+    line-height: 1.04;
+    letter-spacing: -0.034em;
+    font-weight: var(--w-title);
+    color: var(--fg);
+  }
+
+  .progs-register dd {
+    margin: 0;
+    font-size: 16px;
+    color: var(--meta);
+  }
+
+  .progs-hero a,
+  .progs-footer a,
+  .progs-register a {
+    text-decoration-color: var(--meta);
+  }
+
+  /* Sur téléphone, le statut passe toujours sous le nom, pour que les deux
+     lignes du registre se ressemblent. */
+  @media (max-width: 760px) {
+    .progs-register div {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 6px;
+    }
+  }
+</style>

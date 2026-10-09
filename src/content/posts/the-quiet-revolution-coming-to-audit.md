@@ -3,6 +3,7 @@ title: "The quiet revolution coming to audit"
 description: "How artificial intelligence is beginning to reshape one of the world's most methodical professions."
 date: 2026-04-15
 author: "Syntexia Editorial"
+topic: "Audit"
 ---
 
 Audit is, by design, a deliberate profession. It moves at the pace of evidence. It is bound by standards, shaped by regulation, and grounded in professional scepticism. These are strengths, not weaknesses: they are why audit matters to capital markets, to regulators, and to the public interest.

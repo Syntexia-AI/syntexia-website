@@ -76,7 +76,7 @@ Les trois aggravations non portées par la directive :
 2. Deux des cinq personnes portent le **même** numéro de mobile (`install-signature.html:311` et `:320`).
 3. `install-signature.html:300` attribue la fonction de CTO à une personne, pendant que `team.html:93-94` l attribue à une autre. Le site publie deux CTO.
 
-Le repo contient par ailleurs `_internal/` (qui ajoute une sixième adresse nominative, pour une sixième personne absente de la liste des cinq), `avatars/` (1,6 Mo d'images personnelles d un dirigeant, marquées `# Personal assets (NEVER ship)` dans `DEPLOY.md:103`), `_scripts/`, `screenshots/`, et `DEPLOY.md` lui-même qui expose le sous-domaine client `tcaintelligence.syntexia.ai` et la configuration Google Workspace. `.vercelignore` les exclut du site, `.gitignore` ne les exclut pas de GitHub.
+Le repo contient par ailleurs `_internal/` (qui ajoute une sixième adresse nominative, pour une sixième personne absente de la liste des cinq), `avatars/` (1,6 Mo d'images personnelles d un dirigeant, marquées `# Personal assets (NEVER ship)` dans `DEPLOY.md:103`), `_scripts/`, `screenshots/`, et `DEPLOY.md` lui-même qui expose un sous-domaine client et la configuration Google Workspace. `.vercelignore` les exclut du site, `.gitignore` ne les exclut pas de GitHub.
 
 C'est le point 0 de W1, et la partie qui compte (réécriture d'historique, force push, désindexation) relève de l'humain. Procédure en TODO-HUMAIN 1.
 

@@ -478,9 +478,20 @@ a:hover {
 
 .footer-legal {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 14px;
   color: var(--meta);
+}
+
+/* Le mark s'aligne sur la première ligne, la mention légale. */
+.footer-legal .mark {
+  margin-top: 4px;
+}
+
+.footer-lines {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .footer-legal small {

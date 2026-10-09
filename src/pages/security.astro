@@ -2,7 +2,7 @@
 import Base from '../layouts/Base.astro';
 import Sheet from '../components/Sheet.astro';
 import { contractAnswers, securityIsLinked } from '../facts';
-import { INVOICE, BALANCE, TIMESHEET } from '../data/documents';
+import { INVOICE, FACTURA_ES, LIVRAISON_FR, CALL_SUMMARY } from '../data/documents';
 
 // Ce que Syntexia peut mettre dans un contrat, et ce que ce site ne fait pas.
 // Chaque réponse vient de contractAnswers dans facts.ts, avec sa source ; la
@@ -10,39 +10,46 @@ import { INVOICE, BALANCE, TIMESHEET } from '../data/documents';
 // moins trois (securityIsLinked). Tant qu'elle ne l'est pas, elle n'est ni
 // indexée ni dans le plan du site.
 //
-// Les trois documents sont entièrement fictifs (src/data/documents.ts). Ils
+// Rééquilibrée le 2026-10-09 (retours de Karim : le bas du site penchait
+// vers l'audit). Le titre ne reprend plus l'ancien titre des factures, les
+// pièces ne sont plus une balance et une feuille de temps mais ce que
+// traitent les deux offres de l'accueil : des pièces d'achat en trois
+// langues et le résumé d'un appel, celui de la démonstration voix.
+//
+// Toutes les pièces sont entièrement fictives (src/data/documents.ts). Elles
 // illustrent une forme, pas un client.
 ---
 
 <Base
   title="What Syntexia can put in a contract"
-  description="What the systems read, and what this website does not do."
+  description="The limits our systems work within, for your orders, invoices, calls and files, and what this website does not do."
   path="/security"
   noindex={!securityIsLinked}
 >
   <section class="section first">
     <div class="shell split">
       <div>
-        <h1>We read the paperwork nobody wants to read.</h1>
+        <h1>What we can put in a contract.</h1>
         <p class="lead">
-          Supplier invoices, trial balances, timesheets, audit working papers. Read,
-          checked against the source, and prepared inside the software your team already uses.
+          Our systems work within limits we can write into a contract, for your orders,
+          invoices, calls and files. Here they are, with what this website does not do.
         </p>
-        <p class="acts"><a class="btn btn-primary" href="/#contact">Send us a document</a></p>
+        <p class="acts"><a class="btn btn-primary" href="/#contact">Book a call</a></p>
       </div>
 
       <div class="pile">
-        <Sheet heading={INVOICE.heading} rows={INVOICE.rows} total={INVOICE.total} />
-        <Sheet heading={BALANCE.heading} rows={BALANCE.rows} total={BALANCE.total} />
-        <Sheet heading={TIMESHEET.heading} rows={TIMESHEET.rows} />
-        <p class="legend">Illustrative documents. No customer data.</p>
+        <Sheet doc={INVOICE} />
+        <Sheet doc={FACTURA_ES} />
+        <Sheet doc={LIVRAISON_FR} />
+        <Sheet doc={CALL_SUMMARY} />
+        <p class="legend">Illustrative documents in four languages. No customer data.</p>
       </div>
     </div>
   </section>
 
-  <section class="section">
+  <section class="section" aria-labelledby="answers-title">
     <div class="shell">
-      <h2>What we can put in a contract</h2>
+      <h2 id="answers-title">The answers</h2>
       <div class="answers">
         {contractAnswers.map((a) => (
           <div class="answer">
@@ -51,7 +58,6 @@ import { INVOICE, BALANCE, TIMESHEET } from '../data/documents';
           </div>
         ))}
       </div>
-
     </div>
   </section>
 </Base>
@@ -59,15 +65,19 @@ import { INVOICE, BALANCE, TIMESHEET } from '../data/documents';
 <style>
   .first { border-top: 0; }
   .split { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-9); align-items: start; }
-  .lead { margin-top: var(--s-5); font-size: var(--t-body); }
+  .lead { margin-top: var(--s-5); font-size: var(--t-lead); line-height: 1.45; max-width: 36ch; }
   .acts { margin-top: var(--s-6); }
   .pile { display: flex; flex-direction: column; gap: var(--s-4); }
   .legend { font-size: var(--t-small); color: var(--meta); margin-top: var(--s-2); }
   .answers {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: var(--s-6);
+    gap: var(--s-7) var(--s-6);
     margin-top: var(--s-6);
+  }
+  .answer {
+    padding-top: var(--s-4);
+    border-top: 1px solid var(--rule);
   }
   .answer p { margin-top: var(--s-3); }
   @media (max-width: 860px) {

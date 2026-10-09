@@ -101,7 +101,9 @@ export const phone: SourcedFact<{ display: string; dial: string }> = {
     Cela ne démontre pas l'absence de partenariat : un annuaire peut être
     partiel ou en retard. C'est pourquoi le statut est « non sourcé » et non
     « faux ». Question de revue ouverte, voir docs/REVIEW.md. */
-export const partnerNetworkUrl: SourcedFact<string> | null = NONE;
+// Typée explicitement : sans le cast, TypeScript la réduit à null dans ce
+// fichier et refuse tout accès à .value plus bas.
+export const partnerNetworkUrl = NONE as SourcedFact<string> | null;
 
 /** Appartenance au réseau partenaire, sans URL publique.
  *
@@ -114,8 +116,16 @@ export const partnerNetworkUrl: SourcedFact<string> | null = NONE;
  *  mention est rendue, sobrement et sans lien, tant qu'aucune URL n'existe.
  *  Dès qu'une annonce publique sort, renseigner partnerNetworkUrl au dessus :
  *  la mention deviendra cliquable toute seule. */
-export const partnerNetwork: SourcedFact<{ tier: string; programme: string }> | null = {
-  value: { tier: 'Registered Partner', programme: 'Anthropic Claude Partner Network' },
+export const partnerNetwork: SourcedFact<{ tier: string; programme: string; description: string }> | null = {
+  // description : les mots d'Anthropic, page d'annonce du programme
+  // (anthropic.com/news/claude-partner-network), consultée le 2026-10-09 :
+  // « a program for partner organizations helping enterprises adopt
+  // Claude ». Le niveau n'y figure pas : il vient du post de la société.
+  value: {
+    tier: 'Registered Partner',
+    programme: 'Claude Partner Network',
+    description: 'Anthropic’s programme for partner organisations helping enterprises adopt Claude',
+  },
   // Le niveau exact vient du post public de la société : « Syntexia.AI is an
   // official Registered Partner in the Anthropic Claude Partner Network, the
   // programme through which Anthropic supports the firms putting Claude into
@@ -124,6 +134,43 @@ export const partnerNetwork: SourcedFact<{ tier: string; programme: string }> | 
   // supérieurs, et la Services Track est la voie pour y monter.
   source: 'publication LinkedIn de Syntexia.AI, plus validation Karim du 2026-09-01',
 };
+
+/** Programme startups d'Anthropic. Ajouté le 2026-10-09, retours de Karim :
+ *  « We're in the Claude Partner Network and in Claude Startups, so show both
+ *  together near the main buttons, and also in the footer and on About. »
+ *
+ *  Appartenance : déclaration de Karim, du même type que la validation du
+ *  partenariat ci-dessus. Nom et statut vérifiés le 2026-10-09 sur la page
+ *  du programme, https://claude.com/programs/startups : titre « Claude
+ *  Startups », participants appelés « members ». */
+export const startupProgramme: SourcedFact<{ name: string; status: string }> | null = {
+  value: { name: 'Claude Startups', status: 'Member' },
+  source:
+    'appartenance : Karim, 2026-10-09 ; nom et statut : claude.com/programs/startups, consulté le 2026-10-09',
+};
+
+/** Les programmes Anthropic, dans l'ordre d'affichage. Rendus en texte, sans
+ *  logo : nous n'avons pas d'autorisation d'usage de leur marque. Accueil
+ *  (sous les boutons et dans la bande partenariat), pied de page et About
+ *  lisent tous cette liste, qui ne contient que des faits renseignés. */
+export interface Programme {
+  name: string;
+  status: string;
+  url: string | null;
+}
+
+export const programmes: Programme[] = [
+  partnerNetwork && {
+    name: partnerNetwork.value.programme,
+    status: partnerNetwork.value.tier,
+    url: partnerNetworkUrl ? partnerNetworkUrl.value : null,
+  },
+  startupProgramme && {
+    name: startupProgramme.value.name,
+    status: startupProgramme.value.status,
+    url: null,
+  },
+].filter((p): p is Programme => Boolean(p));
 
 /** Les deux règles dures du produit, énoncées publiquement par le CTO.
     Elles disent en une ligne ce que la page /security développe. */
@@ -224,8 +271,11 @@ export const team: {
  *  deux cas montrés sur l'accueil (factures, help desk). */
 export const sectors: { name: string; blurb: string }[] = [
   {
+    // Réécrit le 2026-10-09 sur le récit achats et finance demandé par Karim.
+    // L'ancienne version : « Calls answered at any hour, bookings taken,
+    // supplier paperwork read overnight. »
     name: 'Hospitality',
-    blurb: 'Calls answered at any hour, bookings taken, supplier paperwork read overnight.',
+    blurb: 'Orders drafted from the forecast and bought at one agreed price for every site. Calls answered at any hour.',
   },
   {
     name: 'Financial services',
@@ -260,18 +310,49 @@ export const sectors: { name: string; blurb: string }[] = [
  *  RÈGLES D'ANONYMAT, à tenir dans le site ET dans ce dépôt, qui est public :
  *  aucun nom de client, aucun nom de logiciel ou de système tiré de leurs
  *  documents, aucun lieu, aucun nombre de sites ou d'établissements. Seuls
- *  les descripteurs ci-dessous sont publiés.
+ *  les descripteurs ci-dessous sont publiés. Depuis le 2026-10-09 : aucun nom
+ *  de programme ni de concours non plus, et aucun chiffre, sauf une cible
+ *  présentée comme telle.
  *
  *  Le cas voix est un prototype : aucune formulation ne doit le présenter
  *  comme déployé (« live », « in production », « every day »…).
  *
- *  Dans les deux démonstrations, documents, montants, noms et numéros sont
- *  fictifs, et le disent. */
+ *  Dans les démonstrations, documents, montants, quantités, noms et numéros
+ *  sont fictifs, et le disent. */
 export const cases = {
-  invoices: {
+  /** Recentré le 2026-10-09 à la demande de Karim : montrer l'automatisation
+   *  des achats et de la finance plutôt que la lecture de factures, que
+   *  d'autres copient facilement. Le récit est le sien, en quatre temps :
+   *  commandes tirées de la prévision, un seul meilleur prix pour tous les
+   *  sites, facture contrôlée contre la commande et le prix, rapprochement et
+   *  clôture comme sous-produits. La démonstration de facture devient
+   *  l'étape 3. L'ancien texte : « Supplier invoices arrive in every format,
+   *  get read, checked against the order and the supplier codes, and posted
+   *  into the ERP. Anything uncertain is flagged with its reason, and a
+   *  person validates it. » */
+  automation: {
     client: 'A multi-restaurant hospitality group',
-    flow: 'Supplier invoices arrive in every format, get read, checked against the order and the supplier codes, and posted into the ERP. Anything uncertain is flagged with its reason, and a person validates it.',
-    source: 'Karim, 2026-10-02',
+    flow: 'Purchasing and finance run as one flow, from the forecast to the close. Reading the invoice is one step of four.',
+    rule: 'Anything uncertain is flagged with its reason, and a person decides. It works in almost any business that buys from suppliers.',
+    steps: [
+      {
+        title: 'Orders follow the forecast',
+        body: 'Each site’s order is drafted from what it expects to use and what it already has in stock. The person who runs the site confirms it.',
+      },
+      {
+        title: 'One best price, every site',
+        body: 'Every site orders at the best price the group has agreed, from the supplier that holds it.',
+      },
+      {
+        title: 'Invoices checked against order and price',
+        body: 'Invoices arrive in any language and any format. Each line is read and checked against the order and the agreed price, and a difference is flagged with its reason.',
+      },
+      {
+        title: 'The close as a by-product',
+        body: 'Orders, deliveries and invoices are matched as they arrive, so the month-end close starts from lines that already agree.',
+      },
+    ],
+    source: 'Karim, 2026-10-02 pour le cas ; récit en quatre étapes, Karim, retours du 2026-10-09',
   },
   voice: {
     client: 'An IT help desk at a European bank',
@@ -290,20 +371,37 @@ export const cases = {
     l'accueil et le pied de page qu'à partir de SECURITY_LINK_THRESHOLD
     entrées. */
 export const contractAnswers: { title: string; body: string; source: string }[] = [
-  // Les trois premières viennent de l'architecture réelle des plateformes,
-  // lue dans les dépôts le 2026-08-31. Voir docs/FACTS-PRODUIT.md. Ce sont des
-  // contraintes de conception, pas des intentions commerciales.
+  // « Who decides », « Who else touches your data » et « Where your files
+  // live » viennent de l'architecture réelle des plateformes, lue dans les
+  // dépôts le 2026-08-31 (docs/FACTS-PRODUIT.md) : des contraintes de
+  // conception, pas des intentions commerciales. « What the phone line
+  // does » reprend le cas voix décrit par Karim le 2026-10-02.
   {
     title: 'Who decides',
     // Réécrit le 2026-10-02 : le mot « agent » est retiré du site (Syntexia est
     // une couche d'intelligence), et la phrase « nothing is written back »
-    // ne valait que pour l'audit. Les factures, elles, sont passées dans
-    // l'ERP du client : la règle générale est donc le signalement motivé et
-    // la validation par une personne, la règle d'audit est gardée telle quelle.
+    // ne valait que pour l'audit.
+    // Réécrit le 2026-10-09 pour rééquilibrer la page hors audit (retours de
+    // Karim) : la règle d'audit tient désormais en une proposition, à côté de
+    // celle des écritures ERP, qui reprend l'état final de la démonstration
+    // des factures (« Entry prepared, posted once validated »). La version
+    // précédente finissait par : « In audit, nothing is written back into
+    // your audit software by us, and no conclusion is reached without a
+    // person signing it. »
     body:
-      'Syntexia prepares the work, and a person decides. Anything uncertain is flagged with its reason and waits for someone to validate it. In audit, nothing is written back into your audit software by us, and no conclusion is reached without a person signing it.',
+      'Syntexia prepares the work, and a person decides. Anything uncertain is flagged with its reason and waits for someone to validate it before it reaches your ERP. In audit, no conclusion is reached without a person signing it.',
     source:
       "architecture des plateformes, README d'une des plateformes d'audit, 2026-08-31 ; principe de validation confirmé par Karim, 2026-10-02",
+  },
+  {
+    // Ajouté le 2026-10-09 : la page ne parlait que de documents. Le contenu
+    // est celui du cas voix décrit par Karim le 2026-10-02 (la ligne confirme
+    // qui appelle avant d'agir, ouvre un ticket pour tout le reste), sans
+    // rien y ajouter.
+    title: 'What the phone line does',
+    body:
+      'It confirms who is calling before it acts on an account, and anything it is not set up to handle becomes a ticket for your team.',
+    source: 'cas voix décrit par Karim, 2026-10-02 (cases.voice)',
   },
   {
     title: 'Who else touches your data',
