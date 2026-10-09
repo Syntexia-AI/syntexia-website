@@ -5,6 +5,16 @@ Une ligne par fait. Source obligatoire. Sans source, le fait n'entre pas sur le 
 **État au 2026-08-31, après la passe complète.** Trois lignes sont passées en VÉRIFIÉ ou TRANCHÉ pendant la passe : la raison sociale (source tierce Companies House), la forme canonique (décision), la date de l article audit. Tout le reste est vide, et tout ce qui est vide est absent du site.
 
 Ce fichier est à remplir par Karim et Baptiste. W1 ne démarre pas avant.
+
+**Ajouts du 2026-10-09** (retours de Karim), reportés dans `src/facts.ts` :
+
+```
+claude_partner_network: statut=Registered Partner | source: publication LinkedIn de la société, validation Karim du 2026-09-01 | statut: VALIDÉ EN INTERNE (aucune URL publique)
+claude_startups: nom=Claude Startups, statut=Member | source: appartenance Karim, 2026-10-09 ; nom et statut claude.com/programs/startups, consulté le 2026-10-09 | statut: VÉRIFIÉ pour le nom, VALIDÉ EN INTERNE pour l'appartenance
+recit_achats_finance: quatre étapes (prévision, meilleur prix tous sites, facture contre commande et prix, rapprochement et clôture) | source: message de Karim du 2026-10-09 | statut: À RELIRE contre son deck
+articles_2026-10-09: reading-the-invoice-is-the-easy-part, what-a-phone-line-is-not-allowed-to-say | auteur: Syntexia | statut: À VALIDER (Karim)
+troisieme_fiche_equipe: | statut: EN ATTENTE de l'accord de la personne (nom non publié dans ce dépôt avant), puis titre, bio courte, photo, LinkedIn
+```
 Chaque ligne renseignée doit basculer la ligne correspondante de `docs/CLAIMS.md`.
 
 ```

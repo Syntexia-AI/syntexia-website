@@ -1,22 +1,39 @@
 ---
 import { cases } from '../facts';
-import { INVOICE, INVOICE_LINES, INVOICE_ORDER } from '../data/documents';
+import {
+  INVOICE,
+  INBOX,
+  LINES,
+  FLAGGED,
+  ORDER_REF,
+  INVOICE_TOTAL,
+  AGREED_PRICE,
+  INVOICED_PRICE,
+  PRICE_GAP,
+} from '../data/documents';
 
-// Automatisation des factures fournisseurs, le visuel principal de l'accueil.
-// Cas décrit par Karim le 2026-10-02, anonymisé : voir cases.invoices dans
-// facts.ts et ses règles d'anonymat (ce dépôt est public).
+// La facture, troisième des quatre étapes de la démonstration des achats
+// (AutomationFlow). Cas décrit par Karim le 2026-10-02, anonymisé : voir
+// cases.automation dans facts.ts et ses règles d'anonymat (ce dépôt est
+// public).
 //
 // Ce que la démonstration raconte, et rien de plus :
-//   la facture arrive (n'importe quel format), elle est lue, rapprochée du
-//   code fournisseur et de la commande, l'écriture ERP est préparée ; ce qui
+//   la facture arrive, dans n'importe quelle langue et n'importe quel format
+//   (la boîte de réception en montre quatre : portugais, espagnol, français,
+//   anglais) ; elle est lue, rapprochée du code fournisseur, de la commande
+//   et du prix convenu à l'étape 2 ; l'écriture ERP est préparée ; ce qui
 //   est incertain est signalé avec sa raison, et une personne valide.
+//
+// Depuis le 2026-10-09, l'écran est entièrement en anglais, montants
+// compris, alors que la pièce garde sa langue et ses conventions : chaque
+// ligne porte son nom au catalogue, avec en dessous le texte imprimé.
 //
 // Code couleur de la direction (docs/DA-2026-10.md) : ce que fait Syntexia est
 // en cuivre (point d'activité, coches, cercle sur le papier, signalement),
 // la décision de la personne est en noir (le bouton s'allume quand c'est à
 // elle).
 //
-// Tout est fictif : pièce, montants, codes, numéros (src/data/documents.ts).
+// Tout est fictif : pièces, montants, codes, numéros (src/data/documents.ts).
 // Le fournisseur et son NIF sont caviardés. Aucun nom de logiciel, aucun lieu.
 //
 // Mouvement : une seule passe, quand la démonstration entre à l'écran, puis
@@ -25,55 +42,47 @@ import { INVOICE, INVOICE_LINES, INVOICE_ORDER } from '../data/documents';
 // la démonstration est déjà visible au chargement, l'état final s'affiche
 // d'emblée : écriture prête, une ligne signalée, en attente de validation.
 
-const INBOX = [
-  { ref: 'FT 2026/0148', format: 'PDF', current: true },
-  { ref: 'FT 2026/0151', format: 'Scan' },
-  { ref: 'GR 3307', format: 'Photo' },
-  { ref: 'INV-88412', format: 'E-invoice' },
-];
-
-// La ligne signalée : le prix facturé ne correspond pas à la commande.
-const FLAGGED = 'Azeite virgem extra 5 L';
-const LINES = INVOICE_LINES.map((l) => ({ ...l, flag: l.label === FLAGGED }));
+const LINE_ITEMS = LINES.map((l, i) => ({ ...l, flag: i === FLAGGED }));
+const flagged = LINES[FLAGGED];
 
 const CHECKS = [
   { label: 'Supplier', value: 'Matched to code F-0217', at: 1 },
-  { label: 'Order', value: `PO ${INVOICE_ORDER}, 3 of 3 lines found`, at: 2 },
-  { label: 'Prices', value: '1 line differs from the order', at: 3 },
+  { label: 'Order', value: `PO ${ORDER_REF}, 3 of 3 lines found`, at: 2 },
+  { label: 'Price', value: '1 line above the agreed price', at: 3 },
   { label: 'ERP', value: 'Entry prepared, posted once validated', at: 4 },
 ];
 
 const FINAL = 4;
-const paperLabel = `Illustrative supplier invoice ${INVOICE.heading}, total ${INVOICE.total?.value}. The amount of ${FLAGGED} is circled.`;
+const paperLabel = `Illustrative Portuguese supplier invoice ${INVOICE.heading}, total ${INVOICE.total?.value} euros. The amount of ${flagged.printed} is circled.`;
 ---
 
 <figure class="inv" data-inv data-step={FINAL}>
   <div class="paper" role="img" aria-label={paperLabel}>
-    <div lang="pt-PT">
+    <div lang={INVOICE.lang}>
       <p class="paper-head">{INVOICE.heading}</p>
       <table>
         <tbody>
           <tr><td>Fornecedor</td><td class="n"><span class="redact"></span></td></tr>
           <tr><td>NIF</td><td class="n"><span class="redact"></span></td></tr>
-          <tr><td>Encomenda</td><td class="n">{INVOICE_ORDER}</td></tr>
+          <tr><td>Encomenda</td><td class="n">{ORDER_REF}</td></tr>
         </tbody>
       </table>
       <div class="paper-rule"></div>
       <table>
         <tbody>
-          {LINES.map((l) => (
+          {LINE_ITEMS.map((l) => (
             <tr>
-              <td>{l.label}</td>
+              <td>{l.printed}</td>
               <td class="n">
                 {l.flag ? (
                   <span class="circled">
-                    {l.value}
+                    {l.printedValue}
                     <svg class="circle" viewBox="0 0 100 44" preserveAspectRatio="none">
                       <path d="M8 24C9 10 34 4 56 5c22 1 39 7 38 19-1 12-24 16-47 15C24 38 7 34 8 22" pathLength="100"></path>
                     </svg>
                   </span>
                 ) : (
-                  l.value
+                  l.printedValue
                 )}
               </td>
             </tr>
@@ -90,13 +99,13 @@ const paperLabel = `Illustrative supplier invoice ${INVOICE.heading}, total ${IN
   </div>
 
   <div class="win">
-    <div class="rail" aria-hidden="true">
+    <div class="rail">
       <p class="rail-h">Inbox</p>
       <ul>
         {INBOX.map((d) => (
-          <li class={d.current ? 'is-current' : undefined}>
+          <li class={d.current ? 'is-current' : undefined} aria-current={d.current ? 'true' : undefined}>
             <span class="rail-ref">{d.ref}</span>
-            <span class="rail-format">{d.format}</span>
+            <span class="rail-format">{d.language} · {d.format}</span>
           </li>
         ))}
       </ul>
@@ -105,7 +114,7 @@ const paperLabel = `Illustrative supplier invoice ${INVOICE.heading}, total ${IN
     <div class="win-main">
       <header class="win-head">
         <div class="win-id">
-          <span class="win-ref">{INVOICE.heading.replace('FATURA ', '')}</span>
+          <span class="win-ref">Invoice {INVOICE.heading.replace('FATURA ', '')}</span>
           <span class="win-supplier">Supplier <span class="redact" role="img" aria-label="Redacted"></span></span>
         </div>
         <div class="win-status">
@@ -118,9 +127,12 @@ const paperLabel = `Illustrative supplier invoice ${INVOICE.heading}, total ${IN
         <div class="win-col">
           <p class="col-h">Invoice lines</p>
           <ul class="lines">
-            {LINES.map((l) => (
+            {LINE_ITEMS.map((l) => (
               <li class={l.flag ? 'line is-flag' : 'line'}>
-                <span class="line-label" lang="pt-PT">{l.label}</span>
+                <span class="line-label">
+                  {l.en}
+                  <span class="line-printed" lang={INVOICE.lang}>{l.printed}</span>
+                </span>
                 <span class="line-amount">{l.value}</span>
                 <span class="line-mark" aria-hidden="true">
                   {l.flag ? (
@@ -138,7 +150,7 @@ const paperLabel = `Illustrative supplier invoice ${INVOICE.heading}, total ${IN
             ))}
             <li class="line line-total">
               <span class="line-label">Total</span>
-              <span class="line-amount">{INVOICE.total?.value}</span>
+              <span class="line-amount">{INVOICE_TOTAL}</span>
               <span class="line-mark"></span>
             </li>
           </ul>
@@ -164,9 +176,9 @@ const paperLabel = `Illustrative supplier invoice ${INVOICE.heading}, total ${IN
             <path d="M8 4.6v4.4"></path>
             <path d="M8 11.3v.1"></path>
           </svg>
-          <span>Flagged: <span lang="pt-PT">{FLAGGED}</span></span>
+          <span>Flagged: {flagged.en}</span>
         </p>
-        <p class="flag-why">Invoiced at 96,20. The order says 92,40, a 4,1&nbsp;% difference.</p>
+        <p class="flag-why">Invoiced at {INVOICED_PRICE}. The agreed price is {AGREED_PRICE}, a {PRICE_GAP} difference.</p>
       </div>
 
       <footer class="win-foot">
@@ -177,7 +189,7 @@ const paperLabel = `Illustrative supplier invoice ${INVOICE.heading}, total ${IN
   </div>
 
   <figcaption class="inv-cap">
-    <span>{cases.invoices.client}. Fictional invoice, no customer data.</span>
+    <span>{cases.automation.client}. Fictional documents, no customer data.</span>
     <button class="replay" type="button" data-control hidden>Replay the check</button>
   </figcaption>
 </figure>
@@ -379,7 +391,8 @@ const paperLabel = `Illustrative supplier invoice ${INVOICE.heading}, total ${IN
     box-shadow: var(--shadow-win);
   }
 
-  /* La boîte de réception : un format par pièce, c'est tout le propos. */
+  /* La boîte de réception : une langue et un format par pièce, c'est tout
+     le propos. L'écran, lui, reste en anglais. */
   .rail {
     background: var(--paper-2);
     border-right: 1px solid var(--frame);
@@ -410,6 +423,10 @@ const paperLabel = `Illustrative supplier invoice ${INVOICE.heading}, total ${IN
   .rail-ref {
     font-weight: 600;
     font-variant-numeric: tabular-nums;
+  }
+
+  .rail-format {
+    white-space: nowrap;
   }
 
   .win-main {
@@ -514,11 +531,13 @@ const paperLabel = `Illustrative supplier invoice ${INVOICE.heading}, total ${IN
     gap: 12px;
   }
 
+  /* Alignées sur la première ligne : le nom au catalogue, le montant et la
+     marque se lisent ensemble, le texte imprimé passe dessous. */
   .line {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto 18px;
     gap: 12px;
-    align-items: center;
+    align-items: start;
     font-size: 15px;
     line-height: 1.35;
     color: var(--black);
@@ -529,11 +548,25 @@ const paperLabel = `Illustrative supplier invoice ${INVOICE.heading}, total ${IN
     color: var(--stone);
   }
 
+  .line-label {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    min-width: 0;
+  }
+
+  /* Le texte tel qu'imprimé sur la pièce, sous le nom au catalogue. */
+  .line-printed {
+    font-size: 13px;
+    color: var(--stone);
+  }
+
   .line-amount {
     font-variant-numeric: tabular-nums;
   }
 
   .line-total {
+    align-items: baseline;
     padding-top: 12px;
     border-top: 1px solid var(--frame);
     font-weight: 600;
@@ -542,6 +575,7 @@ const paperLabel = `Illustrative supplier invoice ${INVOICE.heading}, total ${IN
   .line-mark {
     display: grid;
     place-items: center;
+    padding-top: 2px;
   }
 
   .mark-tick,
@@ -769,12 +803,23 @@ const paperLabel = `Illustrative supplier invoice ${INVOICE.heading}, total ${IN
     }
   }
 
+  /* Plus de rail latéral : la boîte de réception passe au-dessus, en deux
+     colonnes, pour garder les quatre langues à l'écran. */
   @media (max-width: 900px) {
     .win {
       grid-template-columns: minmax(0, 1fr);
     }
     .rail {
-      display: none;
+      border-right: 0;
+      border-bottom: 1px solid var(--frame);
+      padding: 14px 0 10px;
+    }
+    .rail ul {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .rail li {
+      padding: 8px 18px;
     }
   }
 

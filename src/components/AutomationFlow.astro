@@ -1,0 +1,610 @@
+---
+import InvoiceRun from './InvoiceRun.astro';
+import { cases } from '../facts';
+import {
+  LINES,
+  FLAGGED,
+  ORDER_DRAFT,
+  PRICE_CHECK,
+  INBOX,
+  MATCH,
+  ORDER_REF,
+  DELIVERY_REF,
+  INVOICE_REF,
+  AGREED_PRICE,
+} from '../data/documents';
+
+// L'automatisation des achats et de la finance, en quatre étapes. Demandée
+// par Karim le 2026-10-09 : montrer la chaîne entière plutôt que la seule
+// lecture des factures, que d'autres copient facilement. Son récit : les
+// commandes suivent la prévision, un seul meilleur prix vaut pour tous les
+// sites, chaque facture est contrôlée contre la commande et ce prix, le
+// rapprochement et la clôture en sortent d'eux-mêmes.
+//
+// Dessin : les quatre étapes côte à côte sur un même filet noir, un point
+// cuivre par étape (c'est l'intelligence qui les tient). Chacune porte un
+// fragment de l'écran qui la fait. La facture, étape 3, a son gros plan
+// juste en dessous : c'est la démonstration InvoiceRun, devenue une étape
+// parmi quatre.
+//
+// Les mêmes trois articles traversent les quatre écrans, et l'huile d'olive
+// est la ligne qui accroche : commandée, achetée au prix convenu, facturée
+// plus cher, mise en attente de validation avant la clôture. Tout est fictif
+// (src/data/documents.ts). Cuivre : ce que fait l'intelligence. Noir : ce
+// qui revient à une personne (confirmer la commande).
+//
+// Les fragments sont des images d'écran : role="img" et une description
+// complète dans aria-label. Rien ne bouge ici ; le seul mouvement de la
+// section est la passe de la démonstration de l'étape 3.
+
+const steps = cases.automation.steps;
+const num = (i: number) => String(i + 1).padStart(2, '0');
+
+const tick = 'M3 8.6l3.2 3.1L13 4.6';
+
+const orderLabel = `Illustration. ${ORDER_DRAFT.heading} for ${ORDER_DRAFT.when}, drafted from the forecast: ${ORDER_DRAFT.rows
+  .map((r) => `${r.short}, forecast ${r.expected}, in stock ${r.stock}, order ${r.order}`)
+  .join('; ')}. The order waits for the site to confirm it.`;
+
+const agreed = PRICE_CHECK.offers.find((o) => o.agreed);
+const priceLabel = `Illustration. Prices for ${PRICE_CHECK.item} from three suppliers. The price the group agreed, ${agreed?.price} from ${agreed?.supplier}, is applied to every site.`;
+
+const formatName = (f: string) => (f === 'PDF' ? f : f.toLowerCase());
+const stackLabel = `Illustration. Four supplier invoices in four languages and formats: ${INBOX.map(
+  (d) => `${d.language} ${formatName(d.format)}`
+).join(', ')}.`;
+
+const matchLabel = `Illustration. Order ${ORDER_REF} matched line by line against delivery note ${DELIVERY_REF} and invoice ${INVOICE_REF}. ${MATCH.rows
+  .filter((r) => !r.flagged)
+  .map((r) => r.short)
+  .join(' and ')} agree everywhere. ${MATCH.rows.find((r) => r.flagged)?.short} waits for validation before it goes to the close.`;
+
+// Pile de l'étape 3 : la facture lue en dernier, au premier plan. Sa
+// dernière ligne visible est celle de l'huile, signalée dans le gros plan.
+const stack = [...INBOX].reverse();
+const flaggedLine = LINES[FLAGGED];
+---
+
+<div class="flow">
+  <ol class="steps">
+    <li class="step">
+      <p class="step-n tabular" aria-hidden="true">{num(0)}</p>
+      <h3 class="step-title">{steps[0].title}</h3>
+      <p class="step-body">{steps[0].body}</p>
+      <div class="frag" role="img" aria-label={orderLabel}>
+        <div class="frag-head">
+          <span class="frag-t">{ORDER_DRAFT.heading}</span>
+          <span class="frag-meta"><i class="act"></i>From the forecast</span>
+          <span class="frag-sub">{ORDER_DRAFT.when}</span>
+        </div>
+        <table class="t-order">
+          <colgroup><col /><col class="c-forecast" /><col class="c-stock" /><col class="c-order" /></colgroup>
+          <thead>
+            <tr><th>Item</th><th>Forecast</th><th>Stock</th><th>Order</th></tr>
+          </thead>
+          <tbody>
+            {ORDER_DRAFT.rows.map((r) => (
+              <tr><td>{r.short}</td><td>{r.expected}</td><td>{r.stock}</td><td class="strong">{r.order}</td></tr>
+            ))}
+          </tbody>
+        </table>
+        <div class="frag-foot">
+          <span class="frag-note">The site confirms</span>
+          <span class="frag-btn">Confirm order</span>
+        </div>
+      </div>
+    </li>
+
+    <li class="step">
+      <p class="step-n tabular" aria-hidden="true">{num(1)}</p>
+      <h3 class="step-title">{steps[1].title}</h3>
+      <p class="step-body">{steps[1].body}</p>
+      <div class="frag" role="img" aria-label={priceLabel}>
+        <div class="frag-head">
+          <span class="frag-t">{PRICE_CHECK.item}</span>
+        </div>
+        <table class="t-price">
+          <colgroup><col /><col class="c-price" /><col class="c-agreed" /></colgroup>
+          <tbody>
+            {PRICE_CHECK.offers.map((o) => (
+              <tr class={o.agreed ? 'is-agreed' : undefined}>
+                <td>{o.supplier}</td>
+                <td>{o.price}</td>
+                <td class="agreed">{o.agreed ? 'Agreed' : ''}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <div class="frag-foot">
+          <span class="frag-meta"><i class="act"></i>Applied to every site</span>
+          <span class="frag-strong tabular">{AGREED_PRICE}</span>
+        </div>
+      </div>
+    </li>
+
+    <li class="step">
+      <p class="step-n tabular" aria-hidden="true">{num(2)}</p>
+      <h3 class="step-title">{steps[2].title}</h3>
+      <p class="step-body">{steps[2].body}</p>
+      <div class="stack" role="img" aria-label={stackLabel}>
+        {stack.map((d) => (
+          <div class={d.current ? 'slip is-front' : 'slip'}>
+            <p class="slip-head">{d.head}</p>
+            {d.current && (
+              <>
+                <p class="slip-row"><span>Fornecedor</span><span class="slip-redact"></span></p>
+                <p class="slip-row"><span>Encomenda</span><span>{ORDER_REF}</span></p>
+                <p class="slip-row"><span>{flaggedLine.printed}</span><span>{flaggedLine.printedValue}</span></p>
+              </>
+            )}
+          </div>
+        ))}
+      </div>
+    </li>
+
+    <li class="step">
+      <p class="step-n tabular" aria-hidden="true">{num(3)}</p>
+      <h3 class="step-title">{steps[3].title}</h3>
+      <p class="step-body">{steps[3].body}</p>
+      <div class="frag" role="img" aria-label={matchLabel}>
+        <div class="frag-head">
+          <span class="frag-t">Order {ORDER_REF}</span>
+          <span class="frag-meta"><i class="act"></i>Matched as it arrives</span>
+        </div>
+        <table class="grid3">
+          <colgroup><col /><col class="c-m1" /><col class="c-m2" /><col class="c-m3" /></colgroup>
+          <thead>
+            <tr><th></th><th>Order</th><th>Delivery</th><th>Invoice</th></tr>
+          </thead>
+          <tbody>
+            {MATCH.rows.map((r) => (
+              <tr class={r.flagged ? 'is-flag' : undefined}>
+                <td>{r.short}</td>
+                <td class="ck"><svg class="tick" viewBox="0 0 16 16"><path d={tick}></path></svg></td>
+                <td class="ck"><svg class="tick" viewBox="0 0 16 16"><path d={tick}></path></svg></td>
+                <td class="ck">
+                  {r.flagged ? (
+                    <svg class="flag" viewBox="0 0 16 16">
+                      <circle cx="8" cy="8" r="6.6"></circle>
+                      <path d="M8 4.6v4.4"></path>
+                      <path d="M8 11.3v.1"></path>
+                    </svg>
+                  ) : (
+                    <svg class="tick" viewBox="0 0 16 16"><path d={tick}></path></svg>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <div class="frag-foot">
+          <span class="frag-note">Goes to the close once validated</span>
+        </div>
+      </div>
+    </li>
+  </ol>
+
+  <p class="flow-cap">Illustrative screens and documents, with fictional data.</p>
+
+  <div class="closeup">
+    <h3 class="closeup-label"><span class="tabular">{num(2)}</span> Up close: one invoice, checked</h3>
+    <InvoiceRun />
+  </div>
+</div>
+
+<style>
+  /* ---------- Les quatre étapes, sur un même filet ---------- */
+
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    column-gap: var(--gap);
+    border-top: 1px solid var(--fg);
+  }
+
+  /* Sous-grille : numéros, titres, textes et fragments s'alignent d'une
+     étape à l'autre, quelle que soit la longueur des textes. Sans
+     sous-grille, chaque étape reste lisible, simplement moins alignée. */
+  .step {
+    position: relative;
+    display: grid;
+    grid-row: span 4;
+    grid-template-rows: subgrid;
+    row-gap: 0;
+    align-content: start;
+    padding-top: 22px;
+    min-width: 0;
+  }
+
+  /* Le point de l'étape, posé sur le filet. Cuivre : c'est l'intelligence
+     qui tient chacune des quatre. */
+  .step::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: -5px;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--dot);
+  }
+
+  .step-n {
+    font-size: var(--t-small);
+    color: var(--meta);
+  }
+
+  .step-title {
+    margin-top: 14px;
+    font-size: clamp(21px, 1.75vw, 27px);
+    line-height: 1.12;
+    letter-spacing: -0.022em;
+    max-width: 15ch;
+  }
+
+  .step-body {
+    margin-top: 14px;
+    font-size: 16px;
+    line-height: 1.55;
+    color: var(--fg-2);
+    max-width: 34ch;
+  }
+
+  /* ---------- Fragments d'écran ----------
+     Le même cadre que la fenêtre de la démonstration, sans son ombre : ce
+     sont des vignettes, pas l'objet principal. */
+
+  .frag {
+    align-self: start;
+    margin-top: 26px;
+    background: var(--white);
+    color: var(--black);
+    border: 1px solid var(--frame);
+    border-radius: 8px;
+    overflow: hidden;
+    font-size: 14px;
+    line-height: 1.35;
+  }
+
+  .frag-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 4px 12px;
+    padding: 13px 16px 12px;
+    border-bottom: 1px solid var(--frame);
+  }
+
+  .frag-t {
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  .frag-meta {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 13px;
+    color: var(--stone);
+  }
+
+  .frag-sub {
+    flex-basis: 100%;
+    font-size: 13px;
+    color: var(--stone);
+  }
+
+  /* Le point d'activité : c'est Syntexia qui a préparé l'écran. */
+  .act {
+    width: 7px;
+    height: 7px;
+    flex: none;
+    border-radius: 50%;
+    background: var(--copper);
+  }
+
+  /* Colonnes fixes : les chiffres gardent leur place, le nom de l'article
+     passe à la ligne s'il le faut, rien ne sort du cadre. */
+  .frag table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .c-forecast {
+    width: 66px;
+  }
+
+  .c-stock {
+    width: 46px;
+  }
+
+  .c-order {
+    width: 58px;
+  }
+
+  .c-price {
+    width: 84px;
+  }
+
+  .c-agreed {
+    width: 78px;
+  }
+
+  .c-m1 {
+    width: 50px;
+  }
+
+  .c-m2 {
+    width: 62px;
+  }
+
+  .c-m3 {
+    width: 66px;
+  }
+
+  .frag th {
+    padding: 11px 4px 5px;
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--stone);
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  .frag td {
+    padding: 6px 4px;
+    text-align: right;
+    vertical-align: baseline;
+  }
+
+  .frag th:first-child,
+  .frag td:first-child {
+    padding-left: 16px;
+    text-align: left;
+  }
+
+  .frag th:last-child,
+  .frag td:last-child {
+    padding-right: 16px;
+  }
+
+  .frag tbody tr:first-child td {
+    padding-top: 9px;
+  }
+
+  .frag tbody tr:last-child td {
+    padding-bottom: 12px;
+  }
+
+  .frag .strong,
+  .frag .is-agreed td {
+    font-weight: 600;
+  }
+
+  /* L'accord sur le prix est une décision du groupe : en noir. Ce que fait
+     l'intelligence, l'appliquer à tous les sites, porte le point cuivre. */
+  .frag td.agreed {
+    font-size: 13px;
+    font-weight: 560;
+    color: var(--black);
+  }
+
+  /* Cellule de coche. Pas de classe « mark » ici : c'est celle du mark de
+     la marque (base.css), qui en ferait une grille de points. */
+  .frag td.ck {
+    width: 46px;
+    vertical-align: middle;
+  }
+
+  .tick,
+  .flag {
+    display: inline-block;
+    width: 15px;
+    height: 15px;
+    max-width: none;
+    fill: none;
+    stroke: var(--copper);
+    stroke-width: 1.9;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .grid3 td.ck {
+    width: auto;
+    text-align: center;
+  }
+
+  .grid3 th {
+    text-align: center;
+  }
+
+  .grid3 th:first-child {
+    text-align: left;
+  }
+
+  .frag-foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px 16px;
+    padding: 12px 16px 13px;
+    border-top: 1px solid var(--frame);
+  }
+
+  .frag-note {
+    font-size: 13px;
+    color: var(--stone);
+  }
+
+  .frag-strong {
+    font-size: 15px;
+    font-weight: 600;
+  }
+
+  /* La décision revient à une personne : en noir. Pas cliquable, c'est une
+     reproduction. */
+  .frag-btn {
+    font-size: 13px;
+    font-weight: 560;
+    padding: 8px 12px;
+    background: var(--black);
+    color: var(--white);
+    white-space: nowrap;
+  }
+
+  /* ---------- Étape 3 : quatre pièces, quatre langues ----------
+     La pile se lit de haut en bas : chaque feuille ne montre que son
+     en-tête, la facture portugaise, lue dans le gros plan, passe devant. */
+
+  .stack {
+    position: relative;
+    align-self: start;
+    margin-top: 26px;
+    height: 236px;
+  }
+
+  .slip {
+    position: absolute;
+    left: 6px;
+    right: 6px;
+    height: 132px;
+    padding: 12px 16px;
+    background: var(--white);
+    color: var(--typewriter);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    line-height: 1.5;
+    box-shadow: var(--shadow-sheet);
+  }
+
+  .slip-head {
+    font-weight: 700;
+    color: var(--black);
+    letter-spacing: 0.02em;
+    max-width: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: clip;
+  }
+
+  .slip-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    max-width: none;
+    color: var(--typewriter);
+    white-space: nowrap;
+  }
+
+  .slip-row span:first-child {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .slip-head + .slip-row {
+    margin-top: 10px;
+  }
+
+  .slip-redact {
+    display: inline-block;
+    width: 64px;
+    height: 9px;
+    margin-top: 0.45em;
+    background: var(--black);
+  }
+
+  /* Ordre de la pile, du fond vers l'avant : anglais, français, espagnol,
+     portugais. Chaque feuille a sa pose, la photo penche le plus. */
+  .slip:nth-child(1) {
+    top: 0;
+    transform: rotate(0.9deg);
+  }
+
+  .slip:nth-child(2) {
+    top: 34px;
+    transform: rotate(-1.4deg);
+  }
+
+  .slip:nth-child(3) {
+    top: 68px;
+    transform: rotate(0.5deg);
+  }
+
+  .slip.is-front {
+    top: 102px;
+    transform: rotate(-0.4deg);
+  }
+
+  /* Les fragments et la pile sont des illustrations : on le dit, en clair,
+     sous les quatre étapes. */
+  .flow-cap {
+    margin-top: 28px;
+    font-size: var(--t-small);
+    line-height: var(--lh-small);
+    color: var(--meta);
+  }
+
+  /* ---------- Gros plan de l'étape 3 ---------- */
+
+  .closeup {
+    margin-top: clamp(64px, 7vw, 112px);
+  }
+
+  .closeup-label {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    margin-bottom: clamp(28px, 3vw, 40px);
+    padding-top: 16px;
+    border-top: 1px solid var(--rule);
+    font-size: 16px;
+    line-height: 1.4;
+    letter-spacing: -0.005em;
+    font-weight: 560;
+    color: var(--fg);
+    max-width: none;
+  }
+
+  .closeup-label .tabular {
+    font-size: var(--t-small);
+    font-weight: 400;
+    color: var(--meta);
+  }
+
+  /* ---------- Adaptation ----------
+     Deux étapes par ligne sous 1240 px, une seule sous 760 px. */
+
+  @media (max-width: 1239px) {
+    .steps {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      border-top: 0;
+    }
+    .step {
+      border-top: 1px solid var(--fg);
+    }
+    .step:nth-child(n + 3) {
+      margin-top: clamp(56px, 7vw, 88px);
+    }
+  }
+
+  @media (max-width: 760px) {
+    .steps {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .step {
+      display: block;
+    }
+    .step:nth-child(n + 2) {
+      margin-top: 56px;
+    }
+    .step-title,
+    .step-body {
+      max-width: none;
+    }
+  }
+</style>

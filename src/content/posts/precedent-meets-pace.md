@@ -3,6 +3,7 @@ title: "Precedent meets pace"
 description: "How AI is rewriting the economics of legal work, and why a profession built on precedent has no precedent for this."
 date: 2026-05-23
 author: "Karim Vissangy"
+topic: "Legal"
 ---
 
 The law is the only profession that builds its future entirely out of its past. Every argument leans on precedent, every contract on a clause that worked before, every piece of advice on the accumulated judgement of those who came earlier. It is a discipline engineered to move carefully, and for good reason. *Carelessness in law is not inefficiency; it is malpractice.*

@@ -1,13 +1,20 @@
 ---
 import BrandMark from './BrandMark.astro';
+import Programmes from './Programmes.astro';
 import { legalEntity, companiesHouseUrl, linkedinCompany, contactEmail, securityIsLinked } from '../facts';
+
+// Pied de page : la mention légale, puis, depuis le 2026-10-09, les deux
+// programmes Anthropic (Karim : « also in the footer »), et les liens.
 ---
 <footer class="footer on-black">
   <div class="shell">
     <div class="footer-inner">
       <div class="footer-legal">
         <BrandMark />
-        <small><a href={companiesHouseUrl} rel="noopener">{legalEntity.value}</a></small>
+        <div class="footer-lines">
+          <small><a href={companiesHouseUrl} rel="noopener">{legalEntity.value}</a></small>
+          <Programmes variant="footer" />
+        </div>
       </div>
 
       <div class="footer-links">

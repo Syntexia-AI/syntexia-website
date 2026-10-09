@@ -5,6 +5,35 @@ Paquet de revue de la passe complète. Branche `refonte-2026-09`, 2026-08-31.
 
 ---
 
+## 0 bis. Passe du 2026-10-09, retours de Karim
+
+Sur `focus-automation-voice`, décrite dans `docs/DA-2026-10.md` (section
+« Recentrage du 2026-10-09 ») :
+
+- automatisation montrée comme une chaîne achats et finance en quatre
+  étapes, la démonstration de facture devenue l'étape 3 ;
+- factures en quatre langues (PT, ES, FR, EN), écran en anglais ;
+- Claude Partner Network et Claude Startups cités ensemble sous les boutons
+  de l'accueil, dans la bande partenariat, le pied de page et About ;
+- bas du site rééquilibré : trois derniers articles sur l'accueil, sujet de
+  chaque article affiché, deux articles ajoutés (automatisation, voix), page
+  Security et phrase de recrutement sorties de l'audit.
+
+À trancher avant la mise en ligne :
+
+1. **Le deck de Karim n'a pas été lu.** Le récit des quatre étapes suit son
+   message ; à relire contre le deck.
+2. **Les deux nouveaux articles** (`reading-the-invoice-is-the-easy-part`,
+   `what-a-phone-line-is-not-allowed-to-say`) sont signés « Syntexia » et
+   n'ont pas été relus par Karim. Leurs règles sont des règles de
+   conception, écrites comme telles (« Rules we build to »).
+3. **Troisième fiche équipe** : en attente de l'accord de la personne et de
+   ses éléments ; son nom n'entre dans ce dépôt public qu'après.
+
+Réglé pendant la passe : le nom « Claude Startups » et le statut de membre
+sont ceux de la page du programme (claude.com/programs/startups, consultée
+le 2026-10-09).
+
 ## 0. État au 2026-10-02, à lire d'abord
 
 Ce paquet décrit l'état du 2026-08-31. Depuis, sur la branche

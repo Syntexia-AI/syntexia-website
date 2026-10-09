@@ -3,6 +3,7 @@ title: "The number that is almost right"
 description: "In regulated work, the dangerous answer is not the one that is obviously wrong. It is the one that looks fine."
 date: 2026-08-14
 author: "Baptiste Bouault"
+topic: "Practice"
 ---
 
 During testing, a system I had built answered a question about a single store with a correct number. The arithmetic was right. The data was real. The number was the total for the whole network.

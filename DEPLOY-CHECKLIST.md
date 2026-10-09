@@ -77,7 +77,7 @@ curl -s -o /dev/null -w "%{http_code}\n" $PREVIEW/design/syntexia-home-4da.html
 Les trois doivent renvoyer `404`. **C'est un point de contrôle sérieux :** ces fichiers décrivent les défauts du site et contiennent la maquette de travail. S'ils répondent `200`, arrête tout.
 
 ```
-curl -s $PREVIEW/ | grep -c "We read the paperwork nobody wants to"
+curl -s $PREVIEW/ | grep -c "It starts before the"
 ```
 Doit renvoyer au moins `1`, ce qui prouve que le texte est bien dans le HTML sans exécuter de JavaScript.
 
@@ -178,7 +178,7 @@ curl -sI https://syntexia.ai | head -1
 Doit renvoyer `308` vers `https://www.syntexia.ai` (Vercel répond 308 aux redirections permanentes). **C'est le seul endroit où cette redirection est testable.** Si elle ne fonctionne pas, vérifie dans Vercel que le domaine apex est bien rattaché au projet.
 
 ```
-for r in / /about /team /blog /security /legal /posts/precedent-meets-pace /posts/the-quiet-revolution-coming-to-audit /posts/the-number-that-is-almost-right /posts/the-order-a-firm-works-in /robots.txt /sitemap.xml /favicon.ico /og-image.png; do
+for r in / /about /team /blog /security /legal /posts/precedent-meets-pace /posts/the-quiet-revolution-coming-to-audit /posts/the-number-that-is-almost-right /posts/the-order-a-firm-works-in /posts/reading-the-invoice-is-the-easy-part /posts/what-a-phone-line-is-not-allowed-to-say /robots.txt /sitemap.xml /favicon.ico /og-image.png; do
   printf "%-50s %s\n" "$r" "$(curl -s -o /dev/null -w '%{http_code}' https://www.syntexia.ai$r)"
 done
 ```
@@ -186,7 +186,7 @@ Toutes doivent renvoyer `200`.
 
 ```
 curl -sI https://www.syntexia.ai/ | grep -iE "strict-transport|content-security|x-content-type|x-frame|referrer-policy|permissions-policy|cross-origin-opener"
-curl -s https://www.syntexia.ai/ | grep -c "We read the paperwork nobody wants to"
+curl -s https://www.syntexia.ai/ | grep -c "It starts before the"
 curl -s -o /dev/null -w "%{http_code}\n" https://www.syntexia.ai/docs/CLAIMS.md
 ```
 Sept en-têtes présents. Le `grep` au moins `1`. Le dernier `404`.

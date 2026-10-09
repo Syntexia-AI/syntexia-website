@@ -39,6 +39,7 @@ const articleLd = {
     <div class="shell">
       <p class="meta">
         <time class="tabular" datetime={iso}>{human}</time>
+        <span class="topic">{post.data.topic}</span>
         <span>{post.data.author}</span>
       </p>
       <h1>{post.data.title}</h1>
@@ -53,7 +54,8 @@ const articleLd = {
 
 <style>
   .first { border-top: 0; }
-  .meta { display: flex; gap: var(--s-5); font-size: var(--t-small); color: var(--meta); margin-bottom: var(--s-5); }
+  .meta { display: flex; flex-wrap: wrap; gap: var(--s-2) var(--s-5); font-size: var(--t-small); color: var(--meta); margin-bottom: var(--s-5); }
+  .meta .topic { color: var(--fg); font-weight: 560; }
   .prose { margin-top: var(--s-7); max-width: var(--measure); }
   .prose :global(p) { margin-bottom: var(--s-5); }
   .prose :global(h2) { margin: var(--s-8) 0 var(--s-4); }

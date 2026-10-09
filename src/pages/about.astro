@@ -1,15 +1,22 @@
 ---
 import Base from '../layouts/Base.astro';
-import { partnerNetworkUrl, location, sectors } from '../facts';
+import Programmes from '../components/Programmes.astro';
+import { location, sectors, programmes, partnerNetwork, startupProgramme } from '../facts';
 
 // Copy repris de about.html, nettoyé.
 // Ce qui a été retiré et pourquoi est dans docs/REVIEW.md, section « Retiré »,
 // avec la ligne de restauration de chaque passage.
+//
+// 2026-10-09 : la section partenariat n'attend plus une URL publique pour
+// s'afficher. Elle cite les deux programmes Anthropic (Karim : « show both
+// together … and on About »), avec leurs statuts tirés de facts.ts. La
+// description du Claude Partner Network est celle de la page d'annonce
+// d'Anthropic (partnerNetwork.value.description dans facts.ts).
 ---
 
 <Base
   title="About Syntexia"
-  description="Syntexia builds voice and document systems that run inside the tools a company already uses."
+  description="Syntexia builds automation and voice systems that run inside the tools a company already uses."
   path="/about"
 >
   <section class="section first">
@@ -53,6 +60,30 @@ import { partnerNetworkUrl, location, sectors } from '../facts';
     </div>
   </section>
 
+  {programmes.length > 0 && (
+    <section class="section" aria-labelledby="claude-title">
+      <div class="shell">
+        <h2 id="claude-title">We build with Claude</h2>
+        <div class="prose">
+          {partnerNetwork && (
+            <p>
+              Syntexia is a {partnerNetwork.value.tier} in the {partnerNetwork.value.programme},{' '}
+              {partnerNetwork.value.description}{startupProgramme ? <>, and a member of {startupProgramme.value.name}</> : null}.
+            </p>
+          )}
+          <p>
+            Claude is the model family we believe sets the standard for the kind of careful,
+            high-stakes work our customers operate in. The models change. What does not
+            change is that a person makes the decision.
+          </p>
+        </div>
+        <div class="progs">
+          <Programmes variant="register" />
+        </div>
+      </div>
+    </section>
+  )}
+
   <section class="section">
     <div class="shell">
       <h2>What we build for</h2>
@@ -81,20 +112,6 @@ import { partnerNetworkUrl, location, sectors } from '../facts';
     </div>
   </section>
 
-  {partnerNetworkUrl && (
-    <section class="section">
-      <div class="shell">
-        <h2>Anthropic Claude Partner Network</h2>
-        <div class="prose">
-          <p>
-            We build with Claude, the model family we believe sets the standard for the
-            kind of careful, high-stakes work our customers operate in.
-            <a href={partnerNetworkUrl.value} rel="noopener">Read the announcement</a>.
-          </p>
-        </div>
-      </div>
-    </section>
-  )}
 
   <section class="section">
     <div class="shell">
@@ -110,6 +127,7 @@ import { partnerNetworkUrl, location, sectors } from '../facts';
   .first { border-top: 0; }
   .prose { margin-top: var(--s-6); display: flex; flex-direction: column; gap: var(--s-5); }
   .where { font-size: 19px; color: var(--fg); font-weight: 500; }
+  .progs { margin-top: var(--s-8); }
   .sectors {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));

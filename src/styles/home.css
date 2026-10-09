@@ -151,6 +151,14 @@
   gap: 16px 34px;
 }
 
+/* Les programmes Anthropic, juste sous les boutons (Karim, 2026-10-09). */
+.hero-progs {
+  grid-column: 7 / span 5;
+  grid-row: 3;
+  margin-top: 6px;
+  max-width: 520px;
+}
+
 /* ---------- Ce que fait la société, dès le premier écran ----------
    Deux lignes, chacune renvoie à sa démonstration. Placées sous le titre,
    à gauche, en face de la promesse et des boutons. */
@@ -207,7 +215,7 @@
   text-underline-offset: 0.25em;
 }
 
-/* ---------- Les deux cas : factures, puis voix ---------- */
+/* ---------- Les deux cas : achats et finance, puis voix ---------- */
 
 .case-intro {
   row-gap: 28px;
@@ -331,10 +339,23 @@
   text-decoration: none;
 }
 
-.post-date {
+.post-meta {
   grid-column: 1 / span 2;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
   font-size: var(--t-small);
+  line-height: var(--lh-small);
+}
+
+.post-date {
   color: var(--meta);
+}
+
+/* Le sujet de l'article : en noir, c'est ce qui permet de choisir. */
+.post-topic {
+  color: var(--fg);
+  font-weight: 560;
 }
 
 .post-title {
@@ -407,7 +428,8 @@
 
 @media (max-width: 1180px) {
   .hero-lead,
-  .hero-actions {
+  .hero-actions,
+  .hero-progs {
     grid-column: 6 / -1;
   }
   .post-title {
@@ -421,6 +443,7 @@
 @media (max-width: 900px) {
   .hero-lead,
   .hero-actions,
+  .hero-progs,
   .offers {
     grid-column: 1 / span 10;
   }
@@ -430,8 +453,11 @@
   .hero-actions {
     grid-row: 2;
   }
-  .offers {
+  .hero-progs {
     grid-row: 3;
+  }
+  .offers {
+    grid-row: 4;
   }
   .case-intro .h2,
   .case-text {
@@ -450,12 +476,17 @@
 @media (max-width: 760px) {
   .hero-lead,
   .hero-actions,
+  .hero-progs,
   .offers,
   .about-title,
-  .post-date,
+  .post-meta,
   .post-title,
   .post-desc {
     grid-column: 1 / -1;
+  }
+  .post-meta {
+    flex-direction: row;
+    gap: 14px;
   }
   .hero-title .l,
   .contact-title .l {

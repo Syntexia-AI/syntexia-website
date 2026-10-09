@@ -2,10 +2,9 @@
 import Base from '../../layouts/Base.astro';
 import { getCollection } from 'astro:content';
 import { monthYear } from '../../lib/format';
+import { sortPosts } from '../../lib/posts';
 
-const posts = (await getCollection('posts')).sort(
-  (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
-);
+const posts = sortPosts(await getCollection('posts'));
 ---
 
 <Base
@@ -19,7 +18,10 @@ const posts = (await getCollection('posts')).sort(
       <div class="list">
         {posts.map((p) => (
           <a class="row" href={`/posts/${p.id}`}>
-            <span class="row-date tabular">{monthYear(p.data.date)}</span>
+            <span class="row-meta">
+              <span class="row-date tabular">{monthYear(p.data.date)}</span>
+              <span class="row-topic">{p.data.topic}</span>
+            </span>
             <div class="row-body">
               <h2 class="row-title">{p.data.title}</h2>
               <span class="row-desc">{p.data.description}</span>
@@ -42,7 +44,9 @@ const posts = (await getCollection('posts')).sort(
     border-bottom: 1px solid var(--rule);
     text-decoration: none;
   }
-  .row-date { font-size: var(--t-small); color: var(--meta); }
+  .row-meta { display: flex; flex-direction: column; gap: 2px; font-size: var(--t-small); line-height: var(--lh-small); }
+  .row-date { color: var(--meta); }
+  .row-topic { color: var(--fg); font-weight: 560; }
   .row-body { display: block; }
   .row-title { display: block; font-size: var(--t-h3); font-weight: 600; line-height: var(--lh-h3); letter-spacing: -0.01em; }
   .row-desc { display: block; margin-top: var(--s-3); color: var(--fg-2); max-width: 62ch; }
@@ -50,5 +54,6 @@ const posts = (await getCollection('posts')).sort(
   .row:hover .row-title { text-decoration-color: currentColor; }
   @media (max-width: 640px) {
     .row { grid-template-columns: 1fr; gap: var(--s-2); }
+    .row-meta { flex-direction: row; gap: 14px; }
   }
 </style>
